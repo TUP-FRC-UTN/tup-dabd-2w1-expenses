@@ -1,0 +1,70 @@
+<!--LLamada al componente navbar de la libreria core del profe-->
+<app-navbar [menuItems]="items" (menuVisited)="onMenuVisited($event)" />
+
+<!--casos dependiendo de lo seleccionado en el navbar-->
+<div>
+    @switch (visibleSection) {
+    @case ('menu1') {
+    <p>Mostrar el componente de Lista de Gastos para Administrador</p>
+    <p>Aca iria el tema de el routing, que te mande a otro componente</p>
+    <p>NO llamariamos directamente al componente aca porque sino no seria routing</p>
+    }
+    @case ('menu2') {
+    <p>Mostrar el componente para registrar un Gasto</p>
+    }
+    @case ('menu3') {
+    <p>Componente desabilitado</p>
+    }
+    @default {
+    <h2>HOME</h2>
+    }
+    }
+</div>
+
+<!--Ejemplo de una tabla con Datatables, es solo ejemplo, se quita en el futuro-->
+<div class="container">
+    <table id="myTable" class="display">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Legajo</th>
+                <th>Edad</th>
+                <th>Curso</th>
+                <th>Grupo</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Mateo Di Francisco</td>
+                <td>111979</td>
+                <td>25</td>
+                <td>2W1</td>
+                <td>7</td>
+            </tr>
+            <tr>
+                <td>Pepito</td>
+                <td>123456</td>
+                <td>20</td>
+                <td>2W1</td>
+                <td>6</td>
+            </tr>
+            <tr>
+                <td>Juancito</td>
+                <td>333000</td>
+                <td>27</td>
+                <td>2W2</td>
+                <td>5</td>
+            </tr>
+            <tr>
+                <td>Ulises</td>
+                <td>200567</td>
+                <td>26</td>
+                <td>2W1</td>
+                <td>3</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!--para el routing-->
+<router-outlet />
