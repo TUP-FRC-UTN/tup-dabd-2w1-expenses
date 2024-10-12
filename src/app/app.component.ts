@@ -23,15 +23,7 @@ import 'datatables.net-bs5';
 export class AppComponent implements OnInit{
   
   ngOnInit(): void {
-      //para iniciar el datatables, configuraciones basicas
-      //se hace en el onInit para que se carge al cargar la pag
-    $('#myTable').DataTable({
-      paging: true,
-      searching: true,
-      ordering: true,
-      lengthChange: true,
-      pageLength: 10
-    });
+    
   }
   title = 'template-app';
 

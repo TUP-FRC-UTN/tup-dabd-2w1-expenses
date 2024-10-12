@@ -4,6 +4,11 @@ import { BillService } from '../services/bill.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
+//Imports para el DataTable
+import $ from 'jquery';
+import 'datatables.net'
+import 'datatables.net-bs5';
+
 @Component({
   selector: 'app-view-gastos-admin',
   standalone: true,
@@ -25,6 +30,17 @@ export class ViewGastosAdminComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    //Inicializacion del Datatables
+    $('#myTable').DataTable({
+      "language" : {
+        "url": "//cdn.datatables.net/plug-ins/2.1.8/i18n/es-ES.json"
+      },
+      paging : true,
+      searching : true,
+      ordering : true,
+      pageLength : 10,
+
+    });
   }
 
 
