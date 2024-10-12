@@ -26,7 +26,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   expense: Expense = {
     description: '',
     providerId: 1,
-    expenseDate: new Date(),
+    expenseDate: new Date(), 
     invoiceNumber: '',
     typeExpense: '',
     categoryId: 0,
@@ -163,7 +163,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       .registerExpense(this.expense, this.selectedFile ?? undefined)
       .subscribe(
         (response) => {
-          console.log('Gasto registrado exitosamente', response);
+          console.log('Gastoregistradoexitosamente', response);
         },
         (error) => {
           console.error('Error al registrar el gasto', error);
