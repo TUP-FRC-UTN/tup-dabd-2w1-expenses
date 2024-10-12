@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from "ngx-dabd-2w1-core";
 import { MenuItems } from 'ngx-dabd-2w1-core';
 
@@ -8,15 +8,18 @@ import { MenuItems } from 'ngx-dabd-2w1-core';
 import $ from 'jquery';
 import 'datatables.net'
 import 'datatables.net-bs5';
+import { ExpensesRegisterExpenseComponent } from "./components/expenses-register-expense/expenses-register-expense.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent],
+  imports: [RouterOutlet, NavbarComponent, ExpensesRegisterExpenseComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit{
+  
+  constructor(public router: Router) {}
   
   ngOnInit(): void {
       //para iniciar el datatables, configuraciones basicas

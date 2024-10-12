@@ -1,0 +1,309 @@
+
+<body style="background-color: #ffffff">
+  <div class="container-fluid">
+    <div
+      class="container p-2"
+      style="background-color: white; border-radius: 1%"
+    >
+      <h1 class="mb-3">Registrar Gasto</h1>
+      <form #form="ngForm" (ngSubmit)="save()">
+        <div class="mb-3 row">
+          <div class="col">
+            <label for="expenseDate" class="form-lable">Fecha de Gasto</label>
+            <input
+            [value]="today"
+              type="date"
+              name="expenseDate"
+              [(ngModel)]="expense.expenseDate"
+              id="expenseDate"
+              class="form-control"
+              [max]="today | date : 'yyyy-MM-dd'"
+              #fecha="ngModel"
+              required
+            />
+            @if(fecha.touched && fecha.invalid) {
+            <span class="text-danger">La fecha es requerida</span>
+            }
+          </div>
+        </div>
+        <div class="mb-3 row">
+          <div class="col">
+            <label for="invoiceNumber" class="form-lable"
+              >Número de Comprobante</label
+            >
+            <input
+              type="string"
+              name="invoiceNumber"
+              [(ngModel)]="expense.invoiceNumber"
+              id="invoiceNumber"
+              class="form-control"
+              #invoiceNumber="ngModel"
+              required
+            />
+            @if(invoiceNumber.touched && invoiceNumber.invalid) {
+            <span class="text-danger"
+              >El numero de comprobante es requerido</span
+            >
+            }
+          </div>
+          <div class="col">
+            <label for="receipt" class="form-lable">Comprobante</label>
+            <input
+              type="file"
+              name="receipt"
+              id="receipt"
+              class="form-control"
+              (change)="onFileSelected($event)"
+              accept="image/*,.pdf"
+            />
+          </div>
+        </div>
+        <div class="mb-3 row">
+          <div class="col">
+            <label for="selectprovider" class="form-lable">Proveedor</label>
+            <select
+              class="form-select"
+              name="selectprovider"
+              [(ngModel)]="expense.providerId"
+              id="selectprovider"
+              aria-label="Seleccione un proveedor:"
+              #provider="ngModel"
+              required
+            >
+              <option
+                *ngFor="let provider of listProviders"
+                [value]="provider.id"
+              >
+                {{ provider.description }}
+              </option>
+            </select>
+            @if(provider.touched && provider.invalid) {
+            <span class="text-danger">El proveedor es requerido</span>
+            }
+          </div>
+        </div>
+        <div class="mb-3 row">
+          <div class="col">
+            <label for="typeExpense" class="form-lable">Tipo de Gasto</label>
+            <select
+              name="typeExpense"
+              [(ngModel)]="expense.typeExpense"
+              id="typeExpense"
+              class="form-select"
+              #typeExpense="ngModel"
+              required
+            >
+              <option value="INDIVIDUAL">Individual</option>
+              <option value="COMUN">Común</option>
+              <option value="EXTRAORDINARIO">Extraordinario</option>
+            </select>
+            @if(typeExpense.touched && typeExpense.invalid ) {
+            <span class="text-danger">El tipo de gasto es requerido</span>
+            }
+          </div>
+          <div class="col">
+            <label for="categoryId" class="form-lable"
+              >Categoría de Gasto</label
+            >
+            <select
+              name="categoryId"
+              [(ngModel)]="expense.categoryId"
+              id="categoryId"
+              class="form-select"
+              #categoryId="ngModel"
+              required
+            >
+              @for (expenseCategory of expenseCategoryList; track $index) {
+              <option [value]="expenseCategory.id">
+                {{ expenseCategory.description }}
+              </option>
+              }
+            </select>
+            @if(categoryId.touched && categoryId.invalid) {
+            <span class="text-danger">La categoría de gasto es requerida</span>
+            }
+          </div>
+        </div>
+        <div class="mb-3 row">
+          <div class="col">
+            <label for="amount" class="form-lable">Monto</label>
+            <input
+              type="number"
+              name="amount"
+              [(ngModel)]="expense.amount"
+              id="amount"
+              class="form-control"
+              (keypress)="allowOnlyPositiveNumbers($event)"
+              style="text-align: end"
+              [min]="1"
+              #amount="ngModel"
+              required
+            />
+            @if(amount.touched && amount.invalid) {
+            <span class="text-danger">El monto es requerido</span>
+            }
+          </div>
+          <div class="col">
+            <label for="installments" class="form-lable">Cuotas</label>
+            <select
+              name="installments"
+              [(ngModel)]="expense.installments"
+              id="installments"
+              style="text-align: end"
+              class="form-select"
+              #intallments="ngModel"
+              required
+            >
+              <option value="1">1</option>
+              <option value="3">3</option>
+              <option value="6">6</option>
+              <option value="9">9</option>
+              <option value="12">12</option>
+            </select>
+            @if(intallments.touched && intallments.invalid) {
+            <span class="text-danger">Las cuotas son requeridas</span>
+            }
+          </div>
+        </div>
+        <div class="mb-3 row">
+          <div class="col">
+            <label for="description" class="form-lable">Descripción</label>
+            <textarea
+              name="description"
+              id="description"
+              [(ngModel)]="expense.description"
+              class="form-control"
+              placeholder="Escribe una descripción..."
+              rows="2"
+              #description="ngModel"
+              required
+            >
+            </textarea>
+            @if(description.touched && description.invalid) {
+            <span class="text-danger">La descripción es requerida</span>
+            }
+          </div>
+        </div>
+        @if(expense.typeExpense == 'INDIVIDUAL') {
+        <div class="mb-3 row">
+          <div class="col-9">
+            <label for="owner" class="form-label">Propietarios</label>
+            <select
+              name="owner"
+              id="owner"
+              [(ngModel)]="selectedOwnerId"
+              class="form-select"
+              #owner="ngModel"
+              required
+            >
+              <option *ngFor="let owner of listOwner" [value]="owner.id">
+                {{ owner.name }} {{ owner.lastname }}
+              </option>
+            </select>
+            @if (owner.touched && distributions.length == 0) {
+            <span class="text-danger"
+              >Se debe agregar al menos un propietario</span
+            >
+            }
+          </div>
+          <div class="col-3">
+            <button
+              class="btn btn-primary"
+              type="button"
+              style="width: 100%; margin-top: 32px"
+              (click)="addDistribution()"
+            >
+              Añadir
+            </button>
+          </div>
+          @if(alreadysent){
+          <span class="text-danger"
+            >Ese propietario ya se encuentra en la tabla</span
+          >
+          }
+        </div>
+        <div class="mb-3 row">
+          <div class="col-12">
+            <table datatable class="table table-bordered table-striped">
+              <thead>
+                <tr>
+                  <th class="col-6">Propietario</th>
+                  <th class="col-2">Proporción</th>
+                  <th class="col-2">Monto</th>
+                  <th class="col-2">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="
+                    let distribution of expense.distributions;
+                    let i = index
+                  "
+                  [hidden]="!getOwnerName(distribution.ownerId)"
+                >
+                  <td>
+                    {{ getOwnerName(distribution.ownerId) }}
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      [(ngModel)]="distribution.proportion"
+                      [min]="1"
+                      [max]="100"
+                      style="text-align: end"
+                      class="form-control"
+                      name="proportion{{ i }}"
+                      #distributionInput="ngModel"
+                      (ngModelChange)="validateTotalProportion()"
+                    />
+                  </td>
+                  <td>
+                    <p style="text-align-last: end;"> {{ (expense.amount * distribution.proportion) / 100 | currency }} </p>
+                  </td>
+                  <td>
+                    <button
+                      class="btn btn-danger w-100"
+                      type="button"
+                      (click)="deleteDistribution(i)"
+                    >
+                      Eliminar
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            @if(!validateTotalProportion() && distributions.length > 0) {
+            <span class="text-danger"
+              >La suma de las proporciones debe ser igual a 100</span
+            >
+            }
+          </div>
+        </div>
+        }
+        <div class="mb-3 mt-5 row text-center">
+          <div class="col">
+            <button
+              class="btn btn-secondary"
+              type="reset"
+              style="width: 100%"
+              (click)="clearForm()"
+            >
+              Cancelar
+            </button>
+          </div>
+          <div class="col">
+            <button
+              class="btn btn-success"
+              type="submit"
+              style="width: 100%"
+              [disabled]="!form.valid || !validateTotalProportion()"
+            >
+              Registrar
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <br />
+  </div>
+</body>
