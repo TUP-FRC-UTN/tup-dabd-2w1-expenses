@@ -21,7 +21,7 @@ import { RouterOutlet } from '@angular/router';
 export class ExpensesRegisterExpenseComponent implements OnInit {
 
   @ViewChild('form') form!: NgForm;
-  
+
   distributions: Distributions[] = [];
   expense: Expense = {
     description: '',

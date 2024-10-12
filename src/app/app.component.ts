@@ -39,20 +39,18 @@ export class AppComponent implements OnInit{
   items: MenuItems[] = [
     {
       key: 'menu1',
-      name: 'Lista Gastos',
+      name: 'Lista Gastos como Administrador',
       active: true,
-      //icon: 'alarm' 
     },
     {
       key: 'menu2',
-      name: 'Registrar Gastos',
+      name: 'Lista Gastos como Propietario',
       active: true
     },
     {
       key: 'menu3',
-      name: 'disabled',
-      active: false,
-      disabled: true
+      name: 'Registrar Gastos',
+      active: true,
     }
   ];
 

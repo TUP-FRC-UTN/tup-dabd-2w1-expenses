@@ -11,7 +11,7 @@
           <div class="col">
             <label for="expenseDate" class="form-lable">Fecha de Gasto</label>
             <input
-            [value]="today"
+              [value]="today | date:'yyyy-MM-dd'"
               type="date"
               name="expenseDate"
               [(ngModel)]="expense.expenseDate"

@@ -5,15 +5,13 @@
 <div>
     @switch (visibleSection) {
     @case ('menu1') {
-    <p>Mostrar el componente de Lista de Gastos para Administrador</p>
-    <p>Aca iria el tema de el routing, que te mande a otro componente</p>
-    <p>NO llamariamos directamente al componente aca porque sino no seria routing</p>
+    <p>Mostrar el componente de Lista de Gastos como Administrador</p>
     }
     @case ('menu2') {
-    <app-expenses-register-expense></app-expenses-register-expense>
+        <p>Mostrar el componente de Lista de Gastos como Propietario</p>
     }
     @case ('menu3') {
-    <p>Componente desabilitado</p>
+        <app-expenses-register-expense></app-expenses-register-expense>
     }
     @default {
     <h2>HOME</h2>
