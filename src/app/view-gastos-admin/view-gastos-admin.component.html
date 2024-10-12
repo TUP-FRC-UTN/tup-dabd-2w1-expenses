@@ -1,0 +1,64 @@
+<div class="container">
+    <!-- Filtro -->
+    <div class="row mb-3">
+        <!--<div class="col-md-3">
+            <input type="text" class="form-control" placeholder="Filtro">
+        </div>-->
+
+        <div class="col-mb-3">
+            <label for="category-provider">Categoría / Proveedor</label>
+                <select class="form-control" id="category-provider" [(ngModel)]="filters.categoryOrProviderOrExpenseType">
+                    <option value="">Seleccione categoría o proveedor</option>
+
+                    <!-- Agrupa las categorías -->
+                    <optgroup label="Categorías">
+                        <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+                    </optgroup>
+
+                    <!-- Agrupa los proveedores -->
+                    <optgroup label="Proveedores">
+                        <option *ngFor="let provider of providers" [value]="provider">{{ provider }}</option>
+                    </optgroup>
+
+                    <!-- Agrupa los tipos de gasto-->
+                    <optgroup label="Tipo de Gasto">
+                        <option *ngFor="let expenseType of expenseTypes" [value]="expenseType">{{ expenseType }}
+                    </option>
+
+                </select>
+        </div>
+        <!--Otra parte-->
+        <div class="col-md-3 text-right">
+            <input type="date" class="form-control" style="width: 150px;">
+            <button class="btn btn-outline-success me-2" >PDF</button>
+            <button class="btn btn-outline-danger" >Excel</button>
+        </div>
+    </div>
+    <!-- Tabla de Resultados -->
+    <div class="container">
+        <table id="myTable" class="display">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Categoría</th>
+                    <th>Proveedor</th>
+                    <th>Monto</th>
+                    <th>Tipo de Gasto</th>
+                    <th>Fecha</th>
+                    <th>Editar</th>
+                </tr>
+            </thead>
+                <tbody>
+                    <tr>
+                        <td>id</td>
+                        <td>cate</td>
+                        <td>pro</td>
+                        <td>amount</td>
+                        <td>typw</td>
+                        <td>time</td>
+                        <td>stat</td>
+                    </tr>
+                </tbody>
+        </table>
+    </div>
+</div>

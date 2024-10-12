@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from "ngx-dabd-2w1-core";
 import { MenuItems } from 'ngx-dabd-2w1-core';
+import { ViewGastosAdminComponent } from './view-gastos-admin/view-gastos-admin.component';
+import { BillService } from './services/bill.service';
+import { HttpClientModule } from '@angular/common/http';
+import { bootstrapApplication } from '@angular/platform-browser';
 
 //imports para el Datatables (el segundo import termina en bs5 para que tenga 
 //los estilos de bootstrap)
@@ -12,7 +16,7 @@ import 'datatables.net-bs5';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent],
+  imports: [RouterOutlet, NavbarComponent, ViewGastosAdminComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
@@ -57,5 +61,7 @@ export class AppComponent implements OnInit{
   onMenuVisited(key: string) {
     this.visibleSection = key;
   }
-}
 
+}
+// Bootstrap la aplicación en modo standalone
+bootstrapApplication(AppComponent);
