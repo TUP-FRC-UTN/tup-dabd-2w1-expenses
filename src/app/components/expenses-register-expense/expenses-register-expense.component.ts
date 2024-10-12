@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, forwardRef, inject, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Distributions } from '../../models/distributions';
 import { Expense } from '../../models/expense';
@@ -9,12 +9,13 @@ import { OwnerService } from '../../services/owner.service';
 import { ProviderService } from '../../services/provider.service';
 import { CommonModule, DatePipe, NgFor, NgIf } from '@angular/common';
 import { Provider } from '../../models/provider';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-expenses-register-expense',
   templateUrl: './expenses-register-expense.component.html',
   standalone: true,
-  imports: [FormsModule, DatePipe, NgFor, NgIf, CommonModule],
+  imports: [FormsModule, DatePipe, NgFor, NgIf, CommonModule,RouterOutlet],
   styleUrls: ['./expenses-register-expense.component.css']
 })
 export class ExpensesRegisterExpenseComponent implements OnInit {
@@ -42,11 +43,9 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   alreadysent = false;
   expenseCategoryList: ExpenseCategory[] = [];
 
-  constructor(
-    private expenseService: ExpenseService,
-    private propietarioService: OwnerService,
-    private providerService: ProviderService
-  ) {}
+  private readonly expenseService = inject(ExpenseService)
+  private readonly propietarioService = inject(OwnerService)
+  private readonly providerService = inject(ProviderService)
 
   ngOnInit(): void {
     this.loadOwners();
