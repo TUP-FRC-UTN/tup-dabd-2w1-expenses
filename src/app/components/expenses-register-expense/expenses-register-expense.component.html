@@ -9,25 +9,6 @@
       <form #form="ngForm" (ngSubmit)="save()">
         <div class="mb-3 row">
           <div class="col">
-            <label for="expenseDate" class="form-lable">Fecha de Gasto</label>
-            <input
-              [value]="today | date:'yyyy-MM-dd'"
-              type="date"
-              name="expenseDate"
-              [(ngModel)]="expense.expenseDate"
-              id="expenseDate"
-              class="form-control"
-              [max]="today | date : 'yyyy-MM-dd'"
-              #fecha="ngModel"
-              required
-            />
-            @if(fecha.touched && fecha.invalid) {
-            <span class="text-danger">La fecha es requerida</span>
-            }
-          </div>
-        </div>
-        <div class="mb-3 row">
-          <div class="col">
             <label for="invoiceNumber" class="form-lable"
               >Número de Comprobante</label
             >
@@ -60,6 +41,23 @@
         </div>
         <div class="mb-3 row">
           <div class="col">
+            <label for="expenseDate" class="form-lable">Fecha de Gasto</label>
+            <input
+              [value]="today | date:'yyyy-MM-dd'"
+              type="date"
+              name="expenseDate"
+              [(ngModel)]="expense.expenseDate"
+              id="expenseDate"
+              class="form-control"
+              [max]="today | date : 'yyyy-MM-dd'"
+              #fecha="ngModel"
+              required
+            />
+            @if(fecha.touched && fecha.invalid) {
+              <span class="text-danger">La fecha es requerida</span>
+            }
+          </div>
+          <div class="col">
             <label for="selectprovider" class="form-lable">Proveedor</label>
             <select
               class="form-select"
@@ -72,13 +70,12 @@
             >
               <option
                 *ngFor="let provider of listProviders"
-                [value]="provider.id"
-              >
+                [value]="provider.id">
                 {{ provider.description }}
               </option>
             </select>
             @if(provider.touched && provider.invalid) {
-            <span class="text-danger">El proveedor es requerido</span>
+              <span class="text-danger">El proveedor es requerido</span>
             }
           </div>
         </div>
