@@ -1,19 +1,13 @@
-<!--LLamada al componente navbar de la libreria core del profe-->
 <app-navbar [menuItems]="items" (menuVisited)="onMenuVisited($event)" />
-<router-outlet></router-outlet>
-<!--casos dependiendo de lo seleccionado en el navbar-->
 <div>
     @switch (visibleSection) {
     @case ('menu1') {
-    <p>Mostrar el componente de Lista de Gastos para Administrador</p>
-    <p>Aca iria el tema de el routing, que te mande a otro componente</p>
-    <p>NO llamariamos directamente al componente aca porque sino no seria routing</p>
+    <app-view-gastos-admin></app-view-gastos-admin>
     }
     @case ('menu2') {
-    <app-expenses-register-expense></app-expenses-register-expense>
+        <app-expenses-register-expense></app-expenses-register-expense>
     }
     @case ('menu3') {
-    <p>Componente desabilitado</p>
     }
     @default {
     <h2>HOME</h2>

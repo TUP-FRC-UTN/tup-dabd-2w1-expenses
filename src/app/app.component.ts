@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from "ngx-dabd-2w1-core";
 import { MenuItems } from 'ngx-dabd-2w1-core';
+import { ViewGastosAdminComponent } from './components/expenses-view-gastos-admin/view-gastos-admin.component';
+import { BillService } from './services/bill.service';
+import { HttpClientModule } from '@angular/common/http';
+import { bootstrapApplication } from '@angular/platform-browser';
 
 //imports para el Datatables (el segundo import termina en bs5 para que tenga 
 //los estilos de bootstrap)
@@ -13,7 +17,7 @@ import { ExpensesRegisterExpenseComponent } from "./components/expenses-register
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, ExpensesRegisterExpenseComponent],
+  imports: [RouterOutlet, NavbarComponent, ViewGastosAdminComponent, HttpClientModule, ExpensesRegisterExpenseComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
@@ -22,15 +26,7 @@ export class AppComponent implements OnInit{
   constructor(public router: Router) {}
   
   ngOnInit(): void {
-      //para iniciar el datatables, configuraciones basicas
-      //se hace en el onInit para que se carge al cargar la pag
-    $('#myTable').DataTable({
-      paging: true,
-      searching: true,
-      ordering: true,
-      lengthChange: true,
-      pageLength: 10
-    });
+    
   }
   title = 'template-app';
 
@@ -39,9 +35,8 @@ export class AppComponent implements OnInit{
   items: MenuItems[] = [
     {
       key: 'menu1',
-      name: 'Lista Gastos',
+      name: 'Listado de Gastos Admin',
       active: true,
-      //icon: 'alarm' 
     },
     {
       key: 'menu2',
@@ -50,7 +45,7 @@ export class AppComponent implements OnInit{
     },
     {
       key: 'menu3',
-      name: 'disabled',
+      name: 'Listado de Gastos Propietarios',
       active: false,
       disabled: true
     }
@@ -60,5 +55,7 @@ export class AppComponent implements OnInit{
   onMenuVisited(key: string) {
     this.visibleSection = key;
   }
-}
 
+}
+// Bootstrap la aplicación en modo standalone
+bootstrapApplication(AppComponent);

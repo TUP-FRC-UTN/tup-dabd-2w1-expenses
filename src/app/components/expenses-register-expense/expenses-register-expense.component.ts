@@ -15,6 +15,7 @@ import { RouterOutlet } from '@angular/router';
   selector: 'app-expenses-register-expense',
   templateUrl: './expenses-register-expense.component.html',
   standalone: true,
+  providers:[ExpenseService,OwnerService,ProviderService],
   imports: [FormsModule, DatePipe, NgFor, NgIf, CommonModule,RouterOutlet],
   styleUrls: ['./expenses-register-expense.component.css']
 })

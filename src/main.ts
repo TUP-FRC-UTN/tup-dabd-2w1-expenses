@@ -6,3 +6,6 @@ import { AppComponent } from './app/app.component';
 
 bootstrapApplication(AppComponent, appConfig)
   .catch((err) => console.error(err));
+
+    // Bootstrap la aplicación en modo standalone
+    bootstrapApplication(AppComponent);

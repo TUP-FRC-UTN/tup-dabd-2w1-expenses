@@ -1,0 +1,32 @@
+<div class="container mt-4">
+  <div class="card border">
+      <div class="card-body">
+          <h5 class="card-title mb-4">Consultar Gastos</h5>
+          <form>
+              <div class="row mb-3">
+                  <div class="col-md-4">
+                      <label for="dateFrom" class="form-label">Fecha Desde</label>
+                      <input type="date" id="dateFrom" class="form-control" style="max-width: 200px;">
+                  </div>
+                  <div class="col-md-4">
+                      <label for="dateTo" class="form-label">Fecha Hasta</label>
+                      <input type="date" id="dateTo" class="form-control" style="max-width: 200px;">
+                  </div>
+                  <div class="col-md-4 d-flex align-items-end"> <!-- Alineación del botón -->
+                      <button type="button" class="btn btn-outline-success">Filtrar</button>
+                  </div>
+              </div>
+          </form>
+
+          <!-- Agrega la tabla dentro del card-body para que el borde incluya la tabla -->
+          <div class="mt-4">
+              <table id="myTable" class="display">
+                  <thead>
+                  </thead>
+                  <tbody>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
+</div>
