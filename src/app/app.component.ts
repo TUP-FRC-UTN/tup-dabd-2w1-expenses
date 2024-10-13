@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, importProvidersFrom, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from "ngx-dabd-2w1-core";
 import { MenuItems } from 'ngx-dabd-2w1-core';
@@ -13,42 +13,38 @@ import $ from 'jquery';
 import 'datatables.net'
 import 'datatables.net-bs5';
 import { ExpensesRegisterExpenseComponent } from "./components/expenses-register-expense/expenses-register-expense.component";
+import { ViewOwnerExpenseComponent } from "./components/expenses-view-owner/view-owner-expense/view-owner-expense.component";
+import { appConfig } from './app.config';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, ViewGastosAdminComponent, HttpClientModule, ExpensesRegisterExpenseComponent],
+  imports: [
+    RouterOutlet,
+    NavbarComponent, 
+    ViewGastosAdminComponent, 
+    HttpClientModule, 
+    ExpensesRegisterExpenseComponent, 
+    ViewOwnerExpenseComponent
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent implements OnInit{
-  
-  constructor(public router: Router) {}
-  
+export class AppComponent implements OnInit {
+
+  constructor(public router: Router) { }
+
   ngOnInit(): void {
-    
+
   }
   title = 'template-app';
 
   //navbar
   visibleSection: string = '';
   items: MenuItems[] = [
-    {
-      key: 'menu1',
-      name: 'Listado de Gastos Admin',
-      active: true,
-    },
-    {
-      key: 'menu2',
-      name: 'Registrar Gastos',
-      active: true
-    },
-    {
-      key: 'menu3',
-      name: 'Listado de Gastos Propietarios',
-      active: false,
-      disabled: true
-    }
+    { key: 'menu1', name: 'Listado de Gastos Admin', active: true },
+    { key: 'menu2', name: 'Registrar Gastos', active: true },
+    { key: 'menu3', name: 'Listado de Gastos Propietarios', active: true }
   ];
 
   //navbar
@@ -58,4 +54,10 @@ export class AppComponent implements OnInit{
 
 }
 // Bootstrap la aplicación en modo standalone
-bootstrapApplication(AppComponent);
+bootstrapApplication(AppComponent, {
+  providers: [
+    importProvidersFrom(HttpClientModule),
+    ...appConfig.providers
+  ]
+})
+.catch((err) => console.error(err));
