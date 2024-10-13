@@ -8,6 +8,8 @@ import { CommonModule } from '@angular/common';
 import $ from 'jquery';
 import 'datatables.net'
 import 'datatables.net-bs5';
+import { DistributionList } from '../models/distributionList';
+import { Instalmentlist } from '../models/installmentList';
 
 @Component({
   selector: 'app-view-gastos-admin',
@@ -17,7 +19,23 @@ import 'datatables.net-bs5';
   styleUrl: './view-gastos-admin.component.scss'
 })
 export class ViewGastosAdminComponent implements OnInit {
-  bills: Bill[] = [];
+  
+  distributionList : DistributionList[] = [];
+  installmentList : Instalmentlist[] = [];
+
+  bills: Bill[] = [
+    {
+      id : 10,
+      category : "Internet",
+      provider : "EPEC",
+      amount : 15000,
+      expenseType : "Comun",
+      createdDatetime : new Date(),
+      file : "archivo.ts",
+      distributionList : this.distributionList,
+      instalmentlist : this.installmentList
+    }
+  ];
   filterBills: Bill[] = [];
   categories: string[] = [];
   providers: string[] = [];
@@ -38,8 +56,25 @@ export class ViewGastosAdminComponent implements OnInit {
       paging : true,
       searching : true,
       ordering : true,
+      lengthChange : true,
       pageLength : 10,
-
+      data : this.bills,
+      columns : [
+        { title: "ID", data: 'id', visible: false },
+        { title: "Categoría", data: "category" },
+        { title: "Proveedor", data: "provider" },
+        { title: "Monto", data: "amount" },
+        { title: "Tipo de Gasto", data: "expenseType" },
+        { title: "Fecha", data: "createdDatetime",
+          render: function(data) {
+            return new Date(data).toLocaleDateString();
+          }
+        },
+        { title: "Opciones",                                  
+          data: null,
+          defaultContent: '<button class="btn btn-primary">Editar</button>'
+        }
+      ]
     });
   }
 

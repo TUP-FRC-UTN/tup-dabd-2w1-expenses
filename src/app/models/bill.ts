@@ -1,4 +1,5 @@
-import { Distribution } from "./distribution";
+import { DistributionList } from "./distributionList";
+import { Instalmentlist } from "./installmentList";
 
 export interface Bill {
     id: number;
@@ -6,9 +7,8 @@ export interface Bill {
     provider: string;
     amount: number;
     expenseType: string;
-    createdDatetime: Date;
-
-    //Consultar
-    distributionList: Distribution[];
-    
+    createdDatetime?: Date;
+    file : string;
+    distributionList : DistributionList[];
+    instalmentlist : Instalmentlist[];
 }
