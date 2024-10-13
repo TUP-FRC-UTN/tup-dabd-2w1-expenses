@@ -2,7 +2,6 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Bill } from '../../models/bill';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-
 //Imports para el DataTable
 import $ from 'jquery';
 import 'datatables.net'
@@ -10,6 +9,7 @@ import 'datatables.net-bs5';
 import { DistributionList } from '../../models/distributionList';
 import { Instalmentlist } from '../../models/installmentList';
 import { BillService } from '../../services/bill.service';
+
 
 @Component({
   selector: 'app-view-gastos-admin',
@@ -20,9 +20,13 @@ import { BillService } from '../../services/bill.service';
   styleUrl: './view-gastos-admin.component.scss'
 })
 export class ViewGastosAdminComponent implements OnInit {
-  
+
+  dateFrom: string = ''; 
+  dateTo: string = '';
   distributionList : DistributionList[] = [];
   installmentList : Instalmentlist[] = [];
+  failedBillId: number =0;
+  showErrorModal = false;
 
   private readonly billService = inject(BillService)
 
@@ -80,11 +84,94 @@ export class ViewGastosAdminComponent implements OnInit {
         {
           title: "Opciones",
           data: null,
-          defaultContent: '<button class="btn btn-primary">Eliminar</button>'
+          defaultContent: '<button class="btn btn-danger">Eliminar</button>'
         }
       ]
     });
+    $('#myTable tbody').on('click', '.btn-danger', (event) => {
+      const row = $(event.currentTarget).closest('tr');
+      const rowData = $('#myTable').DataTable().row(row).data();
+      this.deleteBill(rowData.id);
+    });
     
+  }
+  deleteBill(id: any) {
+    this.billService.deleteLogicBill(id)
+      .subscribe(
+        () => {
+          console.log(`Gasto con ID ${id} eliminada con éxito.`);
+          alert('Se elimino con exito el gasto')
+          this.loadBills();
+        },
+        (error) => {
+          console.error(`Error al eliminar la factura con ID ${id}:`, error);
+          this.failedBillId=id
+          this.showModalToNoteCredit();
+        }
+      );
+  }
+  showModalToNoteCredit() {
+    this.showErrorModal = true;
+    setTimeout(() => {
+      const modalElement = document.getElementById('errorModal');
+      if (modalElement) {
+        modalElement.style.display = 'block';
+        modalElement.classList.add('show');
+      }
+    }, 0);
+  }
+  filterData() {
+      const formattedDateFrom = this.formatDate(this.dateFrom);
+      const formattedDateTo = this.formatDate(this.dateTo);
+
+      this.billService.getBillsByDateRange(formattedDateFrom, formattedDateTo).subscribe(
+        (filteredBills) => {
+          this.bills = filteredBills; 
+          this.loadBillsFiltered();
+          console.log(filteredBills);
+        },
+        (error) => {
+          console.error('Error al filtrar los gastos:', error);
+        }
+      );
+  }
+  loadBillsFiltered() {
+    const dataTable = $('#myTable').DataTable();
+    dataTable.clear();
+    dataTable.rows.add(this.bills);
+    dataTable.draw();
+  }
+  formatDate(date: string) {
+  const parsedDate = new Date(date);
+  const year = parsedDate.getFullYear();
+  const month = (parsedDate.getMonth() + 1).toString().padStart(2, '0')
+  const day = parsedDate.getDate().toString().padStart(2, '0'); 
+  return `${year}-${month}-${day}`;
+  }
+
+  closeModal() {
+    this.showErrorModal = false;
+    const modalElement = document.getElementById('errorModal');
+    if (modalElement) {
+      modalElement.style.display = 'none';
+      modalElement.classList.remove('show');
+    }
+  }
+  deleteWithNoteCredit() {
+    this.billService.createNoteOfCredit(this.failedBillId)
+      .subscribe(
+        () => {
+          console.log(`Gasto con ID ${this.failedBillId} se le creo nota de credito con exito`);
+          this.loadBills();
+          alert('Se realizo la nota de credito con exito')
+          this.closeModal();
+        },
+        (error) => {
+          console.error(`Error al realizar la nota de credito del gasto con ID ${this.failedBillId}:`, error);
+          alert('No se pudo realizar la nota de credito con exito')
+          this.showModalToNoteCredit();
+        }
+      );
   }
   loadBills() {
     this.billService.getBillsOnInit().subscribe({
@@ -107,7 +194,7 @@ export class ViewGastosAdminComponent implements OnInit {
   }
 
 
-  applyFilters(): void {
+  /*applyFilters(): void {
     let filtered = this.bills;
 
   if (this.filters.categoryOrProviderOrExpenseType) {
@@ -121,6 +208,6 @@ export class ViewGastosAdminComponent implements OnInit {
   }
 
   this.filterBills = filtered;
-}
+}*/
 
 }
