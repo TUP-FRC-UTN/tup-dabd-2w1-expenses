@@ -3,7 +3,7 @@ import { Router, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from "ngx-dabd-2w1-core";
 import { MenuItems } from 'ngx-dabd-2w1-core';
 import { ViewGastosAdminComponent } from './components/expenses-view-gastos-admin/view-gastos-admin.component';
-import { BillService } from './services/bill.service';
+import { BillService } from './services/billServices/bill.service';
 import { HttpClientModule } from '@angular/common/http';
 import { bootstrapApplication } from '@angular/platform-browser';
 

@@ -4,7 +4,7 @@ import { Distributions } from '../../models/distributions';
 import { Expense } from '../../models/expense';
 import { Owner } from '../../models/owner';
 import { ExpenseCategory } from '../../models/expense-category';
-import { ExpenseService } from '../../services/expense.service';
+import { ExpenseService } from '../../services/expensesServices/expense.service';
 import { OwnerService } from '../../services/owner.service';
 import { ProviderService } from '../../services/provider.service';
 import { CommonModule, DatePipe, NgFor, NgIf } from '@angular/common';

@@ -8,7 +8,7 @@ import 'datatables.net'
 import 'datatables.net-bs5';
 import { DistributionList } from '../../models/distributionList';
 import { Instalmentlist } from '../../models/installmentList';
-import { BillService } from '../../services/bill.service';
+import { BillService } from '../../services/billServices/bill.service';
 
 
 @Component({
@@ -44,6 +44,7 @@ export class ViewGastosAdminComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadBills()
+    this.loadDates()
     $('#myTable').DataTable({
       paging: true,
       searching: true,
@@ -94,6 +95,19 @@ export class ViewGastosAdminComponent implements OnInit {
       this.deleteBill(rowData.id);
     });
     
+  }
+  loadDates() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    this.dateTo = `${yyyy}-${mm}-${dd}`;
+    const past = new Date();
+    past.setMonth(past.getMonth() - 1); 
+    const pastyyyy = past.getFullYear();
+    const pastmm = String(past.getMonth() + 1).padStart(2, '0');
+    const pastdd = String(past.getDate()).padStart(2, '0');
+    this.dateFrom = `${pastyyyy}-${pastmm}-${pastdd}`;
   }
   deleteBill(id: any) {
     this.billService.deleteLogicBill(id)
@@ -152,6 +166,7 @@ export class ViewGastosAdminComponent implements OnInit {
   closeModal() {
     this.showErrorModal = false;
     const modalElement = document.getElementById('errorModal');
+    this.loadBillsFiltered()
     if (modalElement) {
       modalElement.style.display = 'none';
       modalElement.classList.remove('show');
