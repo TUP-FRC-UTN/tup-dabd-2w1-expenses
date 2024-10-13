@@ -16,7 +16,7 @@ import 'datatables.net-bs5';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, ViewGastosAdminComponent],
+  imports: [RouterOutlet, NavbarComponent, ViewGastosAdminComponent,HttpClientModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

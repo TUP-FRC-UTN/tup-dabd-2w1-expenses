@@ -1,46 +1,32 @@
-<div class="container">
-    <!-- Filtro -->
-    <div class="row mb-3">
-        <!--<div class="col-md-3">
-            <input type="text" class="form-control" placeholder="Filtro">
-        </div>-->
+<div class="container mt-4">
+  <div class="card border">
+      <div class="card-body">
+          <h5 class="card-title mb-4">Consultar Gastos</h5>
+          <form>
+              <div class="row mb-3">
+                  <div class="col-md-4">
+                      <label for="dateFrom" class="form-label">Fecha Desde</label>
+                      <input type="date" id="dateFrom" class="form-control" style="max-width: 200px;">
+                  </div>
+                  <div class="col-md-4">
+                      <label for="dateTo" class="form-label">Fecha Hasta</label>
+                      <input type="date" id="dateTo" class="form-control" style="max-width: 200px;">
+                  </div>
+                  <div class="col-md-4 d-flex align-items-end"> <!-- Alineación del botón -->
+                      <button type="button" class="btn btn-outline-success">Filtrar</button>
+                  </div>
+              </div>
+          </form>
 
-        <div class="col-mb-3">
-            <label for="category-provider">Categoría / Proveedor</label>
-                <select class="form-control" id="category-provider" [(ngModel)]="filters.categoryOrProviderOrExpenseType">
-                    <option value="">Seleccione categoría o proveedor</option>
-
-                    <!-- Agrupa las categorías -->
-                    <optgroup label="Categorías">
-                        <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
-                    </optgroup>
-
-                    <!-- Agrupa los proveedores -->
-                    <optgroup label="Proveedores">
-                        <option *ngFor="let provider of providers" [value]="provider">{{ provider }}</option>
-                    </optgroup>
-
-                    <!-- Agrupa los tipos de gasto-->
-                    <optgroup label="Tipo de Gasto">
-                        <option *ngFor="let expenseType of expenseTypes" [value]="expenseType">{{ expenseType }}
-                    </option>
-
-                </select>
-        </div>
-        <!--Otra parte-->
-        <div class="col-md-3 text-right">
-            <input type="date" class="form-control" style="width: 150px;">
-            <button class="btn btn-outline-success me-2" >PDF</button>
-            <button class="btn btn-outline-danger" >Excel</button>
-        </div>
-    </div>
-    <!-- Tabla de Resultados -->
-    <div class="container">
-        <table id="myTable" class="display">
-            <thead>
-            </thead>
-                <tbody>
-                </tbody>
-        </table>
-    </div>
+          <!-- Agrega la tabla dentro del card-body para que el borde incluya la tabla -->
+          <div class="mt-4">
+              <table id="myTable" class="display">
+                  <thead>
+                  </thead>
+                  <tbody>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
 </div>
