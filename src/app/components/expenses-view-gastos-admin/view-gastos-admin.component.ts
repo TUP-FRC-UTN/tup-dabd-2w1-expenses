@@ -1,6 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { Bill } from '../models/bill';
-import { BillService } from '../services/bill.service';
+import { Bill } from '../../models/bill';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -8,8 +7,9 @@ import { CommonModule } from '@angular/common';
 import $ from 'jquery';
 import 'datatables.net'
 import 'datatables.net-bs5';
-import { DistributionList } from '../models/distributionList';
-import { Instalmentlist } from '../models/installmentList';
+import { DistributionList } from '../../models/distributionList';
+import { Instalmentlist } from '../../models/installmentList';
+import { BillService } from '../../services/bill.service';
 
 @Component({
   selector: 'app-view-gastos-admin',
@@ -24,7 +24,7 @@ export class ViewGastosAdminComponent implements OnInit {
   distributionList : DistributionList[] = [];
   installmentList : Instalmentlist[] = [];
 
-  constructor(private billService: BillService) {}
+  private readonly billService = inject(BillService)
 
   bills: Bill[] = [];
   filterBills: Bill[] = [];

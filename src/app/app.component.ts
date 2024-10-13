@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from "ngx-dabd-2w1-core";
 import { MenuItems } from 'ngx-dabd-2w1-core';
-import { ViewGastosAdminComponent } from './view-gastos-admin/view-gastos-admin.component';
+import { ViewGastosAdminComponent } from './components/expenses-view-gastos-admin/view-gastos-admin.component';
 import { BillService } from './services/bill.service';
 import { HttpClientModule } from '@angular/common/http';
 import { bootstrapApplication } from '@angular/platform-browser';
@@ -12,15 +12,18 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import $ from 'jquery';
 import 'datatables.net'
 import 'datatables.net-bs5';
+import { ExpensesRegisterExpenseComponent } from "./components/expenses-register-expense/expenses-register-expense.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, ViewGastosAdminComponent,HttpClientModule],
+  imports: [RouterOutlet, NavbarComponent, ViewGastosAdminComponent, HttpClientModule, ExpensesRegisterExpenseComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit{
+  
+  constructor(public router: Router) {}
   
   ngOnInit(): void {
     
@@ -32,9 +35,8 @@ export class AppComponent implements OnInit{
   items: MenuItems[] = [
     {
       key: 'menu1',
-      name: 'Lista Gastos',
+      name: 'Listado de Gastos Admin',
       active: true,
-      //icon: 'alarm' 
     },
     {
       key: 'menu2',
@@ -43,7 +45,7 @@ export class AppComponent implements OnInit{
     },
     {
       key: 'menu3',
-      name: 'disabled',
+      name: 'Listado de Gastos Propietarios',
       active: false,
       disabled: true
     }
