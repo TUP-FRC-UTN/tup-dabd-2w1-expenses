@@ -1,32 +1,49 @@
 <div class="container mt-4">
-  <div class="card border">
+    <div class="card border">
       <div class="card-body">
-          <h5 class="card-title mb-4">Consultar Gastos</h5>
-          <form>
-              <div class="row mb-3">
-                  <div class="col-md-4">
-                      <label for="dateFrom" class="form-label">Fecha Desde</label>
-                      <input type="date" id="dateFrom" class="form-control" style="max-width: 200px;">
-                  </div>
-                  <div class="col-md-4">
-                      <label for="dateTo" class="form-label">Fecha Hasta</label>
-                      <input type="date" id="dateTo" class="form-control" style="max-width: 200px;">
-                  </div>
-                  <div class="col-md-4 d-flex align-items-end"> <!-- Alineación del botón -->
-                      <button type="button" class="btn btn-outline-success">Filtrar</button>
-                  </div>
-              </div>
-          </form>
-
-          <!-- Agrega la tabla dentro del card-body para que el borde incluya la tabla -->
-          <div class="mt-4">
-              <table id="myTable" class="display">
-                  <thead>
-                  </thead>
-                  <tbody>
-                  </tbody>
-              </table>
+        <h5 class="card-title mb-4">Consultar Gastos</h5>
+        <form>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="dateFrom" class="form-label">Fecha Desde</label>
+              <input type="date" id="dateFrom" class="form-control" style="max-width: 200px;" [(ngModel)]="dateFrom" name="dateFrom">
+            </div>
+            <div class="col-md-4">
+              <label for="dateTo" class="form-label">Fecha Hasta</label>
+              <input type="date" id="dateTo" class="form-control" style="max-width: 200px;" [(ngModel)]="dateTo" name="dateTo">
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+              <button type="button" class="btn btn-outline-success" (click)="filterData()">Filtrar</button>
+            </div>
           </div>
-      </div>
+        </form>
+  
+        <div class="mt-4">
+          <table id="myTable" class="display">
+            <thead>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Modal -->
+        <div *ngIf="showErrorModal" class="modal" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" >Nota de credito</h5>
+                 
+                </div>
+                <div class="modal-body">
+                  El gasto ya esta cobrado. ¿desea realizar una nota de credito?
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+                  <button type="button" class="btn btn-primary" (click)="deleteWithNoteCredit()">Aceptar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+    </div>
   </div>
-</div>
