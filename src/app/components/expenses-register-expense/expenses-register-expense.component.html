@@ -7,13 +7,13 @@
           <div class="col">
             <label for="expenseDate" class="form-lable">Fecha de Gasto</label>
             <input
-              [value]="today"
+              [value]="today "
               type="date"
               name="expenseDate"
               [(ngModel)]="expense.expenseDate"
               id="expenseDate"
               class="form-control"
-              [max]="today | date : 'yyyy-MM-dd'"
+              [max]="today | date : 'dd-MM-YYYY'"
               #fecha="ngModel"
               required
             />

@@ -43,7 +43,17 @@ export class ViewOwnerExpenseComponent implements OnInit {
         return acc;
       }, {});
 
-      this.getBillsByOwnerId(223);
+      this.billService.getBillsOnInit().subscribe((data: BillViewOwner[]) => {
+        console.log('Datos de facturas recibidos:', data);
+        this.bills = data.map(bill => ({
+          ...bill,
+          providerId: this.providersMap[bill.providerId] || 'Desconocido'
+        }));
+        this.filteredBills = [...this.bills];
+        setTimeout(() => {
+          this.initDataTable(this.filteredBills);
+        }, 0);
+      });
     });
   }
 
@@ -62,15 +72,13 @@ export class ViewOwnerExpenseComponent implements OnInit {
   }
 
   getBillsByOwnerId(ownerId: number): void {
-    this.billService.getBillsByOwnerId(ownerId).subscribe((data: BillViewOwner[]) => {
+    this.billService.getBillsByOwnerIdAndDateFromDateTo(ownerId,this.fechaDesde,this.fechaHasta).subscribe((data: BillViewOwner[]) => {
       console.log('Datos de facturas recibidos:', data);
       this.bills = data.map(bill => ({
         ...bill,
         providerId: this.providersMap[bill.providerId] || 'Desconocido'
       }));
-
       this.filteredBills = [...this.bills];
-
       setTimeout(() => {
         this.initDataTable(this.filteredBills);
       }, 0);
@@ -79,17 +87,32 @@ export class ViewOwnerExpenseComponent implements OnInit {
 
 
   filtrarPorFecha(): void {
-    const desde = new Date(this.fechaDesde);
-    const hasta = new Date(this.fechaHasta);
+    const formattedDateFrom = this.formatDate(this.fechaDesde);
+    const formattedDateTo = this.formatDate(this.fechaHasta);
 
-    this.filteredBills = this.bills.filter(bill => {
-      const expenseDate = new Date(bill.expenseDate[0], bill.expenseDate[1] - 1, bill.expenseDate[2]);
-      return (!this.fechaDesde || expenseDate >= desde) && (!this.fechaHasta || expenseDate <= hasta);
-    });
-
-    setTimeout(() => {
-      this.initDataTable(this.filteredBills);
-    }, 0);
+    this.billService.getBillsByOwnerIdAndDateFromDateTo(223,formattedDateFrom, formattedDateTo).subscribe(
+      (filteredBills) => {
+        this.bills = filteredBills; 
+        this.loadBillsFiltered();
+        console.log(filteredBills);
+      },
+      (error) => {
+        console.error('Error al filtrar los gastos:', error);
+      }
+    );
+  }
+  loadBillsFiltered() {
+    const dataTable = $('#myTable').DataTable();
+    dataTable.clear();
+    dataTable.rows.add(this.bills);
+    dataTable.draw();
+  }
+  formatDate(date: string) {
+    const parsedDate = new Date(date);
+    const year = parsedDate.getFullYear();
+    const month = (parsedDate.getMonth() + 1).toString().padStart(2, '0')
+    const day = parsedDate.getDate().toString().padStart(2, '0'); 
+    return `${year}-${month}-${day}`;
   }
 
   initDataTable(data: BillViewOwner[]): void {
@@ -109,13 +132,22 @@ export class ViewOwnerExpenseComponent implements OnInit {
       data: data,
       columns: [
         { data: 'description', title: 'Descripción' },
-        { data: 'categoryDescription', title: 'Categoría' },
+        { data: 'category.description', title: 'Categoría' },
         { data: 'providerId', title: 'Proveedor' },
         { data: 'expenseType', title: 'Tipo de Gasto' },
         {
           data: 'expenseDate',
           title: 'Fecha',
-          render: (data) => new Date(data[0], data[1] - 1, data[2]).toLocaleDateString(),
+          render: function(data) {
+            if (Array.isArray(data) && data.length === 3) {
+              const date = new Date(data[0], data[1] - 1, data[2]);
+              const day = date.getDate().toString().padStart(2, '0');
+              const month = (date.getMonth() + 1).toString().padStart(2, '0');
+              const year = date.getFullYear();
+              return `${day}/${month}/${year}`;
+            }
+            return data;  //Funcion utilizada para formatear fecha a dd/mm/yyyy
+          }
         },
         {
           data: 'amount',

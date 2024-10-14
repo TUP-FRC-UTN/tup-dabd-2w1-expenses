@@ -15,7 +15,7 @@ export class BillService {
 
   getBillsOnInit(): Observable<Bill[]> {
     const currentDate = new Date();
-    const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth()-2, 1);
     const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
     const dateFrom = firstDayOfMonth.toISOString().split('T')[0];
     const dateTo = lastDayOfMonth.toISOString().split('T')[0];

@@ -12,20 +12,19 @@ export class BillViewOwnerService {
 
   constructor(private http: HttpClient) {}
 
-  getBillsByOwnerId(ownerId: number): Observable<BillViewOwner[]> {
-    const url = `${this.apiUrl}?id=${ownerId}`;
-    return this.http.get<any[]>(url).pipe(
-      map((data: any[]) =>
-        data.map(item => ({
-          id: item.id,
-          description: item.description,
-          providerId: item.providerId,
-          expenseDate: item.expenseDate,
-          expenseType: item.expenseType,
-          categoryDescription: item.category.description,
-          amount: Number(item.amount)
-        }))
-      )
-    );
+
+  getBillsOnInit(): Observable<BillViewOwner[]> {
+    const currentDate = new Date();
+    const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+    const dateFrom = firstDayOfMonth.toISOString().split('T')[0];
+    const dateTo = lastDayOfMonth.toISOString().split('T')[0];
+    const urlWithFilters = `${this.apiUrl}?id=223&startDate=${dateFrom}&endDate=${dateTo}`;
+    console.log(urlWithFilters)
+    return this.http.get<BillViewOwner[]>(urlWithFilters);
+  }
+  getBillsByOwnerIdAndDateFromDateTo(ownerId: number, fechaDesde: string, fechaHasta: string) : Observable<BillViewOwner[]> {
+     const urlWithFilters = `${this.apiUrl}?id=223&startDate=${fechaDesde}&endDate=${fechaHasta}`
+    return this.http.get<BillViewOwner[]>(urlWithFilters);
   }
 }

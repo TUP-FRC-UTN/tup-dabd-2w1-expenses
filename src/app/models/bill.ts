@@ -7,7 +7,7 @@ export interface Bill {
     provider: string;
     amount: number;
     expenseType: string;
-    expenseDate?: Date;
+    expenseDate: string;
     file : string;
     distributionList : DistributionList[];
     instalmentlist : Instalmentlist[];

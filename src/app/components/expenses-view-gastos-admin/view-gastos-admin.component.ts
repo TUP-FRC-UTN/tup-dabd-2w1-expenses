@@ -3,6 +3,7 @@ import { Bill } from '../../models/bill';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 //Imports para el DataTable
+import  moment from 'moment'
 import $ from 'jquery';
 import 'datatables.net'
 import 'datatables.net-bs5';
@@ -41,26 +42,37 @@ export class ViewGastosAdminComponent implements OnInit {
     categoryOrProviderOrExpenseType: '',
     expenseTypes: '',
   }
+  
 
   ngOnInit(): void {
-    this.loadBills()
-    this.loadDates()
+    // Definir el tipo de ordenación 'date-moment' para las fechas
+    ($.fn.dataTable as any).moment = function (format: string) {
+      $.fn.dataTable.ext.type.order['date-moment-pre'] = function (data: any) {
+        return moment(data, format).unix(); // Convertir la fecha a timestamp para una correcta ordenación
+      };
+    };
+  
+    // Aplica Moment.js al formato 'YYYY-MM-DD'
+    ($.fn.dataTable as any).moment('YYYY-MM-DD');
+   this.loadBills()
+   this.loadDates()
+  
+    // Inicializar DataTable
     $('#myTable').DataTable({
       paging: true,
       searching: true,
       ordering: true,
-      lengthChange: false,  
-      info: true,          
+      lengthChange: false,
+      info: true,
       pageLength: 10,
-      data: this.bills,
+      data: this.bills, // DataSource de la API
       language: {
         processing: "Procesando...",
         search: "Buscar:",
-        lengthMenu: "Mostrar _MENU_ registros",
+        lengthMenu: "Mostrar MENU registros",
         info: "Mostrando del _START_ al _END_ de _TOTAL_ registros",
         infoEmpty: "Mostrando 0 registros",
-        infoFiltered: "(filtrado de _MAX_ registros totales)",
-        infoPostFix: "",
+        infoFiltered: "(filtrado de MAX registros totales)",
         loadingRecords: "Cargando...",
         zeroRecords: "No se encontraron resultados",
         emptyTable: "No hay datos disponibles en la tabla",
@@ -69,10 +81,6 @@ export class ViewGastosAdminComponent implements OnInit {
           previous: "Anterior",
           next: "Siguiente",
           last: "Último"
-        },
-        aria: {
-          sortAscending: ": activar para ordenar la columna de manera ascendente",
-          sortDescending: ": activar para ordenar la columna de manera descendente"
         }
       },
       columns: [
@@ -81,7 +89,15 @@ export class ViewGastosAdminComponent implements OnInit {
         { title: "Proveedor", data: "provider" },
         { title: "Monto", data: "amount" },
         { title: "Tipo de Gasto", data: "expenseType" },
-        { title: "Fecha", data: "expenseDate"},
+        { 
+          title: "Fecha", 
+          data: "expenseDate", 
+          render: function(data) {
+            // Usar Moment.js para formatear las fechas desde 'YYYY-MM-DD' a 'DD/MM/YYYY'
+            return moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY');
+          },
+          type: 'date-moment' // Tipo de columna para fechas, utilizando Moment.js
+        },
         {
           title: "Opciones",
           data: null,
@@ -89,12 +105,13 @@ export class ViewGastosAdminComponent implements OnInit {
         }
       ]
     });
+  
+    // Acción para el botón de eliminar
     $('#myTable tbody').on('click', '.btn-danger', (event) => {
       const row = $(event.currentTarget).closest('tr');
       const rowData = $('#myTable').DataTable().row(row).data();
       this.deleteBill(rowData.id);
     });
-    
   }
   loadDates() {
     const today = new Date();
@@ -119,8 +136,9 @@ export class ViewGastosAdminComponent implements OnInit {
         },
         (error) => {
           console.error(`Error al eliminar la factura con ID ${id}:`, error);
-          this.failedBillId=id
+          debugger
           this.showModalToNoteCredit();
+          this.failedBillId=id
         }
       );
   }
@@ -193,7 +211,6 @@ export class ViewGastosAdminComponent implements OnInit {
       next: (data: Bill[]) => {
         console.log('Bills received:', data);
         this.bills = data;
-  
         const dataTable = $('#myTable').DataTable();
         dataTable.clear();
         dataTable.rows.add(this.bills);
