@@ -104,6 +104,7 @@ export class ViewGastosAdminComponent implements OnInit {
   filterData() {
       const formattedDateFrom = this.formatDate(this.dateFrom);
       const formattedDateTo = this.formatDate(this.dateTo);
+      debugger
       this.billService.getBillsByDateRange(formattedDateFrom, formattedDateTo).subscribe(
         (filteredBills) => {
           this.bills = filteredBills; 
@@ -116,6 +117,9 @@ export class ViewGastosAdminComponent implements OnInit {
   }
   loadBillsFiltered() {
     const dataTable = $('#myTable').DataTable();
+    dataTable.clear();
+    dataTable.rows.add(this.bills);
+    dataTable.draw();
     
   }
   formatDate(date: string) {
