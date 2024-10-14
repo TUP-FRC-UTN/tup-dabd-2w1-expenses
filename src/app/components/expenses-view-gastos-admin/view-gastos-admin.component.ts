@@ -180,8 +180,11 @@ export class ViewGastosAdminComponent implements OnInit {
         { title: "ID", data: 'id', visible: false },
         { title: "Categoría", data: "category" },
         { title: "Proveedor", data: "provider" },
+        
+        { title: "Tipo de Gasto", data: "expenseType",render: function(data) {
+          return data === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : data;
+        } },
         { title: "Monto", data: "amount",render: (data) => `$${data}` },
-        { title: "Tipo de Gasto", data: "expenseType" },
         { 
           title: "Fecha", 
           data: "expenseDate", 

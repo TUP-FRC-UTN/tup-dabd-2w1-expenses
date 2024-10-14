@@ -203,10 +203,21 @@ export class ViewOwnerExpenseComponent implements OnInit {
       pageLength: 10,
       data: this.bills,
       columns: [
-        { data: 'description', title: 'Descripción' },
         { data: 'category.description', title: 'Categoría' },
-        { data: 'providerId', title: 'Proveedor' },
-        { data: 'expenseType', title: 'Tipo de Gasto' },
+        { data: 'providerId', title: 'Proveedor',render: function(data){
+          return "empresa anonima"
+        } },
+        { data: 'expenseType', title: 'Tipo de Gasto',render: function(data) {
+          return data === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : data;
+        } },
+        { data: 'description', title: 'Descripción' },
+        
+        {
+          data: 'amount',
+          title: 'Monto',
+          render: (data) => `$${data}`,
+        },
+        
         { 
           title: "Fecha", 
           data: "expenseDate", 
@@ -216,11 +227,7 @@ export class ViewOwnerExpenseComponent implements OnInit {
           },
           type: 'date-moment' // Usamos el tipo 'date-moment' para la ordenación correcta
         },
-        {
-          data: 'amount',
-          title: 'Monto',
-          render: (data) => `$${data}`,
-        },
+        
       ],
       language: {
         processing: 'Procesando...',
