@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import 'datatables.net';
 import 'datatables.net-bs5';
+import moment from 'moment';
 import $ from 'jquery';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
@@ -31,31 +32,35 @@ export class ViewOwnerExpenseComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadData();
+    $.fn.dataTable.ext.type.order['date-moment-pre'] = function (d: string) {
+      return moment(d, 'DD/MM/YYYY').unix();  // Convertir la fecha a timestamp para que pueda ordenarse
+    };
+    //this.loadData();
     this.loadDates();
-    this.initDataTable(this.bills);
+    this.filtrarPorFecha();
+    //this.initDataTable(this.bills);
   }
 
-  loadData(): void {
-    this.providerService.getProviders().subscribe(providers => {
-      this.providersMap = providers.reduce((acc: { [key: string]: string }, provider) => {
-        acc[provider.id] = provider.nombre;
-        return acc;
-      }, {});
+  // loadData(): void {
+  //   this.providerService.getProviders().subscribe(providers => {
+  //     this.providersMap = providers.reduce((acc: { [key: string]: string }, provider) => {
+  //       acc[provider.id] = provider.nombre;
+  //       return acc;
+  //     }, {});
 
-      this.billService.getBillsOnInit().subscribe((data: BillViewOwner[]) => {
-        console.log('Datos de facturas recibidos:', data);
-        this.bills = data.map(bill => ({
-          ...bill,
-          providerId: this.providersMap[bill.providerId] || 'Desconocido'
-        }));
-        this.filteredBills = [...this.bills];
-        setTimeout(() => {
-          this.initDataTable(this.filteredBills);
-        }, 0);
-      });
-    });
-  }
+  //     this.billService.getBillsOnInit().subscribe((data: BillViewOwner[]) => {
+  //       console.log('Datos de facturas recibidos:', data);
+  //       this.bills = data.map(bill => ({
+  //         ...bill,
+  //         providerId: this.providersMap[bill.providerId] || 'Desconocido'
+  //       }));
+  //       this.filteredBills = [...this.bills];
+  //       setTimeout(() => {
+  //         this.initDataTable(this.filteredBills);
+  //       }, 0);
+  //     });
+  //   });
+  // }
 
   loadDates() {
     const today = new Date();
@@ -71,19 +76,19 @@ export class ViewOwnerExpenseComponent implements OnInit {
     this.fechaDesde = `${pastyyyy}-${pastmm}-${pastdd}`;
   }
 
-  getBillsByOwnerId(ownerId: number): void {
-    this.billService.getBillsByOwnerIdAndDateFromDateTo(ownerId,this.fechaDesde,this.fechaHasta).subscribe((data: BillViewOwner[]) => {
-      console.log('Datos de facturas recibidos:', data);
-      this.bills = data.map(bill => ({
-        ...bill,
-        providerId: this.providersMap[bill.providerId] || 'Desconocido'
-      }));
-      this.filteredBills = [...this.bills];
-      setTimeout(() => {
-        this.initDataTable(this.filteredBills);
-      }, 0);
-    });
-  }
+  // getBillsByOwnerId(ownerId: number): void {
+  //   this.billService.getBillsByOwnerIdAndDateFromDateTo(ownerId,this.fechaDesde,this.fechaHasta).subscribe((data: BillViewOwner[]) => {
+  //     console.log('Datos de facturas recibidos:', data);
+  //     this.bills = data.map(bill => ({
+  //       ...bill,
+  //       providerId: this.providersMap[bill.providerId] || 'Desconocido'
+  //     }));
+  //     this.filteredBills = [...this.bills];
+  //     setTimeout(() => {
+  //       this.initDataTable(this.filteredBills);
+  //     }, 0);
+  //   });
+  // }
 
 
   filtrarPorFecha(): void {
@@ -93,7 +98,7 @@ export class ViewOwnerExpenseComponent implements OnInit {
     this.billService.getBillsByOwnerIdAndDateFromDateTo(223,formattedDateFrom, formattedDateTo).subscribe(
       (filteredBills) => {
         this.bills = filteredBills; 
-        this.loadBillsFiltered();
+        this.configDataTable();
         console.log(filteredBills);
       },
       (error) => {
@@ -101,12 +106,12 @@ export class ViewOwnerExpenseComponent implements OnInit {
       }
     );
   }
-  loadBillsFiltered() {
-    const dataTable = $('#myTable').DataTable();
-    dataTable.clear();
-    dataTable.rows.add(this.bills);
-    dataTable.draw();
-  }
+  // loadBillsFiltered() {
+  //   const dataTable = $('#myTable').DataTable();
+  //   dataTable.clear();
+  //   dataTable.rows.add(this.bills);
+  //   dataTable.draw();
+  // }
   formatDate(date: string) {
     const parsedDate = new Date(date);
     const year = parsedDate.getFullYear();
@@ -115,39 +120,99 @@ export class ViewOwnerExpenseComponent implements OnInit {
     return `${year}-${month}-${day}`;
   }
 
-  initDataTable(data: BillViewOwner[]): void {
-    const table = $('#myTable');
+  // initDataTable(data: BillViewOwner[]): void {
+  //   const table = $('#myTable');
 
-    if (($.fn as any).DataTable.isDataTable('#myTable')) {
-      $('#myTable').DataTable().clear().destroy();
+  //   if (($.fn as any).DataTable.isDataTable('#myTable')) {
+  //     $('#myTable').DataTable().clear().destroy();
+  //   }
+
+  //   this.dataTable = table.DataTable({
+  //     paging: true,
+  //     searching: true,
+  //     ordering: true,
+  //     lengthChange: false,
+  //     info: true,
+  //     pageLength: 10,
+  //     data: data,
+  //     columns: [
+  //       { data: 'description', title: 'Descripción' },
+  //       { data: 'category.description', title: 'Categoría' },
+  //       { data: 'providerId', title: 'Proveedor' },
+  //       { data: 'expenseType', title: 'Tipo de Gasto' },
+  //       {
+  //         data: 'expenseDate',
+  //         title: 'Fecha',
+  //         render: function(data) {
+  //           if (Array.isArray(data) && data.length === 3) {
+  //             const date = new Date(data[0], data[1] - 1, data[2]);
+  //             const day = date.getDate().toString().padStart(2, '0');
+  //             const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  //             const year = date.getFullYear();
+  //             return `${day}/${month}/${year}`;
+  //           }
+  //           return data;  //Funcion utilizada para formatear fecha a dd/mm/yyyy
+  //         }
+  //       },
+  //       {
+  //         data: 'amount',
+  //         title: 'Monto',
+  //         render: (data) => `$${data}`,
+  //       },
+  //     ],
+  //     language: {
+  //       processing: 'Procesando...',
+  //       search: 'Buscar:',
+  //       lengthMenu: 'Mostrar _MENU_ registros',
+  //       info: 'Mostrando del _START_ al _END_ de _TOTAL_ registros',
+  //       infoEmpty: 'Mostrando 0 registros',
+  //       infoFiltered: '(filtrado de _MAX_ registros totales)',
+  //       loadingRecords: 'Cargando...',
+  //       zeroRecords: 'No se encontraron resultados',
+  //       emptyTable: 'No hay datos disponibles en la tabla',
+  //       paginate: {
+  //         first: 'Primero',
+  //         previous: 'Anterior',
+  //         next: 'Siguiente',
+  //         last: 'Último',
+  //       },
+  //       aria: {
+  //         sortAscending: ': activar para ordenar la columna de manera ascendente',
+  //         sortDescending: ': activar para ordenar la columna de manera descendente',
+  //       },
+  //     },
+  //   });
+  // }
+  configDataTable(){
+    if ($.fn.DataTable.isDataTable('#myTable')) {
+      let table = $('#myTable').DataTable();
+      table.clear();
+      table.rows.add(this.bills);
+      table.draw();
+      return;  // Salir de la función después de actualizar los datos
     }
-
-    this.dataTable = table.DataTable({
+    // Inicializar DataTables con los datos cargados
+    $('#myTable').DataTable({
       paging: true,
       searching: true,
       ordering: true,
       lengthChange: false,
       info: true,
       pageLength: 10,
-      data: data,
+      data: this.bills,
       columns: [
         { data: 'description', title: 'Descripción' },
         { data: 'category.description', title: 'Categoría' },
         { data: 'providerId', title: 'Proveedor' },
         { data: 'expenseType', title: 'Tipo de Gasto' },
-        {
-          data: 'expenseDate',
-          title: 'Fecha',
+        { 
+          title: "Fecha", 
+          data: "expenseDate", 
           render: function(data) {
-            if (Array.isArray(data) && data.length === 3) {
-              const date = new Date(data[0], data[1] - 1, data[2]);
-              const day = date.getDate().toString().padStart(2, '0');
-              const month = (date.getMonth() + 1).toString().padStart(2, '0');
-              const year = date.getFullYear();
-              return `${day}/${month}/${year}`;
-            }
-            return data;  //Funcion utilizada para formatear fecha a dd/mm/yyyy
-          }
+            // Convertir de 'YYYY-MM-DD' a 'DD/MM/YYYY' para la visualización
+            return moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY');
+          },
+          type: 'date-moment' // Usamos el tipo 'date-moment' para la ordenación correcta
         },
         {
           data: 'amount',
@@ -175,7 +240,7 @@ export class ViewOwnerExpenseComponent implements OnInit {
           sortAscending: ': activar para ordenar la columna de manera ascendente',
           sortDescending: ': activar para ordenar la columna de manera descendente',
         },
-      },
+      }
     });
   }
 }

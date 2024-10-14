@@ -3,7 +3,7 @@ import { Bill } from '../../models/bill';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 //Imports para el DataTable
-import  moment from 'moment'
+import moment from 'moment';
 import $ from 'jquery';
 import 'datatables.net'
 import 'datatables.net-bs5';
@@ -44,75 +44,14 @@ export class ViewGastosAdminComponent implements OnInit {
     expenseTypes: '',
   }
   
-
   ngOnInit(): void {
-    // Definir el tipo de ordenación 'date-moment' para las fechas
-    ($.fn.dataTable as any).moment = function (format: string) {
-      $.fn.dataTable.ext.type.order['date-moment-pre'] = function (data: any) {
-        return moment(data, format).unix(); // Convertir la fecha a timestamp para una correcta ordenación
-      };
+    $.fn.dataTable.ext.type.order['date-moment-pre'] = function (d: string) {
+      return moment(d, 'DD/MM/YYYY').unix();  // Convertir la fecha a timestamp para que pueda ordenarse
     };
-  
-    // Aplica Moment.js al formato 'YYYY-MM-DD'
-    ($.fn.dataTable as any).moment('YYYY-MM-DD');
-   this.loadBills()
+
    this.loadDates()
-  
-    // Inicializar DataTable
-    $('#myTable').DataTable({
-      paging: true,
-      searching: true,
-      ordering: true,
-      lengthChange: false,
-      info: true,
-      pageLength: 10,
-      data: this.bills, // DataSource de la API
-      language: {
-        processing: "Procesando...",
-        search: "Buscar:",
-        lengthMenu: "Mostrar MENU registros",
-        info: "Mostrando del _START_ al _END_ de _TOTAL_ registros",
-        infoEmpty: "Mostrando 0 registros",
-        infoFiltered: "(filtrado de MAX registros totales)",
-        loadingRecords: "Cargando...",
-        zeroRecords: "No se encontraron resultados",
-        emptyTable: "No hay datos disponibles en la tabla",
-        paginate: {
-          first: "Primero",
-          previous: "Anterior",
-          next: "Siguiente",
-          last: "Último"
-        }
-      },
-      columns: [
-        { title: "ID", data: 'id', visible: false },
-        { title: "Categoría", data: "category" },
-        { title: "Proveedor", data: "provider" },
-        { title: "Monto", data: "amount" },
-        { title: "Tipo de Gasto", data: "expenseType" },
-        { 
-          title: "Fecha", 
-          data: "expenseDate", 
-          render: function(data) {
-            // Usar Moment.js para formatear las fechas desde 'YYYY-MM-DD' a 'DD/MM/YYYY'
-            return moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY');
-          },
-          type: 'date-moment' // Tipo de columna para fechas, utilizando Moment.js
-        },
-        {
-          title: "Opciones",
-          data: null,
-          defaultContent: '<button class="btn btn-danger">Eliminar</button>'
-        }
-      ]
-    });
-  
-    // Acción para el botón de eliminar
-    $('#myTable tbody').on('click', '.btn-danger', (event) => {
-      const row = $(event.currentTarget).closest('tr');
-      const rowData = $('#myTable').DataTable().row(row).data();
-      this.deleteBill(rowData.id);
-    });
+   this.configDataTable();
+    this.filterData();
   }
   loadDates() {
     const today = new Date();
@@ -133,12 +72,19 @@ export class ViewGastosAdminComponent implements OnInit {
         () => {
           console.log(`Gasto con ID ${id} eliminada con éxito.`);
           alert('Se elimino con exito el gasto')
-          this.loadBills();
+          this.filterData();
         },
         (error) => {
           console.error(`Error al eliminar la factura con ID ${id}:`, error);
-          this.showModalToNoteCredit();
-          this.failedBillId=id
+          if(error.error.status==409 && error.error.message=="Expense has related bill installments"){
+            this.showModalToNoteCredit();
+            this.failedBillId=id
+          }
+          else{
+            alert('Se elimino con exito el gasto')
+          }
+
+          
         }
       );
   }
@@ -156,12 +102,10 @@ export class ViewGastosAdminComponent implements OnInit {
   filterData() {
       const formattedDateFrom = this.formatDate(this.dateFrom);
       const formattedDateTo = this.formatDate(this.dateTo);
-
       this.billService.getBillsByDateRange(formattedDateFrom, formattedDateTo).subscribe(
         (filteredBills) => {
           this.bills = filteredBills; 
-          this.loadBillsFiltered();
-          console.log(filteredBills);
+          this.configDataTable();
         },
         (error) => {
           console.error('Error al filtrar los gastos:', error);
@@ -170,9 +114,7 @@ export class ViewGastosAdminComponent implements OnInit {
   }
   loadBillsFiltered() {
     const dataTable = $('#myTable').DataTable();
-    dataTable.clear();
-    dataTable.rows.add(this.bills);
-    dataTable.draw();
+    
   }
   formatDate(date: string) {
   const parsedDate = new Date(date);
@@ -197,7 +139,7 @@ export class ViewGastosAdminComponent implements OnInit {
       .subscribe(
         () => {
           console.log(`Gasto con ID ${this.failedBillId} se le creo nota de credito con exito`);
-          this.loadBills();
+          this.filterData();
           alert('Se realizo la nota de credito con exito')
           this.closeModal();
         },
@@ -208,22 +150,69 @@ export class ViewGastosAdminComponent implements OnInit {
         }
       );
   }
-  loadBills() {
-    this.billService.getBillsOnInit().subscribe({
-      next: (data: Bill[]) => {
-        console.log('Bills received:', data);
-        this.bills = data;
-        const dataTable = $('#myTable').DataTable();
-        dataTable.clear();
-        dataTable.rows.add(this.bills);
-        dataTable.draw();
-      },
-      error: (error) => {
-        console.error('Error fetching bills:', error);
-      },
-      complete: () => {
-        console.log('Request completed');
+  configDataTable(){
+    // Verifica si la tabla ya está inicializada, si es así, destrúyela antes de reinicializar
+    
+    if ($.fn.DataTable.isDataTable('#myTable')) {
+      let table = $('#myTable').DataTable();
+      table.clear();
+      table.rows.add(this.bills);
+      table.draw();
+      return;  // Salir de la función después de actualizar los datos
+    }
+    // Inicializar DataTables con los datos cargados
+    $('#myTable').DataTable({
+      paging: true,
+      searching: true,
+      ordering: true,
+      lengthChange: false,
+      info: true,
+      pageLength: 10,
+      data: this.bills, // Aquí los datos ya están disponibles
+      columns: [
+        { title: "ID", data: 'id', visible: false },
+        { title: "Categoría", data: "category" },
+        { title: "Proveedor", data: "provider" },
+        { title: "Monto", data: "amount",render: (data) => `$${data}` },
+        { title: "Tipo de Gasto", data: "expenseType" },
+        { 
+          title: "Fecha", 
+          data: "expenseDate", 
+          render: function(data) {
+            // Convertir de 'YYYY-MM-DD' a 'DD/MM/YYYY' para la visualización
+            return moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY');
+          },
+          type: 'date-moment' // Usamos el tipo 'date-moment' para la ordenación correcta
+        },
+        {
+          title: "Opciones",
+          data: null,
+          defaultContent: '<button class="btn btn-danger">Eliminar</button>'
+        }
+      ],
+      language: {
+        processing: "Procesando...",
+        search: "Buscar:",
+        lengthMenu: "Mostrar MENU registros",
+        info: "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+        infoEmpty: "Mostrando 0 registros",
+        infoFiltered: "(filtrado de MAX registros totales)",
+        loadingRecords: "Cargando...",
+        zeroRecords: "No se encontraron resultados",
+        emptyTable: "No hay datos disponibles en la tabla",
+        paginate: {
+          first: "Primero",
+          previous: "Anterior",
+          next: "Siguiente",
+          last: "Último"
+        }
       }
+    });
+    // Acción para el botón de eliminar
+    $('#myTable tbody').on('click', '.btn-danger', (event) => {
+      const row = $(event.currentTarget).closest('tr');
+      const rowData = $('#myTable').DataTable().row(row).data();
+      this.deleteBill(rowData.id);
     });
   }
 
