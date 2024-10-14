@@ -11,7 +11,8 @@
             class="form-control"
             [(ngModel)]="dateFrom"
             name="dateFrom"
-            placeholder="dd-mm-yyyy"
+            [max]="dateTo"
+            
           />
         </div>
         <div class="col">
@@ -22,6 +23,8 @@
             class="form-control"
             [(ngModel)]="dateTo"
             name="dateTo"
+            [min]="dateFrom"
+            [max]="maxDateTo"
           />
         </div>
         <div class="col-md-6 d-flex align-items-end">

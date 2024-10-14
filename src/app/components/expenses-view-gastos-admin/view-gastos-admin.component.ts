@@ -24,6 +24,7 @@ export class ViewGastosAdminComponent implements OnInit {
 
   dateFrom: string = ''; 
   dateTo: string = '';
+  maxDateTo: string = '';
   distributionList : DistributionList[] = [];
   installmentList : Instalmentlist[] = [];
   failedBillId: number =0;
@@ -59,6 +60,7 @@ export class ViewGastosAdminComponent implements OnInit {
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
     this.dateTo = `${yyyy}-${mm}-${dd}`;
+    this.maxDateTo=`${yyyy}-${mm}-${dd}`;
     const past = new Date();
     past.setMonth(past.getMonth() - 1); 
     const pastyyyy = past.getFullYear();

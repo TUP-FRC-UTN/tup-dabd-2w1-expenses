@@ -11,6 +11,7 @@
             [(ngModel)]="fechaDesde"
             class="form-control"
             name="fechaDesde"
+            [max]="fechaHasta"
           />
         </div>
         <div class="col">
@@ -21,6 +22,8 @@
             [(ngModel)]="fechaHasta"
             class="form-control"
             name="fechaHasta"
+            [min]="fechaDesde"
+            [max]="maxDateTo"
           />
         </div>
         <div class="col-md-6 d-flex align-items-end">

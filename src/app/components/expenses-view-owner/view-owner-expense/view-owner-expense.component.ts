@@ -25,6 +25,7 @@ export class ViewOwnerExpenseComponent implements OnInit {
   dataTable: any;
   fechaDesde: string = '';
   fechaHasta: string = '';
+  maxDateTo: string = '';
 
   constructor(
     private billService: BillViewOwnerService, 
@@ -68,6 +69,7 @@ export class ViewOwnerExpenseComponent implements OnInit {
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
     this.fechaHasta = `${yyyy}-${mm}-${dd}`;
+    this.maxDateTo=`${yyyy}-${mm}-${dd}`;
     const past = new Date();
     past.setMonth(past.getMonth() - 1); 
     const pastyyyy = past.getFullYear();
