@@ -33,7 +33,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   expense: Expense = {
     description: '',
     providerId: 1,
-    expenseDate: new Date(),
+    expenseDate: '',
     invoiceNumber: '',
     typeExpense: '',
     categoryId: 0,
@@ -87,7 +87,11 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
 
   loadDate() {
     const today = new Date();
-    this.expense.expenseDate = today; // Asignar la fecha directamente al modelo
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    this.expense.expenseDate = `${yyyy}-${mm}-${dd}`;
+    
   }
 
   private loadOwners() {
@@ -159,7 +163,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     this.expense = {
       description: '',
       providerId: 1,
-      expenseDate: new Date(),
+      expenseDate: '',
       invoiceNumber: '',
       typeExpense: '',
       categoryId: 0,

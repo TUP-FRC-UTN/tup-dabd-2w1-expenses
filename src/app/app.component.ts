@@ -37,14 +37,14 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
 
   }
-  title = 'template-app';
+  title = 'Gastos';
 
   //navbar
   visibleSection: string = '';
   items: MenuItems[] = [
-    { key: 'menu1', name: 'Listado de Gastos Admin', active: true },
-    { key: 'menu2', name: 'Registrar Gastos', active: true },
-    { key: 'menu3', name: 'Listado de Gastos Propietarios', active: true }
+    { key: 'menu1', name: 'Registrar Gastos', active: true },
+    { key: 'menu2', name: 'Consultar Gastos Administrador', active: true },
+    { key: 'menu3', name: 'Consultar Gastos Propietarios', active: true }
   ];
 
   //navbar

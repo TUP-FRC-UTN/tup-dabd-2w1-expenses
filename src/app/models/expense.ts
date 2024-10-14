@@ -3,7 +3,7 @@ import { Distributions } from "./distributions";
 export interface Expense {
     description: string;
     providerId: number;
-    expenseDate: Date;
+    expenseDate: string;
     invoiceNumber: string;
     typeExpense: string;
     categoryId: number;
