@@ -102,8 +102,8 @@ export class ViewGastosAdminComponent implements OnInit {
     }, 0);
   }
   filterData() {
-      const formattedDateFrom = this.formatDate(this.dateFrom);
-      const formattedDateTo = this.formatDate(this.dateTo);
+      const formattedDateFrom = this.dateFrom;
+      const formattedDateTo = this.dateTo;
       debugger
       this.billService.getBillsByDateRange(formattedDateFrom, formattedDateTo).subscribe(
         (filteredBills) => {
@@ -122,13 +122,14 @@ export class ViewGastosAdminComponent implements OnInit {
     dataTable.draw();
     
   }
-  formatDate(date: string) {
-  const parsedDate = new Date(date);
-  const year = parsedDate.getFullYear();
-  const month = (parsedDate.getMonth() + 1).toString().padStart(2, '0')
-  const day = parsedDate.getDate().toString().padStart(2, '0'); 
-  return `${year}-${month}-${day}`;
-  }
+  // formatDate(date: string) {
+  // const parsedDate = new Date(date);
+  // parsedDate.setHours(0, 0, 0, 0)
+  // const year = parsedDate.getFullYear();
+  // const month = (parsedDate.getMonth() + 1).toString().padStart(2, '0')
+  // const day = parsedDate.getDate().toString().padStart(2, '0'); 
+  // return `${year}-${month}-${day}`;
+  // }
 
   closeModal() {
     this.showErrorModal = false;

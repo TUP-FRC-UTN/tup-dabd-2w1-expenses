@@ -94,8 +94,8 @@ export class ViewOwnerExpenseComponent implements OnInit {
 
 
   filtrarPorFecha(): void {
-    const formattedDateFrom = this.formatDate(this.fechaDesde);
-    const formattedDateTo = this.formatDate(this.fechaHasta);
+    const formattedDateFrom = this.fechaDesde;
+    const formattedDateTo = this.fechaHasta;
 
     this.billService.getBillsByOwnerIdAndDateFromDateTo(223,formattedDateFrom, formattedDateTo).subscribe(
       (filteredBills) => {
@@ -114,13 +114,13 @@ export class ViewOwnerExpenseComponent implements OnInit {
   //   dataTable.rows.add(this.bills);
   //   dataTable.draw();
   // }
-  formatDate(date: string) {
-    const parsedDate = new Date(date);
-    const year = parsedDate.getFullYear();
-    const month = (parsedDate.getMonth() + 1).toString().padStart(2, '0')
-    const day = parsedDate.getDate().toString().padStart(2, '0'); 
-    return `${year}-${month}-${day}`;
-  }
+  // formatDate(date: string) {
+  //   const parsedDate = new Date(date);
+  //   const year = parsedDate.getFullYear();
+  //   const month = (parsedDate.getMonth() + 1).toString().padStart(2, '0')
+  //   const day = parsedDate.getDate().toString().padStart(2, '0'); 
+  //   return `${year}-${month}-${day}`;
+  // }
 
   // initDataTable(data: BillViewOwner[]): void {
   //   const table = $('#myTable');

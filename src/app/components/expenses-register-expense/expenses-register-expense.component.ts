@@ -3,6 +3,7 @@ import {
   forwardRef,
   inject,
   Inject,
+  ChangeDetectorRef,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -41,15 +42,15 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     installments: 0,
     distributions: this.distributions,
   };
-
+  
   selectedFile: File | null = null;
   listOwner: Owner[] = [];
   selectedOwnerId: number = 0;
   listProviders: Provider[] = [];
-  today = new Date();
+  today:string='';
   alreadysent = false;
   expenseCategoryList: ExpenseCategory[] = [];
-
+  private cdRef = inject(ChangeDetectorRef);
   private readonly expenseService = inject(ExpenseService);
   private readonly propietarioService = inject(OwnerService);
   private readonly providerService = inject(ProviderService);
@@ -67,21 +68,45 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     this.selectedFile = event.target.files[0];
   }
 
+  // allowOnlyPositiveNumbers(event: KeyboardEvent): void {
+  //   const charCode = event.which ? event.which : event.keyCode;
+  //   const inputValue: string = (event.target as HTMLInputElement).value;
+
+  //   if (
+  //     (charCode < 48 || charCode > 57) &&
+  //     charCode !== 44 &&
+  //     charCode !== 102 &&
+  //     charCode !== 70
+  //   ) {
+  //     event.preventDefault();
+  //   }
+
+  //   if (charCode === 44 && inputValue.includes(',')) {
+  //     event.preventDefault();
+  //   }
+  // }
   allowOnlyPositiveNumbers(event: KeyboardEvent): void {
     const charCode = event.which ? event.which : event.keyCode;
     const inputValue: string = (event.target as HTMLInputElement).value;
-
+  
+    // Permitir números, la tecla de borrar (backspace), y el punto decimal (.)
     if (
-      (charCode < 48 || charCode > 57) &&
-      charCode !== 44 &&
-      charCode !== 102 &&
-      charCode !== 70
+      (charCode < 48 || charCode > 57) && // No es un número
+      charCode !== 46 && // Permitir el punto decimal
+      charCode !== 8 // Permitir borrar
     ) {
       event.preventDefault();
     }
-
-    if (charCode === 44 && inputValue.includes(',')) {
+  
+    // Evitar que se ingrese más de un punto decimal
+    if (charCode === 46 && inputValue.includes('.')) {
       event.preventDefault();
+    }
+    if (inputValue.includes('.')) {
+      const decimalPart = inputValue.split('.')[1];
+      if (decimalPart && decimalPart.length >= 2) {
+        event.preventDefault(); // No permitir más de 2 dígitos después del punto
+      }
     }
   }
 
@@ -91,6 +116,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
     this.expense.expenseDate = `${yyyy}-${mm}-${dd}`;
+    this.today=`${yyyy}-${mm}-${dd}`;
     
   }
 
@@ -112,11 +138,11 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   }
   private loadExpenseCategories() {
     this.expenseCategoryList = [
-      { id: '1', description: 'Arreglo de camaras' },
-      { id: '2', description: 'Pago de sueldos y jornales' },
-      { id: '3', description: 'Factura de luz' },
-      { id: '4', description: 'Factura de agua' },
-      { id: '5', description: 'Factura de gas' },
+      { id: '1', description: 'Mantenimiento' },
+      { id: '2', description: 'Servicios' },
+      { id: '3', description: 'Reparaciones' },
+      { id: '4', description: 'Administración' },
+      { id: '5', description: 'Seguridad' },
     ];
   }
   public addDistribution(): void {
@@ -139,10 +165,24 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   }
 
   public getOwnerName(ownerId: number): string {
-    const owner = this.listOwner.find((o) => o.id === ownerId);
+    const owner = this.listOwner.find((o) => o.id == ownerId);
     return owner ? `${owner.name} ${owner.lastname}` : '';
   }
-
+  onProportionChange(value: number, index: number): void {
+    // Mantener el valor actualizado al escribir, pero limitarlo en el evento `blur`
+    this.distributions[index].proportion = value;
+    this.validateTotalProportion();
+  }
+  
+  onBlur(event: any, index: number): void {
+    const value = this.distributions[index].proportion;
+    if (value > 100) {
+      this.distributions[index].proportion = 100;
+    } else if (value < 1) {
+      this.distributions[index].proportion = 1;
+    }
+    this.validateTotalProportion();
+  }
   validateTotalProportion(): boolean {
     const total = this.expense.distributions.reduce(
       (sum, distribution) => sum + distribution.proportion,
@@ -175,9 +215,15 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     this.selectedOwnerId = 0;
     this.alreadysent = false;
     this.form.resetForm();
+    this.loadDate();
+    this.cdRef.detectChanges();
   }
-
+  isSubmitting = false;
   save(): void {
+    if (this.isSubmitting) {
+      return; // Evita múltiples envíos
+    }
+    this.isSubmitting = true;
     if (this.expense.typeExpense === 'INDIVIDUAL') {
       if (!this.validateTotalProportion()) {
         return;
@@ -192,13 +238,36 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     this.expenseService
       .registerExpense(this.expense, this.selectedFile ?? undefined)
       .subscribe(
+        // (response) => {
+        //   if(response.status===200){
+        //     alert('Se registro correctamente')
+        //     this.clearForm();
+        //   }
+        //   console.log('Gasto registrado exitosamente', response);
+        //   this.isSubmitting = false; // Rehabilita el botón
+        // },
+        // (error) => {
+        //   alert('Se produjo un error al registrar gastos')
+        //   console.error('Error al registrar el gasto', error);
+        //   this.isSubmitting = false; // Rehabilita el botón
+        // }
         (response) => {
+          // Asegúrate de que estás verificando correctamente la estructura de la respuesta
+          if(response && response.status === 200) {
+            console.log('Respuesta exitosa');  // Esto te ayudará a ver si se ejecuta más de una vez
+            alert('Se registró correctamente');
+            this.clearForm();
+          } else {
+            console.log('Respuesta inesperada', response);
+          }
           console.log('Gasto registrado exitosamente', response);
+          this.isSubmitting = false; // Rehabilita el botón
         },
         (error) => {
+          alert('Se produjo un error al registrar gastos');
           console.error('Error al registrar el gasto', error);
+          this.isSubmitting = false; // Rehabilita el botón
         }
       );
-    this.clearForm();
   }
 }
