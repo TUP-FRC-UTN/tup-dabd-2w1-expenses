@@ -1,4 +1,11 @@
-import { Component, forwardRef, inject, Inject, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  forwardRef,
+  inject,
+  Inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Distributions } from '../../models/distributions';
 import { Expense } from '../../models/expense';
@@ -15,19 +22,18 @@ import { RouterOutlet } from '@angular/router';
   selector: 'app-expenses-register-expense',
   templateUrl: './expenses-register-expense.component.html',
   standalone: true,
-  providers:[ExpenseService,OwnerService,ProviderService],
-  imports: [FormsModule, DatePipe, NgFor, NgIf, CommonModule,RouterOutlet],
-  styleUrls: ['./expenses-register-expense.component.css']
+  providers: [ExpenseService, OwnerService, ProviderService],
+  imports: [FormsModule, DatePipe, NgFor, NgIf, CommonModule, RouterOutlet],
+  styleUrls: ['./expenses-register-expense.component.css'],
 })
 export class ExpensesRegisterExpenseComponent implements OnInit {
-
   @ViewChild('form') form!: NgForm;
-  
+
   distributions: Distributions[] = [];
   expense: Expense = {
     description: '',
     providerId: 1,
-    expenseDate: new Date(), 
+    expenseDate: '',
     invoiceNumber: '',
     typeExpense: '',
     categoryId: 0,
@@ -44,13 +50,14 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   alreadysent = false;
   expenseCategoryList: ExpenseCategory[] = [];
 
-  private readonly expenseService = inject(ExpenseService)
-  private readonly propietarioService = inject(OwnerService)
-  private readonly providerService = inject(ProviderService)
+  private readonly expenseService = inject(ExpenseService);
+  private readonly propietarioService = inject(OwnerService);
+  private readonly providerService = inject(ProviderService);
 
   ngOnInit(): void {
     this.loadOwners();
     this.loadProviders();
+    this.loadDate();
     this.loadExpenseCategories();
   }
   toUpperCase() {
@@ -63,14 +70,28 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   allowOnlyPositiveNumbers(event: KeyboardEvent): void {
     const charCode = event.which ? event.which : event.keyCode;
     const inputValue: string = (event.target as HTMLInputElement).value;
-  
-    if ((charCode < 48 || charCode > 57) && charCode !== 44 && charCode !== 102 && charCode !== 70) {
+
+    if (
+      (charCode < 48 || charCode > 57) &&
+      charCode !== 44 &&
+      charCode !== 102 &&
+      charCode !== 70
+    ) {
       event.preventDefault();
     }
-  
+
     if (charCode === 44 && inputValue.includes(',')) {
       event.preventDefault();
     }
+  }
+
+  loadDate() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    this.expense.expenseDate = `${yyyy}-${mm}-${dd}`;
+    
   }
 
   private loadOwners() {
@@ -142,7 +163,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     this.expense = {
       description: '',
       providerId: 1,
-      expenseDate: new Date(),
+      expenseDate: '',
       invoiceNumber: '',
       typeExpense: '',
       categoryId: 0,
@@ -157,16 +178,22 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   }
 
   save(): void {
-    if (!this.validateTotalProportion()) {
-      return;
+    if (this.expense.typeExpense === 'INDIVIDUAL') {
+      if (!this.validateTotalProportion()) {
+        return;
+      }
+      this.prepareDistributions();
+    } else {
+      // Si el tipo de gasto es COMUN o EXTRAORDINARIO, vaciamos las distribuciones
+      this.expense.distributions = [];
     }
 
-    this.prepareDistributions();
+    // Llamamos al servicio para registrar el gasto
     this.expenseService
       .registerExpense(this.expense, this.selectedFile ?? undefined)
       .subscribe(
         (response) => {
-          console.log('Gastoregistradoexitosamente', response);
+          console.log('Gasto registrado exitosamente', response);
         },
         (error) => {
           console.error('Error al registrar el gasto', error);
@@ -174,5 +201,4 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       );
     this.clearForm();
   }
-
 }

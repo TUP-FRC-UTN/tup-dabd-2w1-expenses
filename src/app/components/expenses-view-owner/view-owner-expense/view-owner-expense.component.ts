@@ -32,6 +32,7 @@ export class ViewOwnerExpenseComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadData();
+    this.loadDates();
     this.initDataTable(this.bills);
   }
 
@@ -44,6 +45,20 @@ export class ViewOwnerExpenseComponent implements OnInit {
 
       this.getBillsByOwnerId(223);
     });
+  }
+
+  loadDates() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    this.fechaHasta = `${yyyy}-${mm}-${dd}`;
+    const past = new Date();
+    past.setMonth(past.getMonth() - 1); 
+    const pastyyyy = past.getFullYear();
+    const pastmm = String(past.getMonth() + 1).padStart(2, '0');
+    const pastdd = String(past.getDate()).padStart(2, '0');
+    this.fechaDesde = `${pastyyyy}-${pastmm}-${pastdd}`;
   }
 
   getBillsByOwnerId(ownerId: number): void {

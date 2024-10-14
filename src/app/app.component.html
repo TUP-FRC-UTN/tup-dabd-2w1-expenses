@@ -2,16 +2,16 @@
 <div>
     @switch (visibleSection) {
     @case ('menu1') {
-    <app-view-gastos-admin></app-view-gastos-admin>
+        <app-expenses-register-expense></app-expenses-register-expense>
     }
     @case ('menu2') {
-        <app-expenses-register-expense></app-expenses-register-expense>
+        <app-view-gastos-admin></app-view-gastos-admin>
     }
     @case ('menu3') {
         <app-view-owner-expense></app-view-owner-expense>
     }
     @default {
-    <h2>HOME</h2>
+        
     }
     }
 </div>
