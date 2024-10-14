@@ -62,10 +62,12 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
 
   allowOnlyPositiveNumbers(event: KeyboardEvent): void {
     const charCode = event.which ? event.which : event.keyCode;
-    if ((charCode < 48 || charCode > 57) && charCode !== 44) {
+    const inputValue: string = (event.target as HTMLInputElement).value;
+  
+    if ((charCode < 48 || charCode > 57) && charCode !== 44 && charCode !== 102 && charCode !== 70) {
       event.preventDefault();
     }
-    const inputValue: string = (event.target as HTMLInputElement).value;
+  
     if (charCode === 44 && inputValue.includes(',')) {
       event.preventDefault();
     }
@@ -133,7 +135,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
 
   prepareDistributions(): void {
     this.expense.distributions.forEach((distribution) => {
-      distribution.proportion = distribution.proportion / 10;
+      distribution.proportion = distribution.proportion / 100;
     });
   }
   clearForm(): void {

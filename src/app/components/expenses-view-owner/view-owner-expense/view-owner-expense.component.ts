@@ -32,6 +32,7 @@ export class ViewOwnerExpenseComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadData();
+    this.initDataTable(this.bills);
   }
 
   loadData(): void {

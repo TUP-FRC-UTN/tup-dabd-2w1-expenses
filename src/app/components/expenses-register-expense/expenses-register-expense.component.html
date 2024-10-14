@@ -1,17 +1,13 @@
-
-<body style="background-color: #ffffff">
-  <div class="container-fluid">
-    <div
-      class="container p-2"
-      style="background-color: white; border-radius: 1%"
-    >
-      <h1 class="mb-3">Registrar Gasto</h1>
+<div class="container mt-4">
+  <div class="card border">
+    <div class="card-body">
+      <h3 class="card-title mb-4">Registrar Gasto</h3>
       <form #form="ngForm" (ngSubmit)="save()">
         <div class="mb-3 row">
           <div class="col">
             <label for="expenseDate" class="form-lable">Fecha de Gasto</label>
             <input
-            [value]="today"
+              [value]="today"
               type="date"
               name="expenseDate"
               [(ngModel)]="expense.expenseDate"
@@ -37,13 +33,13 @@
               [(ngModel)]="expense.invoiceNumber"
               id="invoiceNumber"
               class="form-control"
+              [maxlength]="6"
               #invoiceNumber="ngModel"
+              (keypress)="allowOnlyPositiveNumbers($event)"
               required
             />
             @if(invoiceNumber.touched && invoiceNumber.invalid) {
-            <span class="text-danger"
-              >El numero de comprobante es requerido</span
-            >
+            <span class="text-danger">El numero de comprobante es requerido</span>
             }
           </div>
           <div class="col">
@@ -102,9 +98,7 @@
             }
           </div>
           <div class="col">
-            <label for="categoryId" class="form-lable"
-              >Categoría de Gasto</label
-            >
+            <label for="categoryId" class="form-lable">Categoría de Gasto</label>
             <select
               name="categoryId"
               [(ngModel)]="expense.categoryId"
@@ -258,7 +252,12 @@
                     />
                   </td>
                   <td>
-                    <p style="text-align-last: end;"> {{ (expense.amount * distribution.proportion) / 100 | currency }} </p>
+                    <p style="text-align-last: end">
+                      {{
+                        (expense.amount * distribution.proportion) / 100
+                          | currency
+                      }}
+                    </p>
                   </td>
                   <td>
                     <button
@@ -296,14 +295,13 @@
               class="btn btn-success"
               type="submit"
               style="width: 100%"
-              [disabled]="!form.valid || !validateTotalProportion()"
-            >
+            [disabled]="!form.valid || expense.typeExpense == 'INDIVIDUAL' && !validateTotalProportion()">
               Registrar
             </button>
           </div>
         </div>
       </form>
     </div>
-    <br />
   </div>
-</body>
+  <br />
+</div>
