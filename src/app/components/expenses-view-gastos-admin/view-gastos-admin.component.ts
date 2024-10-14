@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { Bill } from '../../models/bill';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -28,7 +28,8 @@ export class ViewGastosAdminComponent implements OnInit {
   installmentList : Instalmentlist[] = [];
   failedBillId: number =0;
   showErrorModal = false;
-
+ @ViewChild('errorModal') errorModal: ElementRef | undefined;
+  constructor(private cdRef: ChangeDetectorRef) {}
   private readonly billService = inject(BillService)
 
   bills: Bill[] = [];
@@ -136,7 +137,6 @@ export class ViewGastosAdminComponent implements OnInit {
         },
         (error) => {
           console.error(`Error al eliminar la factura con ID ${id}:`, error);
-          debugger
           this.showModalToNoteCredit();
           this.failedBillId=id
         }
@@ -144,6 +144,7 @@ export class ViewGastosAdminComponent implements OnInit {
   }
   showModalToNoteCredit() {
     this.showErrorModal = true;
+    this.cdRef.detectChanges();
     setTimeout(() => {
       const modalElement = document.getElementById('errorModal');
       if (modalElement) {
@@ -183,12 +184,13 @@ export class ViewGastosAdminComponent implements OnInit {
 
   closeModal() {
     this.showErrorModal = false;
-    const modalElement = document.getElementById('errorModal');
-    this.loadBillsFiltered()
-    if (modalElement) {
-      modalElement.style.display = 'none';
-      modalElement.classList.remove('show');
+    if (this.errorModal) {
+      this.errorModal.nativeElement.style.display = 'none';
+      this.errorModal.nativeElement.classList.remove('show');
+      document.body.classList.remove('modal-open');
     }
+    this.cdRef.detectChanges();
+    this.loadBillsFiltered();
   }
   deleteWithNoteCredit() {
     this.billService.createNoteOfCredit(this.failedBillId)
