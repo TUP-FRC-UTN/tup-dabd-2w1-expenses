@@ -10,6 +10,7 @@ import 'datatables.net-bs5';
 import { DistributionList } from '../../models/distributionList';
 import { Instalmentlist } from '../../models/installmentList';
 import { BillService } from '../../services/billServices/bill.service';
+import { debounceTime, distinctUntilChanged, filter, mergeMap, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 
 
 @Component({
@@ -22,74 +23,100 @@ import { BillService } from '../../services/billServices/bill.service';
 })
 export class ViewGastosAdminComponent implements OnInit {
 
-  dateFrom: string = ''; 
+  dateFrom: string = '';
   dateTo: string = '';
   maxDateTo: string = '';
-  distributionList : DistributionList[] = [];
-  installmentList : Instalmentlist[] = [];
-  failedBillId: number =0;
+  distributionList: DistributionList[] = [];
+  installmentList: Instalmentlist[] = [];
+  failedBillId: number = 0;
   showErrorModal = false;
- @ViewChild('errorModal') errorModal: ElementRef | undefined;
-  constructor(private cdRef: ChangeDetectorRef) {}
-  private readonly billService = inject(BillService)
+  isInitial: Boolean = true;
+  private dateChangeSubject = new Subject<{ from: string, to: string }>();
+  private unsubscribe$ = new Subject<void>();
+  @ViewChild('errorModal') errorModal: ElementRef | undefined;
 
   bills: Bill[] = [];
   filterBills: Bill[] = [];
   categories: string[] = [];
   providers: string[] = [];
   expenseTypes: string[] = [];
+  constructor(
+    private cdRef: ChangeDetectorRef,
+    private billService: BillService
+  ) {}
 
-
-  filters ={
-    categoryOrProviderOrExpenseType: '',
-    expenseTypes: '',
-  }
-  
   ngOnInit(): void {
-    $.fn.dataTable.ext.type.order['date-moment-pre'] = function (d: string) {
-      return moment(d, 'DD/MM/YYYY').unix();  // Convertir la fecha a timestamp para que pueda ordenarse
-    };
-
-   this.loadDates()
-   this.configDataTable();
-    this.filterData();
+    this.loadDates();
+    this.setupDateChangeObservable();
+    this.configDataTable();
+    this.filterDataOnInit();
   }
+  filterDataOnInit() {
+    this.billService.getBillsByDateRange(this.dateFrom, this.dateTo).subscribe({
+      next: (response: Bill[]) => {
+        this.bills = response;
+        this.loadBillsFiltered();
+      },
+      error: (error) => {
+        console.error('Error fetching initial bills:', error);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
+
+  private setupDateChangeObservable() {
+    this.dateChangeSubject.pipe(
+      debounceTime(3000),
+      distinctUntilChanged((prev, curr) => 
+        prev.from === curr.from && prev.to === curr.to
+      ),
+      switchMap(({ from, to }) => this.billService.getBillsByDateRange(from, to)),
+      takeUntil(this.unsubscribe$)
+    ).subscribe({
+      next: (response: Bill[]) => {
+        this.bills = response;
+        this.loadBillsFiltered();
+      },
+      error: (error) => {
+        console.error('Error fetching bills:', error);
+      }
+    });
+  }
+
+  filterDataOnChange() {
+    this.dateChangeSubject.next({ from: this.dateFrom, to: this.dateTo });
+  }
+
   loadDates() {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    this.dateTo = `${yyyy}-${mm}-${dd}`;
-    this.maxDateTo=`${yyyy}-${mm}-${dd}`;
-    const past = new Date();
-    past.setMonth(past.getMonth() - 1); 
-    const pastyyyy = past.getFullYear();
-    const pastmm = String(past.getMonth() + 1).padStart(2, '0');
-    const pastdd = String(past.getDate()).padStart(2, '0');
-    this.dateFrom = `${pastyyyy}-${pastmm}-${pastdd}`;
+    const today = moment();
+    this.dateTo = today.format('YYYY-MM-DD');
+    this.maxDateTo = this.dateTo;
+    this.dateFrom = today.subtract(1, 'month').format('YYYY-MM-DD');
   }
-  deleteBill(id: any) {
-    this.billService.deleteLogicBill(id)
-      .subscribe(
-        () => {
-          console.log(`Gasto con ID ${id} eliminada con éxito.`);
-          alert('Se elimino con exito el gasto')
-          this.filterData();
-        },
-        (error) => {
-          console.error(`Error al eliminar la factura con ID ${id}:`, error);
-          if(error.error.status==409 && error.error.message=="Expense has related bill installments"){
-            this.showModalToNoteCredit();
-            this.failedBillId=id
-          }
-          else{
-            alert('Se elimino con exito el gasto')
-          }
 
-          
+  deleteBill(id: number) {
+    this.billService.deleteLogicBill(id).subscribe({
+      next: () => {
+        console.log(`Gasto con ID ${id} eliminada con éxito.`);
+        alert('Se eliminó con éxito el gasto');
+        this.filterDataOnChange();
+      },
+      error: (error) => {
+        console.error(`Error al eliminar la factura con ID ${id}:`, error);
+        if (error.error.status == 409 && error.error.message == "Expense has related bill installments") {
+          this.showModalToNoteCredit();
+          this.failedBillId = id;
+        } else {
+          alert('Ocurrió un error al eliminar el gasto');
         }
-      );
+      }
+    });
   }
+
   showModalToNoteCredit() {
     this.showErrorModal = true;
     this.cdRef.detectChanges();
@@ -101,35 +128,11 @@ export class ViewGastosAdminComponent implements OnInit {
       }
     }, 0);
   }
-  filterData() {
-      const formattedDateFrom = this.dateFrom;
-      const formattedDateTo = this.dateTo;
-      debugger
-      this.billService.getBillsByDateRange(formattedDateFrom, formattedDateTo).subscribe(
-        (filteredBills) => {
-          this.bills = filteredBills; 
-          this.configDataTable();
-        },
-        (error) => {
-          console.error('Error al filtrar los gastos:', error);
-        }
-      );
-  }
+
   loadBillsFiltered() {
     const dataTable = $('#myTable').DataTable();
-    dataTable.clear();
-    dataTable.rows.add(this.bills);
-    dataTable.draw();
-    
+    dataTable.clear().rows.add(this.bills).draw();
   }
-  // formatDate(date: string) {
-  // const parsedDate = new Date(date);
-  // parsedDate.setHours(0, 0, 0, 0)
-  // const year = parsedDate.getFullYear();
-  // const month = (parsedDate.getMonth() + 1).toString().padStart(2, '0')
-  // const day = parsedDate.getDate().toString().padStart(2, '0'); 
-  // return `${year}-${month}-${day}`;
-  // }
 
   closeModal() {
     this.showErrorModal = false;
@@ -141,33 +144,30 @@ export class ViewGastosAdminComponent implements OnInit {
     this.cdRef.detectChanges();
     this.loadBillsFiltered();
   }
+
   deleteWithNoteCredit() {
-    this.billService.createNoteOfCredit(this.failedBillId)
-      .subscribe(
-        () => {
-          console.log(`Gasto con ID ${this.failedBillId} se le creo nota de credito con exito`);
-          this.filterData();
-          alert('Se realizo la nota de credito con exito')
-          this.closeModal();
-        },
-        (error) => {
-          console.error(`Error al realizar la nota de credito del gasto con ID ${this.failedBillId}:`, error);
-          alert('No se pudo realizar la nota de credito con exito')
-          this.showModalToNoteCredit();
-        }
-      );
+    this.billService.createNoteOfCredit(this.failedBillId).subscribe({
+      next: () => {
+        console.log(`Gasto con ID ${this.failedBillId} se le creó nota de crédito con éxito`);
+        this.filterDataOnChange();
+        alert('Se realizó la nota de crédito con éxito');
+        this.closeModal();
+      },
+      error: (error) => {
+        console.error(`Error al realizar la nota de crédito del gasto con ID ${this.failedBillId}:`, error);
+        alert('No se pudo realizar la nota de crédito con éxito');
+        this.showModalToNoteCredit();
+      }
+    });
   }
-  configDataTable(){
-    // Verifica si la tabla ya está inicializada, si es así, destrúyela antes de reinicializar
-    
+
+  configDataTable() {
+    $.fn.dataTable.ext.type.order['date-moment-pre'] = (d: string) => moment(d, 'DD/MM/YYYY').unix();
+
     if ($.fn.DataTable.isDataTable('#myTable')) {
-      let table = $('#myTable').DataTable();
-      table.clear();
-      table.rows.add(this.bills);
-      table.draw();
-      return;  // Salir de la función después de actualizar los datos
+      $('#myTable').DataTable().destroy();
     }
-    // Inicializar DataTables con los datos cargados
+
     $('#myTable').DataTable({
       paging: true,
       searching: true,
@@ -175,24 +175,26 @@ export class ViewGastosAdminComponent implements OnInit {
       lengthChange: false,
       info: true,
       pageLength: 10,
-      data: this.bills, // Aquí los datos ya están disponibles
+      data: this.bills,
       columns: [
         { title: "ID", data: 'id', visible: false },
+        { 
+          title: "Tipo de Gasto", 
+          data: "expenseType",
+          render: (data) => data === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : data
+        },
         { title: "Categoría", data: "category" },
         { title: "Proveedor", data: "provider" },
-        
-        { title: "Tipo de Gasto", data: "expenseType",render: function(data) {
-          return data === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : data;
-        } },
-        { title: "Monto", data: "amount",render: (data) => `$${data}` },
         { 
           title: "Fecha", 
           data: "expenseDate", 
-          render: function(data) {
-            // Convertir de 'YYYY-MM-DD' a 'DD/MM/YYYY' para la visualización
-            return moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY');
-          },
-          type: 'date-moment' // Usamos el tipo 'date-moment' para la ordenación correcta
+          render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
+          type: 'date-moment'
+        },
+        { 
+          title: "Monto", 
+          data: "amount",
+          render: (data) => `$${data}`
         },
         {
           title: "Opciones",
@@ -215,32 +217,17 @@ export class ViewGastosAdminComponent implements OnInit {
           previous: "Anterior",
           next: "Siguiente",
           last: "Último"
-        }
       }
+    }
     });
-    // Acción para el botón de eliminar
+
     $('#myTable tbody').on('click', '.btn-danger', (event) => {
       const row = $(event.currentTarget).closest('tr');
       const rowData = $('#myTable').DataTable().row(row).data();
       this.deleteBill(rowData.id);
     });
   }
-
-
-  /*applyFilters(): void {
-    let filtered = this.bills;
-
-  if (this.filters.categoryOrProviderOrExpenseType) {
-    if (this.categories.includes(this.filters.categoryOrProviderOrExpenseType)) {
-      filtered = filtered.filter(bill => bill.category.includes(this.filters.categoryOrProviderOrExpenseType));
-    } else if (this.providers.includes(this.filters.categoryOrProviderOrExpenseType)) {
-      filtered = filtered.filter(bill => bill.provider.includes(this.filters.categoryOrProviderOrExpenseType));
-    } else if (this.expenseTypes.includes(this.filters.categoryOrProviderOrExpenseType)) {
-      filtered = filtered.filter(bill => bill.expenseType.includes(this.filters.categoryOrProviderOrExpenseType));
-    }
-  }
-
-  this.filterBills = filtered;
-}*/
-
 }
+ 
+
+

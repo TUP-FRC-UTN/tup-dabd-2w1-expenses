@@ -4,7 +4,7 @@
       <h3 class="card-title mb-4">Consultar Gastos</h3>
       <div class="row mb-3">
         <div class="col">
-          <label for="dateFrom" class="form-label">Fecha Desde</label>
+          <label for="dateFrom" class="form-label" >Fecha Desde</label>
           <input
             type="date"
             id="dateFrom"
@@ -12,7 +12,7 @@
             [(ngModel)]="dateFrom"
             name="dateFrom"
             [max]="dateTo"
-            
+            (ngModelChange)="filterDataOnChange()"
           />
         </div>
         <div class="col">
@@ -25,16 +25,10 @@
             name="dateTo"
             [min]="dateFrom"
             [max]="maxDateTo"
+            (ngModelChange)="filterDataOnChange()"
           />
         </div>
         <div class="col-md-6 d-flex align-items-end">
-          <button
-            type="button"
-            class="btn btn-success mt-4"
-            (click)="filterData()"
-          >
-            Filtrar
-          </button>
         </div>
       </div>
       <div class="mt-4">
