@@ -9,6 +9,9 @@ import { FormsModule } from '@angular/forms';
 import { BillViewOwner } from '../../../models/viewOwnerModel/bill-view-owner.model';
 import { BillViewOwnerService } from '../../../services/viewOwnerServices/bill-view-owner.service';
 import { ProviderViewOwnerService } from '../../../services/viewOwnerServices/provider-view-owner.service';
+import * as XLSX from 'xlsx';   // Para exportar a Excel
+import jsPDF from 'jspdf';      // Para exportar a PDF
+import 'jspdf-autotable';       // Para generar tablas en PDF
 
 @Component({
   selector: 'app-view-owner-expense',
@@ -107,6 +110,40 @@ export class ViewOwnerExpenseComponent implements OnInit {
         console.error('Error al filtrar los gastos:', error);
       }
     );
+  }
+
+  // Función para exportar a Excel
+  exportToExcel(): void {
+    const table = $('#myTable').DataTable();
+    const filteredData = table.rows({ search: 'applied' }).data().toArray();
+
+    const worksheet = XLSX.utils.json_to_sheet(filteredData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Gastos');
+    XLSX.writeFile(workbook, 'gastos.xlsx');
+  }
+
+  // Función para exportar a PDF
+  exportToPDF(): void {
+    const doc = new jsPDF();
+    const table = $('#myTable').DataTable();
+    const filteredData = table.rows({ search: 'applied' }).data().toArray();
+
+    const pdfData = filteredData.map(bill => [
+      bill.description,
+      bill.categoryDescription,
+      bill.providerId,
+      bill.expenseType,
+      moment(bill.expenseDate).format('DD/MM/YYYY'),
+      `$${bill.amount}`
+    ]);
+
+    (doc as any).autoTable({
+      head: [['Descripción', 'Categoría', 'Proveedor', 'Tipo de Gasto', 'Fecha', 'Monto']],
+      body: pdfData,
+    });
+
+    doc.save('gastos.pdf');
   }
   // loadBillsFiltered() {
   //   const dataTable = $('#myTable').DataTable();
@@ -251,5 +288,7 @@ export class ViewOwnerExpenseComponent implements OnInit {
         },
       }
     });
+
+    
   }
 }

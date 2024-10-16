@@ -26,16 +26,23 @@
             [max]="maxDateTo"
           />
         </div>
+
         <div class="col-md-6 d-flex align-items-end">
-          <button class="btn btn-success mt-4" (click)="filtrarPorFecha()">
+          <button class="btn btn-success mt-4 me-2" (click)="filtrarPorFecha()">
             Filtrar
           </button>
+          <button class="btn btn-success mt-4 me-2" (click)="exportToExcel()">
+            Excel
+          </button>
+          <button class="btn btn-success mt-4" (click)="exportToPDF()">
+            PDF
+          </button>
         </div>
-      </div>
+        
       <div class="mt-4">
         <table id="myTable" class="table table-striped table-bordered display">
-          <thead>
-            <!-- <tr>
+          <thead></thead>
+          <!-- <tr>
               <th>Categoría</th>
               <th>Descripción</th>
               <th>Proveedor</th>
@@ -43,7 +50,6 @@
               <th>Fecha</th>
               <th>Monto</th>
             </tr> -->
-          </thead>
           <tbody></tbody>
         </table>
       </div>
