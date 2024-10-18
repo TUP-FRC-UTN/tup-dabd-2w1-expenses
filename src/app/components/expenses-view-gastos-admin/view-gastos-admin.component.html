@@ -4,7 +4,7 @@
       <h3 class="card-title mb-4">Consultar Gastos</h3>
       <div class="row mb-3">
         <div class="col">
-          <label for="dateFrom" class="form-label">Fecha Desde</label>
+          <label for="dateFrom" class="form-label" >Fecha Desde</label>
           <input
             type="date"
             id="dateFrom"
@@ -12,7 +12,7 @@
             [(ngModel)]="dateFrom"
             name="dateFrom"
             [max]="dateTo"
-            
+            (ngModelChange)="filterDataOnChange()"
           />
         </div>
         <div class="col">
@@ -25,16 +25,13 @@
             name="dateTo"
             [min]="dateFrom"
             [max]="maxDateTo"
+            (ngModelChange)="filterDataOnChange()"
           />
         </div>
         <div class="col-md-6 d-flex align-items-end">
-          <button
-            type="button"
-            class="btn btn-success mt-4"
-            (click)="filterData()"
-          >
-            Filtrar
-          </button>
+          <div *ngIf="isLoading" class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
         </div>
       </div>
       <div class="mt-4">
@@ -42,45 +39,109 @@
           <thead></thead>
           <tbody></tbody>
         </table>
+    <!-- Modal Confirm Delete -->
+        <div
+  #modalConfirmDelete
+  class="modal"
+  id="modalConfirrmationDeleteExpense"
+  tabindex="-1"
+  role="dialog"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmación</h5>
       </div>
+      <div class="modal-body">
+        ¿Está seguro de eliminar el gasto?
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeModal(modalConfirmDelete)"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="confirmDeleteExpense()"
+        >
+          Aceptar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+ <!--Modal show operation successfuly-->
+ <div
+ #operationSuccessfullyDelete
+ class="modal"
+ id="operationSuccessfully"
+ tabindex="-1"
+ role="dialog"
+>
+ <div class="modal-dialog" role="document">
+   <div class="modal-content">
+     <div class="modal-header">
+       <h5 class="modal-title">Confirmación</h5>
+     </div>
+     <div class="modal-body">
+       Se realizo con exito la eliminacion del gasto
+     </div>
+     <div class="modal-footer">
+       <button
+         type="button"
+         class="btn btn-secondary">
+         Cancelar
+       </button>
+       <button
+         type="button"
+         class="btn btn-primary">
+         Aceptar
+       </button>
+     </div>
+   </div>
+ </div>
+</div>
 
-      <!-- Modal -->
-      <div
-        *ngIf="showErrorModal"
-        class="modal"
-        id="errorModal"
-        tabindex="-1"
-        role="dialog"
-        aria-labelledby="errorModalLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Nota de credito</h5>
-            </div>
-            <div class="modal-body">
-              El gasto ya esta cobrado. ¿Desea realizar una nota de credito?
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                (click)="closeModal()"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                class="btn btn-primary"
-                (click)="deleteWithNoteCredit()"
-              >
-                Aceptar
-              </button>
-            </div>
-          </div>
-        </div>
+<!-- Modal Note Credit -->
+<div
+  #modalNoteCredit
+  class="modal"
+  id="showModalNoteCredit"
+  tabindex="-1"
+  role="dialog"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nota de crédito</h5>
       </div>
+      <div class="modal-body">
+        El gasto ya está cobrado. ¿Desea realizar una nota de crédito?
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeModal(modalNoteCredit)"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="deleteWithNoteCredit()"
+        >
+          Aceptar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+  <!-- Modal Confirm Delete -->
     </div>
   </div>
 </div>
