@@ -5,18 +5,44 @@
       <form #form="ngForm" (ngSubmit)="save()">
         <div class="mb-3 row">
           <div class="col">
-            <label for="expenseDate" class="form-lable">Fecha de Gasto</label>
-            <input
-              [value]="today"
-              type="date"
-              name="expenseDate"
-              [(ngModel)]="expense.expenseDate"
-              id="expenseDate"
-              class="form-control"
-              [max]="today | date : 'yyyy-MM-dd'"
-              #fecha="ngModel"
-              required
-            />
+            <div class="d-flex justify-content-start align-items-center mb-2">
+              <div class="col-3">
+                <label for="typeExpense" class="form-lable">Tipo: </label>
+              </div>
+              <select
+                name="typeExpense"
+                [(ngModel)]="expense.typeExpense"
+                id="typeExpense"
+                class="form-select"
+                #typeExpense="ngModel"
+                required
+              >
+                <option value="COMUN">Común</option>
+                <option value="INDIVIDUAL">Individual</option>
+                <option value="EXTRAORDINARIO">Extraordinario</option>
+              </select>
+            </div>
+            @if(typeExpense.touched && typeExpense.invalid ) {
+            <span class="text-danger">El tipo de gasto es requerido</span>
+            }
+          </div>
+          <div class="col">
+            <div class="d-flex justify-content-start align-items-center mb-2">
+              <div class="col-3">
+                <label for="expenseDate" class="form-lable">Fecha: </label>
+              </div>
+              <input
+                [value]="today"
+                type="date"
+                name="expenseDate"
+                [(ngModel)]="expense.expenseDate"
+                id="expenseDate"
+                class="form-control"
+                [max]="today | date : 'yyyy-MM-dd'"
+                #fecha="ngModel"
+                required
+              />
+            </div>
             @if(fecha.touched && fecha.invalid) {
             <span class="text-danger">La fecha es requerida</span>
             }
@@ -24,95 +50,53 @@
         </div>
         <div class="mb-3 row">
           <div class="col">
-            <label for="invoiceNumber" class="form-lable"
-              >Número de Comprobante</label
-            >
-            <input
-              type="string"
-              name="invoiceNumber"
-              [(ngModel)]="expense.invoiceNumber"
-              id="invoiceNumber"
-              class="form-control"
-              [maxlength]="6"
-              #invoiceNumber="ngModel"
-              (keypress)="allowOnlyPositiveNumbers($event)"
-              required
-            />
-            @if(invoiceNumber.touched && invoiceNumber.invalid) {
-            <span class="text-danger">El numero de comprobante es requerido</span>
-            }
-          </div>
-          <div class="col">
-            <label for="receipt" class="form-lable">Comprobante</label>
-            <input
-              type="file"
-              name="receipt"
-              id="receipt"
-              class="form-control"
-              (change)="onFileSelected($event)"
-              accept="image/*,.pdf"
-            />
-          </div>
-        </div>
-        <div class="mb-3 row">
-          <div class="col">
-            <label for="selectprovider" class="form-lable">Proveedor</label>
-            <select
-              class="form-select"
-              name="selectprovider"
-              [(ngModel)]="expense.providerId"
-              id="selectprovider"
-              aria-label="Seleccione un proveedor:"
-              #provider="ngModel"
-              required
-            >
-              <option
-                *ngFor="let provider of listProviders"
-                [value]="provider.id"
+            <div class="d-flex justify-content-start align-items-center mb-2">
+              <div class="col-3">
+                <label for="selectprovider" class="form-lable"
+                  >Proveedor:
+                </label>
+              </div>
+              <select
+                class="form-select"
+                name="selectprovider"
+                [(ngModel)]="expense.providerId"
+                id="selectprovider"
+                aria-label="Seleccione un proveedor:"
+                #provider="ngModel"
+                required
               >
-                {{ provider.description }}
-              </option>
-            </select>
+                <option
+                  *ngFor="let provider of listProviders"
+                  [value]="provider.id"
+                >
+                  {{ provider.description }}
+                </option>
+              </select>
+            </div>
             @if(provider.touched && provider.invalid) {
             <span class="text-danger">El proveedor es requerido</span>
             }
           </div>
-        </div>
-        <div class="mb-3 row">
           <div class="col">
-            <label for="typeExpense" class="form-lable">Tipo de Gasto</label>
-            <select
-              name="typeExpense"
-              [(ngModel)]="expense.typeExpense"
-              id="typeExpense"
-              class="form-select"
-              #typeExpense="ngModel"
-              required
-            >
-              <option value="INDIVIDUAL">Individual</option>
-              <option value="COMUN">Común</option>
-              <option value="EXTRAORDINARIO">Extraordinario</option>
-            </select>
-            @if(typeExpense.touched && typeExpense.invalid ) {
-            <span class="text-danger">El tipo de gasto es requerido</span>
-            }
-          </div>
-          <div class="col">
-            <label for="categoryId" class="form-lable">Categoría de Gasto</label>
-            <select
-              name="categoryId"
-              [(ngModel)]="expense.categoryId"
-              id="categoryId"
-              class="form-select"
-              #categoryId="ngModel"
-              required
-            >
-              @for (expenseCategory of expenseCategoryList; track $index) {
-              <option [value]="expenseCategory.id">
-                {{ expenseCategory.description }}
-              </option>
-              }
-            </select>
+            <div class="d-flex justify-content-start align-items-center mb-2">
+              <div class="col-3">
+                <label for="categoryId" class="form-lable">Categoría: </label>
+              </div>
+              <select
+                name="categoryId"
+                [(ngModel)]="expense.categoryId"
+                id="categoryId"
+                class="form-select"
+                #categoryId="ngModel"
+                required
+              >
+                @for (expenseCategory of expenseCategoryList; track $index) {
+                <option [value]="expenseCategory.id">
+                  {{ expenseCategory.description }}
+                </option>
+                }
+              </select>
+            </div>
             @if(categoryId.touched && categoryId.invalid) {
             <span class="text-danger">La categoría de gasto es requerida</span>
             }
@@ -120,40 +104,89 @@
         </div>
         <div class="mb-3 row">
           <div class="col">
-            <label for="amount" class="form-lable">Monto</label>
-            <input
-              type="number"
-              name="amount"
-              [(ngModel)]="expense.amount"
-              id="amount"
-              class="form-control"
-              (keypress)="allowOnlyPositiveNumbers($event)"
-              style="text-align: end"
-              [min]="1"
-              #amount="ngModel"
-              required
-            />
+            <div class="d-flex justify-content-start align-items-center mb-2">
+              <div class="col-3">
+                <label for="invoiceNumber" class="form-lable">N° Comprobante: </label>
+              </div>
+              <input
+                type="string"
+                name="invoiceNumber"
+                [(ngModel)]="expense.invoiceNumber"
+                id="invoiceNumber"
+                class="form-control"
+                [maxlength]="6"
+                #invoiceNumber="ngModel"
+                (keypress)="allowOnlyPositiveNumbers($event)"
+                required
+              />
+            </div>
+            @if(invoiceNumber.touched && invoiceNumber.invalid) {
+            <span class="text-danger"
+              >El numero de comprobante es requerido</span
+            >
+            }
+          </div>
+          <div class="col">
+            <div class="d-flex justify-content-start align-items-center mb-2">
+              <div class="col-3">
+                <label for="receipt" class="form-lable">Comprobante: </label>
+              </div>
+              <input
+                type="file"
+                name="receipt"
+                id="receipt"
+                class="form-control"
+                (change)="onFileSelected($event)"
+                accept="image/*,.pdf"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3 row">
+          <div class="col">
+            <div class="d-flex justify-content-start align-items-center mb-2">
+              <div class="col-3">
+                <label for="amount" class="form-lable">Monto: </label>
+              </div>
+              <input
+                type="number"
+                name="amount"
+                [(ngModel)]="expense.amount"
+                id="amount"
+                class="form-control"
+                (keypress)="allowOnlyPositiveNumbers($event)"
+                style="text-align: end"
+                [min]="1"
+                #amount="ngModel"
+                required
+              />
+            </div>
             @if(amount.touched && amount.invalid) {
             <span class="text-danger">El monto es requerido</span>
             }
           </div>
           <div class="col">
-            <label for="installments" class="form-lable">Cuotas</label>
-            <select
-              name="installments"
-              [(ngModel)]="expense.installments"
-              id="installments"
-              style="text-align: end"
-              class="form-select"
-              #intallments="ngModel"
-              required
-            >
-              <option value="1">1</option>
-              <option value="3">3</option>
-              <option value="6">6</option>
-              <option value="9">9</option>
-              <option value="12">12</option>
-            </select>
+            <div class="d-flex justify-content-start align-items-center mb-2">
+              <div class="col-3">
+                <label for="installments" class="form-lable">Cuotas: </label>
+              </div>
+              <select
+                name="installments"
+                [(ngModel)]="expense.installments"
+                id="installments"
+                style="text-align: end"
+                class="form-select"
+                #intallments="ngModel"
+                required
+              >
+                <option value="1">1</option>
+                <option value="3">3</option>
+                <option value="6">6</option>
+                <option value="9">9</option>
+                <option value="12">12</option>
+              </select>
+            </div>
             @if(intallments.touched && intallments.invalid) {
             <span class="text-danger">Las cuotas son requeridas</span>
             }
@@ -161,18 +194,22 @@
         </div>
         <div class="mb-3 row">
           <div class="col">
-            <label for="description" class="form-lable">Descripción</label>
-            <textarea
-              name="description"
-              id="description"
-              [(ngModel)]="expense.description"
-              class="form-control"
-              placeholder="Escribe una descripción..."
-              rows="2"
-              #description="ngModel"
-              required
-            >
-            </textarea>
+            <div class="d-flex justify-content-start align-items-center mb-2">
+              <div class="col-1 me-5">
+                <label for="description" class="form-lable">Descripción: </label>
+              </div>
+              <textarea
+                name="description"
+                id="description"
+                [(ngModel)]="expense.description"
+                class="form-control"
+                placeholder="Escribe una descripción..."
+                rows="2"
+                #description="ngModel"
+                required
+              >
+              </textarea>
+            </div>
             @if(description.touched && description.invalid) {
             <span class="text-danger">La descripción es requerida</span>
             }
@@ -295,7 +332,12 @@
               class="btn btn-success"
               type="submit"
               style="width: 100%"
-              [disabled]="!form.valid || (expense.typeExpense == 'INDIVIDUAL' && !validateTotalProportion())">
+              [disabled]="
+                !form.valid ||
+                (expense.typeExpense == 'INDIVIDUAL' &&
+                  !validateTotalProportion())
+              "
+            >
               Registrar
             </button>
           </div>
