@@ -1,28 +1,27 @@
 <div class="container mt-4">
-    <!-- Filtros -->
-    <div class="filter-container d-flex justify-content-end align-items-center mb-3">
-      <div class="me-3">
-        <label for="startDate" class="form-label">Fecha Desde:</label>
-        <input type="date" id="startDate" [(ngModel)]="startDate" class="form-control">
-      </div>
-      <div class="me-3">
-        <label for="endDate" class="form-label">Fecha Hasta:</label>
-        <input type="date" id="endDate" [(ngModel)]="endDate" class="form-control">
-      </div>
-      <button (click)="loadCharts()" class="btn btn-success">Aplicar Filtro</button>
+  <!-- Filtros -->
+  <div class="filter-container d-flex justify-content-end align-items-center mb-3">
+    <div class="me-3">
+      <label for="startDate" class="form-label">Fecha Desde:</label>
+      <input type="date" id="startDate" [(ngModel)]="startDate" class="form-control">
     </div>
-  
-    <!-- Contenedores de Gráficos -->
-    <div class="chart-container">
-      <div *ngIf="yearMonthChart" class="mb-5">
-        <h3 class="text-center">Gastos por Año y Mes</h3>
-        <google-chart [data]="yearMonthChart"></google-chart>
-      </div>
-  
-      <div *ngIf="categoriesPeriodChart">
-        <h3 class="text-center">Gastos por Categoría</h3>
-        <google-chart [data]="categoriesPeriodChart"></google-chart>
-      </div>
+    <div class="me-3">
+      <label for="endDate" class="form-label">Fecha Hasta:</label>
+      <input type="date" id="endDate" [(ngModel)]="endDate" class="form-control">
+    </div>
+    <button (click)="loadCharts()" class="btn btn-success">Aplicar Filtro</button>
+  </div>
+
+  <!-- Contenedores de Gráficos -->
+  <div class="chart-container">
+    <div *ngIf="yearMonthChart" class="mb-5">
+      <h3 class="text-center">Gastos por Año y Mes</h3>
+      <google-chart [data]="yearMonthChart"></google-chart>
+    </div>
+
+    <div *ngIf="categoriesPeriodChart">
+      <h3 class="text-center">Gastos por Categoría</h3>
+      <google-chart [data]="categoriesPeriodChart"></google-chart>
     </div>
   </div>
-  
+</div>
