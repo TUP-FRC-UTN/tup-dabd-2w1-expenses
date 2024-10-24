@@ -15,6 +15,7 @@ import 'datatables.net-bs5';
 import { ExpensesRegisterExpenseComponent } from "./components/expenses-register-expense/expenses-register-expense.component";
 import { ViewOwnerExpenseComponent } from "./components/expenses-view-owner/view-owner-expense/view-owner-expense.component";
 import { appConfig } from './app.config';
+import { ReportExpenseComponent } from './components/expenses-report/report-expense/report-expense.component';
 
 @Component({
   selector: 'app-root',
@@ -25,7 +26,8 @@ import { appConfig } from './app.config';
     ViewGastosAdminComponent, 
     HttpClientModule, 
     ExpensesRegisterExpenseComponent, 
-    ViewOwnerExpenseComponent
+    ViewOwnerExpenseComponent,
+    ReportExpenseComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
@@ -44,7 +46,8 @@ export class AppComponent implements OnInit {
   items: MenuItems[] = [
     { key: 'menu1', name: 'Registrar Gastos', active: true },
     { key: 'menu2', name: 'Consultar Gastos Administrador', active: true },
-    { key: 'menu3', name: 'Consultar Gastos Propietarios', active: true }
+    { key: 'menu3', name: 'Consultar Gastos Propietarios', active: true },
+    { key: 'menu4', name: 'Reporte de Expensas', active: true }
   ];
 
   //navbar
