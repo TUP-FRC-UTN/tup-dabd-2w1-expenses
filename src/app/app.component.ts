@@ -15,18 +15,20 @@ import 'datatables.net-bs5';
 import { ExpensesRegisterExpenseComponent } from "./components/expenses-register-expense/expenses-register-expense.component";
 import { ViewOwnerExpenseComponent } from "./components/expenses-view-owner/view-owner-expense/view-owner-expense.component";
 import { appConfig } from './app.config';
+import { ExpensesNavbarComponent } from "./components/expenses-navbar/expenses-navbar.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
     RouterOutlet,
-    NavbarComponent, 
-    ViewGastosAdminComponent, 
-    HttpClientModule, 
-    ExpensesRegisterExpenseComponent, 
-    ViewOwnerExpenseComponent
-  ],
+    NavbarComponent,
+    ViewGastosAdminComponent,
+    HttpClientModule,
+    ExpensesRegisterExpenseComponent,
+    ViewOwnerExpenseComponent,
+    ExpensesNavbarComponent
+],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
