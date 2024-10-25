@@ -7,7 +7,7 @@
           <div class="col">
             <div class="d-flex justify-content-start align-items-center mb-2">
               <div class="col-3">
-                <label for="typeExpense" class="form-lable">Tipo: </label>
+                <label for="typeExpense" class="form-lable">Tipo *  </label>
               </div>
               <select
                 name="typeExpense"
@@ -29,7 +29,7 @@
           <div class="col">
             <div class="d-flex justify-content-start align-items-center mb-2">
               <div class="col-3">
-                <label for="expenseDate" class="form-lable">Fecha: </label>
+                <label for="expenseDate" class="form-lable">Fecha * </label>
               </div>
               <input
                 [value]="today"
@@ -53,7 +53,7 @@
             <div class="d-flex justify-content-start align-items-center mb-2">
               <div class="col-3">
                 <label for="selectprovider" class="form-lable"
-                  >Proveedor:
+                  >Proveedor
                 </label>
               </div>
               <select
@@ -63,8 +63,8 @@
                 id="selectprovider"
                 aria-label="Seleccione un proveedor:"
                 #provider="ngModel"
-                required
               >
+                <option value="0" selected></option>
                 <option
                   *ngFor="let provider of listProviders"
                   [value]="provider.id"
@@ -73,14 +73,11 @@
                 </option>
               </select>
             </div>
-            @if(provider.touched && provider.invalid) {
-            <span class="text-danger">El proveedor es requerido</span>
-            }
           </div>
           <div class="col">
             <div class="d-flex justify-content-start align-items-center mb-2">
               <div class="col-3">
-                <label for="categoryId" class="form-lable">Categoría: </label>
+                <label for="categoryId" class="form-lable">Categoría * </label>
               </div>
               <select
                 name="categoryId"
@@ -106,7 +103,7 @@
           <div class="col">
             <div class="d-flex justify-content-start align-items-center mb-2">
               <div class="col-3">
-                <label for="invoiceNumber" class="form-lable">N° Comprobante: </label>
+                <label for="invoiceNumber" class="form-lable">N° Comprobante * </label>
               </div>
               <input
                 type="string"
@@ -129,7 +126,7 @@
           <div class="col">
             <div class="d-flex justify-content-start align-items-center mb-2">
               <div class="col-3">
-                <label for="receipt" class="form-lable">Comprobante: </label>
+                <label for="receipt" class="form-lable">Comprobante  </label>
               </div>
               <input
                 type="file"
@@ -147,7 +144,7 @@
           <div class="col">
             <div class="d-flex justify-content-start align-items-center mb-2">
               <div class="col-3">
-                <label for="amount" class="form-lable">Monto: </label>
+                <label for="amount" class="form-lable">Monto * </label>
               </div>
               <input
                 type="number"
@@ -169,7 +166,7 @@
           <div class="col">
             <div class="d-flex justify-content-start align-items-center mb-2">
               <div class="col-3">
-                <label for="installments" class="form-lable">Cuotas: </label>
+                <label for="installments" class="form-lable">Cuotas * </label>
               </div>
               <select
                 name="installments"
@@ -196,7 +193,7 @@
           <div class="col">
             <div class="d-flex justify-content-start align-items-center mb-2">
               <div class="col-1 me-5">
-                <label for="description" class="form-lable">Descripción: </label>
+                <label for="description" class="form-lable">Descripción *</label>
               </div>
               <textarea
                 name="description"

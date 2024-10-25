@@ -61,6 +61,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     this.loadDate();
     this.loadExpenseCategories();
     this.expense.typeExpense = 'COMUN';
+    this.expense.providerId = 0;
     this.expense.installments = 1;  
   }
   toUpperCase() {
@@ -202,11 +203,9 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     });
   }
   clearForm(): void {
-    this.ngOnInit();
     this.alreadysent = false;
     this.form.resetForm();
-    this.loadDate();
-    this.cdRef.detectChanges();
+    this.ngOnInit();
   }
   isSubmitting = false;
   save(): void {
@@ -259,5 +258,6 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
           this.isSubmitting = false; // Rehabilita el botón
         }
       );
+      this.clearForm();
   }
 }
