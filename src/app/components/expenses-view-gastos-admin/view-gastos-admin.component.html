@@ -141,7 +141,32 @@
     </div>
   </div>
 </div>
-  <!-- Modal Confirm Delete -->
+  <!-- Modal Error Delete -->
+  <div
+  #modalError
+  class="modal"
+  id="modalError"
+  tabindex="-1"
+  role="dialog"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Error</h5>
+      </div>
+      <div class="modal-body">
+        Se produjo un error al eliminar el gasto
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="closeModal(modalError)"
+        >
+          Aceptar
+        </button>
+      </div>
     </div>
+  </div>
   </div>
 </div>
