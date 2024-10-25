@@ -224,27 +224,23 @@ private setupDateChangeObservable() {
           render: function(data, type, row) {
             return `
                <div class="dropdown">
-      <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        Opciones
-      </button>
-      <ul class="dropdown-menu">
-        <li>
-          <a class="dropdown-item text-info btn-view" href="#">
-            <i class="fas fa-eye"></i> Ver más
-          </a>
-        </li>
-        <li>
-          <a class="dropdown-item text-secondary btn-edit" href="#">
-            <i class="fas fa-edit"></i> Editar
-          </a>
-        </li>
-        <li>
-          <a class="dropdown-item text-danger btn-delete" href="#">
-            <i class="fas fa-trash"></i> Eliminar
-          </a>
-        </li>
-      </ul>
-    </div>
+    <button class="btn btn-ligth border border-black rounded-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-dots-vertical" 
+    width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" 
+    stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+    <path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+    <path d="M12 19m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+    <path d="M12 5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+  </svg>
+    </button>
+    <ul class="dropdown-menu">
+      <li><button class="dropdown-item view" >Ver Mas</button></li>
+      <li><button class="dropdown-item edit" >Editar</button></li>
+      <li><button class="dropdown-item delete" >Eliminar</button></li>
+
+    </ul>
+  </div>
             `;
           }
       },
@@ -269,19 +265,19 @@ private setupDateChangeObservable() {
     });
     const table = $('#myTable').DataTable();
 
-    $('#myTable tbody').on('click', '.btn-view', (event) => {
+    $('#myTable tbody').on('click', '.view', (event) => {
       const row = $(event.currentTarget).closest('tr');
       const rowData = table.row(row).data();
       this.viewBillDetails(rowData.id);
     });
 
-    $('#myTable tbody').on('click', '.btn-edit', (event) => {
+    $('#myTable tbody').on('click', '.edit', (event) => {
       const row = $(event.currentTarget).closest('tr');
       const rowData = table.row(row).data();
       this.editBill(rowData.id);
     });
 
-    $('#myTable tbody').on('click', '.btn-delete', (event) => {
+    $('#myTable tbody').on('click', '.delete', (event) => {
       const row = $(event.currentTarget).closest('tr');
       const rowData = table.row(row).data();
       this.failedBillId= rowData.id
@@ -290,7 +286,7 @@ private setupDateChangeObservable() {
     
     
   }
-  editBill(id: any) {
+    editBill(id: any) {
     throw new Error('Method not implemented.');
   }
   viewBillDetails(id: any) {

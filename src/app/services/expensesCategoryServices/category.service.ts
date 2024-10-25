@@ -16,6 +16,10 @@ export class CategoryService {
     return this.http.get<Category[]>(this.url+'/all');
   }
 
+  add(expenseCategory: Category): Observable<Category> {
+    
+    return this.http.post<Category>(this.url, expenseCategory.description)
+  }
 
   deleteCategory(id: number): Observable<void> {
     const url=this.url+'/delete?id='+id;

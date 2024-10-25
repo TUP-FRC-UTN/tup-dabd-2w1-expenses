@@ -57,41 +57,6 @@ export class ExpensesViewCategoryComponent implements OnInit {
   }
 
 
-  
-  deleteCategory(id: any) {
-    this.categoryService.deleteCategory(id)
-      .subscribe(
-        () => {
-          console.log(`Categoria con ID ${id} eliminada con éxito.`);
-          alert('Se elimino con exito la categoria')
-          this.filterData();
-        },
-        //reutilizo esto o lo saco?
-        /*(error) => {
-          console.error(`Error al eliminar la categoria con ID ${id}:`, error);
-          if(error.error.status==409 && error.error.message=="Expense has related bill installments"){
-            this.showModalToNoteCredit();
-            this.failedBillId=id
-          }
-          else{
-            alert('Se elimino con exito el gasto')
-          }
-          
-        }*/
-      );
-  }
-
-  showModalToAddCategory() {
-    this.showErrorModal = true;
-    this.cdRef.detectChanges();
-    setTimeout(() => {
-      const modalElement = document.getElementById('errorModal');
-      if (modalElement) {
-        modalElement.style.display = 'block';
-        modalElement.classList.add('show');
-      }
-    }, 0);
-  }
 
   filterData() {
       
@@ -173,6 +138,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
       columns: [
         { title: "ID", data: 'id', visible: false },
         { title: "Categoría", data: "description" },
+        { title: "Estado", data: "state" },
         
         { 
           title: "Fecha", 
@@ -199,9 +165,8 @@ export class ExpensesViewCategoryComponent implements OnInit {
   </svg>
     </button>
     <ul class="dropdown-menu">
-      <li><a class="dropdown-item add" href="#">Agregar</a></li>
-      <li><a class="dropdown-item" href="#">Editar</a></li>
-      <li><a class="dropdown-item" href="#">Eliminar</a></li>
+       <li><button class="dropdown-item edit" >Editar</button></li>
+      <li><button class="dropdown-item delete" >Eliminar</button></li>
     </ul>
   </div>`
         }
@@ -222,10 +187,21 @@ export class ExpensesViewCategoryComponent implements OnInit {
           next: "Siguiente",
           last: "Último"
         }
+      },
+      layout: {
+        topStart: 'search',
+        topEnd: 'pageLength'
       }
+  
     })
     // Acción para el botón de acciones
     $('#myTable tbody').on('click', '.add', (event) => {
+      const row = $(event.currentTarget).closest('tr');
+      const rowData = $('#myTable').DataTable().row(row).data();
+      this.showModalToAddCategory();
+    });
+
+    $('#myTable tbody').on('click', '.edit', (event) => {
       const row = $(event.currentTarget).closest('tr');
       const rowData = $('#myTable').DataTable().row(row).data();
       this.showModalToAddCategory();
@@ -238,16 +214,70 @@ export class ExpensesViewCategoryComponent implements OnInit {
       alert("Formulario Invalido");
       return;
     }
-    
-
     //aca iria otro if que verifica si la categoria ya existe en el back.(con la misma descripcion)
     //con un alert o algo del estilo form.value.descripcion == si esta en el array
 
     //se llama al metodo add del service pasandole como parametro el valor del form
-   // this.categoryService.add(form.value);
+    this.categoryService.add(this.expenseCategory).subscribe({
+      next: () => {
+        console.log(`Categoria agregada con éxito.`);
+        alert('Se agrego con éxito el gasto');
+      },
+      error: (error) => {
+        console.error(`Error al agregar:`, error);
+     //   if (error.error.status == 409 && error.error.message == "Expense has related bill installments") {
+        //  this.openModal(this.modalNoteCredit)} 
+        //else {
+          //alert('Ocurrió un error al eliminar el gasto');
+        //}
+      }
+    })
+    console.log(this.expenseCategory)
     form.reset();
     this.closeModal();
   }
+
+  delete(id:number){
+    this.categoryService.deleteCategory(id).subscribe({
+      next: () => {
+        console.log(`Categoria eliminada con éxito.`);
+        alert('Se eliminó con éxito la categoria');
+      },
+      error: (error) => {
+        console.error(`Error al eliminar la categoria `, error);
+        
+          alert('Ocurrió un error al eliminar el gasto');
+        
+        }
+      }
+    );
+  }
+
+  showModalToAddCategory() {
+    this.showErrorModal = true;
+    this.cdRef.detectChanges();
+    setTimeout(() => {
+      const modalElement = document.getElementById('errorModal');
+      if (modalElement) {
+        modalElement.style.display = 'block';
+        modalElement.classList.add('show');
+      }
+    }, 0);
+  }
+
+  showModalToEditCategory(description:string) {
+    this.showErrorModal = true;
+    this.cdRef.detectChanges();
+    setTimeout(() => {
+      const modalElement = document.getElementById('errorModal');
+      this.expenseCategory.description=description;
+      if (modalElement) {
+        modalElement.style.display = 'block';
+        modalElement.classList.add('show');
+      }
+    }, 0);
+  }
+
 
 
 }
