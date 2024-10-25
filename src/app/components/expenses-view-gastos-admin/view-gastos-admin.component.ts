@@ -37,7 +37,7 @@ export class ViewGastosAdminComponent implements OnInit {
 
 
   bills: Bill[] = [];
-  filterBills: Bill[] = [];
+  filterBills: Bill[] = []; 
   categories: string[] = [];
   providers: string[] = [];
   expenseTypes: string[] = [];
@@ -144,7 +144,7 @@ private setupDateChangeObservable() {
     });
   }
 
- 
+
   openModal(modal: ElementRef | HTMLDivElement) {
     const element = modal instanceof ElementRef ? modal.nativeElement : modal;
     element.style.display = 'block';

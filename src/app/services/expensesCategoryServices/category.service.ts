@@ -26,4 +26,10 @@ export class CategoryService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.delete<void>(url, { headers });
   }
+  updateCategory(category: Category): Observable<any> {
+    return this.http.put(`${this.url}/putById?id=${category.id}&description=${category.description}`, category);
+  }
+  getCategoryById(id: number): Observable<Category> {
+    return this.http.get<Category>(`${this.url}/${id}`);
+  }
 }
