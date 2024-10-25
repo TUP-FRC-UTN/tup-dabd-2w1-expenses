@@ -32,7 +32,6 @@
                 <label for="expenseDate" class="form-lable">Fecha * </label>
               </div>
               <input
-                [value]="today"
                 type="date"
                 name="expenseDate"
                 [(ngModel)]="expense.expenseDate"
@@ -318,7 +317,7 @@
           <div class="col">
             <button
               class="btn btn-secondary"
-              type="reset"
+              type="button"
               style="width: 100%"
               (click)="clearForm()"
             >

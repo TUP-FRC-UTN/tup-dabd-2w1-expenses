@@ -144,7 +144,6 @@ private setupDateChangeObservable() {
     });
   }
 
- 
   openModal(modal: ElementRef | HTMLDivElement) {
     const element = modal instanceof ElementRef ? modal.nativeElement : modal;
     element.style.display = 'block';

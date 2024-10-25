@@ -33,7 +33,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   distributions: Distributions[] = [];
   expense: Expense = {
     description: '',
-    providerId: 1,
+    providerId: 0,
     expenseDate: '',
     invoiceNumber: '',
     typeExpense: '',
@@ -56,13 +56,17 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   private readonly providerService = inject(ProviderService);
 
   ngOnInit(): void {
+    this.initialForm();
+  }
+  initialForm() {
     this.loadOwners();
     this.loadProviders();
     this.loadDate();
     this.loadExpenseCategories();
-    this.expense.typeExpense = 'COMUN';
     this.expense.providerId = 0;
-    this.expense.installments = 1;  
+    this.expense.typeExpense = 'COMUN';
+    this.expense.categoryId = 0;
+    this.expense.installments = 1;
   }
   toUpperCase() {
     this.expense.typeExpense = this.expense.typeExpense.toUpperCase();
@@ -102,7 +106,8 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     const dd = String(today.getDate()).padStart(2, '0');
     this.expense.expenseDate = `${yyyy}-${mm}-${dd}`;
     this.today=`${yyyy}-${mm}-${dd}`;
-    
+    console.log(this.today);
+    console.log(this.expense.expenseDate);
   }
 
   private loadOwners() {
@@ -116,8 +121,6 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     this.providerService.getProviders().subscribe({
       next: (providers: Provider[]) => {
         this.listProviders = providers;
-
-        console.log(this.listProviders);
       },
     });
   }
@@ -185,11 +188,8 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     });
   }
   clearForm(): void {
-    this.alreadysent = false;
-    this.form.resetForm();
-    this.loadDate();
     this.cdRef.detectChanges();
-    this.ngOnInit();
+    this.initialForm()
   }
   isSubmitting = false;
   save(): void {

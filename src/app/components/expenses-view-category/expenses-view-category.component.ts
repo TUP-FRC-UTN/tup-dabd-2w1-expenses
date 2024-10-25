@@ -25,20 +25,13 @@ import { ExpenseCategory } from '../../models/expense-category';
 })
 export class ExpensesViewCategoryComponent implements OnInit {
 
-  
-
-  
   failedBillId: number =0;
   showErrorModal = false;
- @ViewChild('errorModal') errorModal: ElementRef | undefined;
+  @ViewChild('errorModal') errorModal: ElementRef | undefined;
   constructor(private cdRef: ChangeDetectorRef) {}
   private readonly categoryService = inject(CategoryService)
-
   category: ExpenseCategory[] = [];
   filterCategory: ExpenseCategory[] = [];
-  
-
-
   filters ={
     categoryOrProviderOrExpenseType: '',
     expenseTypes: '',
