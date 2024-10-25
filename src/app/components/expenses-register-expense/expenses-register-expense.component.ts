@@ -70,24 +70,6 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   onFileSelected(event: any): void {
     this.selectedFile = event.target.files[0];
   }
-
-  // allowOnlyPositiveNumbers(event: KeyboardEvent): void {
-  //   const charCode = event.which ? event.which : event.keyCode;
-  //   const inputValue: string = (event.target as HTMLInputElement).value;
-
-  //   if (
-  //     (charCode < 48 || charCode > 57) &&
-  //     charCode !== 44 &&
-  //     charCode !== 102 &&
-  //     charCode !== 70
-  //   ) {
-  //     event.preventDefault();
-  //   }
-
-  //   if (charCode === 44 && inputValue.includes(',')) {
-  //     event.preventDefault();
-  //   }
-  // }
   allowOnlyPositiveNumbers(event: KeyboardEvent): void {
     const charCode = event.which ? event.which : event.keyCode;
     const inputValue: string = (event.target as HTMLInputElement).value;
@@ -229,19 +211,6 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     this.expenseService
       .registerExpense(this.expense, this.selectedFile ?? undefined)
       .subscribe(
-        // (response) => {
-        //   if(response.status===200){
-        //     alert('Se registro correctamente')
-        //     this.clearForm();
-        //   }
-        //   console.log('Gasto registrado exitosamente', response);
-        //   this.isSubmitting = false; // Rehabilita el botón
-        // },
-        // (error) => {
-        //   alert('Se produjo un error al registrar gastos')
-        //   console.error('Error al registrar el gasto', error);
-        //   this.isSubmitting = false; // Rehabilita el botón
-        // }
         (response) => {
           // Asegúrate de que estás verificando correctamente la estructura de la respuesta
           if(response && response.status === 200) {
@@ -260,6 +229,5 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
           this.isSubmitting = false; // Rehabilita el botón
         }
       );
-      this.clearForm();
   }
 }
