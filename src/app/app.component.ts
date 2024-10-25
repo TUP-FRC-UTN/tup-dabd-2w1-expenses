@@ -15,6 +15,7 @@ import 'datatables.net-bs5';
 import { ExpensesRegisterExpenseComponent } from "./components/expenses-register-expense/expenses-register-expense.component";
 import { ViewOwnerExpenseComponent } from "./components/expenses-view-owner/view-owner-expense/view-owner-expense.component";
 import { appConfig } from './app.config';
+import { ExpensesNavbarComponent } from "./components/expenses-navbar/expenses-navbar.component";
 import { ExpensesViewCategoryComponent } from "./components/expenses-view-category/expenses-view-category.component";
 
 @Component({
@@ -27,6 +28,7 @@ import { ExpensesViewCategoryComponent } from "./components/expenses-view-catego
     HttpClientModule,
     ExpensesRegisterExpenseComponent,
     ViewOwnerExpenseComponent,
+    ExpensesNavbarComponent,
     ExpensesViewCategoryComponent
 ],
   templateUrl: './app.component.html',
