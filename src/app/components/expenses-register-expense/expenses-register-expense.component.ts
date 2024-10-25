@@ -60,6 +60,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     this.loadDate();
     this.loadExpenseCategories();
     this.expense.typeExpense = 'COMUN';
+    this.expense.providerId = 0;
     this.expense.installments = 1;  
   }
   toUpperCase() {
@@ -162,9 +163,9 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     });
   }
   clearForm(): void {
-    this.ngOnInit();
     this.alreadysent = false;
     this.form.resetForm();
+    this.ngOnInit();
   }
 
   save(): void {
@@ -189,6 +190,6 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
           console.error('Error al registrar el gasto', error);
         }
       );
-    this.clearForm();
+      this.clearForm();
   }
 }
