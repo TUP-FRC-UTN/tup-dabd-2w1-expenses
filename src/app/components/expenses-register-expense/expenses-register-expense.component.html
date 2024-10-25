@@ -22,7 +22,7 @@
                 <option value="EXTRAORDINARIO">Extraordinario</option>
               </select>
             </div>
-            @if(typeExpense.touched && typeExpense.invalid ) {
+            @if(formSubmitted && typeExpense.invalid ) {
             <span class="text-danger">El tipo de gasto es requerido</span>
             }
           </div>
@@ -42,8 +42,8 @@
                 required
               />
             </div>
-            @if(fecha.touched && fecha.invalid) {
-            <span class="text-danger">La fecha es requerida</span>
+            @if(formSubmitted && fecha.invalid) {
+              <span class="text-danger">La fecha es requerida</span>
             }
           </div>
         </div>
@@ -93,7 +93,7 @@
                 }
               </select>
             </div>
-            @if(categoryId.touched && categoryId.invalid) {
+            @if(formSubmitted && categoryId.invalid) {
             <span class="text-danger">La categoría de gasto es requerida</span>
             }
           </div>
@@ -116,7 +116,7 @@
                 required
               />
             </div>
-            @if(invoiceNumber.touched && invoiceNumber.invalid) {
+            @if(formSubmitted && invoiceNumber.invalid) {
             <span class="text-danger"
               >El numero de comprobante es requerido</span
             >
@@ -158,7 +158,7 @@
                 required
               />
             </div>
-            @if(amount.touched && amount.invalid) {
+            @if(formSubmitted && amount.invalid) {
             <span class="text-danger">El monto es requerido</span>
             }
           </div>
@@ -183,7 +183,7 @@
                 <option value="12">12</option>
               </select>
             </div>
-            @if(intallments.touched && intallments.invalid) {
+            @if(formSubmitted && intallments.invalid) {
             <span class="text-danger">Las cuotas son requeridas</span>
             }
           </div>
@@ -206,7 +206,7 @@
               >
               </textarea>
             </div>
-            @if(description.touched && description.invalid) {
+            @if(formSubmitted && description.invalid) {
             <span class="text-danger">La descripción es requerida</span>
             }
           </div>
@@ -227,7 +227,7 @@
                 {{ owner.name }} {{ owner.lastname }}
               </option>
             </select>
-            @if (owner.touched && distributions.length == 0) {
+            @if (formSubmitted && distributions.length == 0) {
             <span class="text-danger"
               >Se debe agregar al menos un propietario</span
             >
@@ -329,7 +329,7 @@
               class="btn btn-success"
               type="submit"
               style="width: 100%"
-              [disabled]="!form.valid || isSubmitting || (expense.typeExpense == 'INDIVIDUAL' && !validateTotalProportion())">
+              >
               Registrar
             </button>
           </div>
@@ -339,3 +339,25 @@
   </div>
   <br />
 </div>
+<!-- Modal Bootstrap -->
+<div class="modal" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header" [ngClass]="{'bg-success text-white': modalType === 'success', 'bg-danger text-white': modalType === 'error'}">
+        <h5 class="modal-title">{{ modalTitle }}</h5>
+        <button type="button" class="btn-close" [ngClass]="{'btn-close-white': true}" (click)="closeModal()"></button>
+      </div>
+      <div class="modal-body">
+        <p>{{ modalMessage }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" [ngClass]="{'btn-success': modalType === 'success', 'btn-danger': modalType === 'error'}" (click)="closeModal()">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop para el modal -->
+<div class="modal-backdrop fade show" *ngIf="showModal"></div>

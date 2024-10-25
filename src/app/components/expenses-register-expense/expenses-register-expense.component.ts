@@ -7,7 +7,7 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { FormsModule, NgForm } from '@angular/forms';
+import { FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
 import { Distributions } from '../../models/distributions';
 import { Expense } from '../../models/expense';
 import { Owner } from '../../models/owner';
@@ -24,11 +24,19 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './expenses-register-expense.component.html',
   standalone: true,
   providers: [ExpenseService, OwnerService, ProviderService],
-  imports: [FormsModule, DatePipe, NgFor, NgIf, CommonModule, RouterOutlet],
+  imports: [FormsModule, DatePipe, NgFor, NgIf, CommonModule, RouterOutlet,ReactiveFormsModule],
   styleUrls: ['./expenses-register-expense.component.css'],
 })
 export class ExpensesRegisterExpenseComponent implements OnInit {
   @ViewChild('form') form!: NgForm;
+  // Modal states
+  showModal = false;
+  modalMessage = '';
+  modalTitle = '';
+  modalType: 'success' | 'error' = 'success';
+
+  // Form validation
+  formSubmitted = false;
 
   distributions: Distributions[] = [];
   expense: Expense = {
@@ -58,6 +66,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   ngOnInit(): void {
     this.initialForm();
   }
+  //Inicializa el formulario con valores deseados
   initialForm() {
     this.loadOwners();
     this.loadProviders();
@@ -67,13 +76,17 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     this.expense.typeExpense = 'COMUN';
     this.expense.categoryId = 0;
     this.expense.installments = 1;
+    this.expense.amount = 0;
+    this.expense.distributions = [];
+    this.expense.invoiceNumber = '';
+    this.expense.description = '';
+    this.selectedOwnerId = 0;
   }
-  toUpperCase() {
-    this.expense.typeExpense = this.expense.typeExpense.toUpperCase();
-  }
+
   onFileSelected(event: any): void {
     this.selectedFile = event.target.files[0];
   }
+
   allowOnlyPositiveNumbers(event: KeyboardEvent): void {
     const charCode = event.which ? event.which : event.keyCode;
     const inputValue: string = (event.target as HTMLInputElement).value;
@@ -171,6 +184,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     }
     this.validateTotalProportion();
   }
+
   validateTotalProportion(): boolean {
     const total = this.expense.distributions.reduce(
       (sum, distribution) => sum + distribution.proportion,
@@ -178,6 +192,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     );
     return total === 100;
   }
+
   public deleteDistribution(index: number): void {
     this.expense.distributions.splice(index, 1);
   }
@@ -187,16 +202,71 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       distribution.proportion = distribution.proportion / 100;
     });
   }
+  repairDistributions(): void {
+    this.expense.distributions.forEach((distribution) => {
+      distribution.proportion = distribution.proportion * 100;
+    });
+  }
   clearForm(): void {
     this.cdRef.detectChanges();
+    this.form.controls['amount'].markAsUntouched();
+    this.form.controls['description'].markAsUntouched();
+    this.form.controls['invoiceNumber'].markAsUntouched();
     this.initialForm()
   }
-  isSubmitting = false;
+  validateForm(): boolean {
+    this.formSubmitted = true;
+    
+    if (!this.form.valid) {
+      Object.keys(this.form.controls).forEach(key => {
+        const control = this.form.controls[key];
+        control.markAsTouched();
+      });
+      this.showErrorModal('Por favor, complete todos los campos requeridos.');
+      return false;
+    }
+
+    if (this.expense.typeExpense === 'INDIVIDUAL') {
+      if (this.expense.distributions.length === 0) {
+        this.showErrorModal('Debe agregar al menos un propietario');
+        return false;
+      }
+      if (!this.validateTotalProportion()) {
+        this.showErrorModal('La suma de las proporciones debe ser igual a 100');
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  // Funciones para el modal
+  showSuccessModal(message: string): void {
+    this.modalTitle = 'Éxito';
+    this.modalMessage = message;
+    this.modalType = 'success';
+    this.showModal = true;
+  }
+
+  showErrorModal(message: string): void {
+    this.modalTitle = 'Error';
+    this.modalMessage = message;
+    this.modalType = 'error';
+    this.showModal = true;
+  }
+
+  closeModal(): void {
+    this.showModal = false;
+    // Si fue un registro exitoso, limpiamos el formulario
+    if (this.modalType === 'success') {
+      this.clearForm();
+    }
+  }
+
   save(): void {
-    if (this.isSubmitting) {
+    if (!this.validateForm()) {
       return; // Evita múltiples envíos
     }
-    this.isSubmitting = true;
     if (this.expense.typeExpense === 'INDIVIDUAL') {
       if (!this.validateTotalProportion()) {
         return;
@@ -214,19 +284,16 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
         (response) => {
           // Asegúrate de que estás verificando correctamente la estructura de la respuesta
           if(response && response.status === 200) {
-            console.log('Respuesta exitosa');  // Esto te ayudará a ver si se ejecuta más de una vez
-            alert('Se registró correctamente');
+            this.showSuccessModal('Se registró correctamente el gasto');
             this.clearForm();
           } else {
-            console.log('Respuesta inesperada', response);
+            this.showErrorModal('Respuesta inesperada del servidor');
           }
-          console.log('Gasto registrado exitosamente', response);
-          this.isSubmitting = false; // Rehabilita el botón
         },
         (error) => {
-          alert('Se produjo un error al registrar gastos');
+          this.showErrorModal('Se produjo un error al registrar el gasto');
           console.error('Error al registrar el gasto', error);
-          this.isSubmitting = false; // Rehabilita el botón
+          this.repairDistributions();
         }
       );
   }
