@@ -20,32 +20,37 @@
           aria-labelledby="errorModalLabel"
           aria-hidden="true"
         >
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title">Editar Categoria</h5>
+        <div class="container mt-4">
+          <div class="modal-dialog card border" role="document">
+              <div class="modal-content card-body">
+                  <div class="modal-header card-title mb-4">
+                      <h5 class="modal-title mb-3">Registrar Categoria de Gasto</h5>
+                  </div>
+                  <div class="modal-body mb-3">
+                      <form #form="ngForm" (ngSubmit)="save(form)">
+                          <div class="row align-items-center">
+                              <div class="col-auto d-flex align-items-center">
+                                  <label for="categoryName" class="col-form-label label-align">Nombre de Categoría</label>
+                              </div>
+                              <div class="col-md-6">
+                                  <input type="text" name="categoryName" id="categoryName" class="form-control" 
+                                      [(ngModel)]="expenseCategory.description" #category="ngModel" required>
+                                  <div class="error-message" style="height: 20px; font-size: 0.875rem;">
+                                      @if (category.touched && category.invalid) {
+                                          <p class="text-danger m-0">El nombre de categoría es requerido</p>
+                                      }
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="modal-footer">
+                              <button type="submit" class="btn btn-danger" (click)="closeModal()">Cerrar</button>
+                              <button type="submit" class="btn btn-success" [disabled]="form.invalid">Guardar</button>
+                          </div>
+                      </form>
+                  </div>
               </div>
-              <div class="modal-body">
-                El gasto ya esta cobrado. ¿Desea realizar una nota de credito?
-              </div>
-              <div class="modal-footer">
-                <button
-                  type="button"
-                  class="btn btn-secondary"
-                  (click)="closeModal()"
-                >
-                  Cancelar
-                </button>
-
-                <button
-                  type="button"
-                  class="btn btn-primary"                  
-                >   <!-- (click)="deleteWithNoteCredit()" -->
-                  Guardar
-                </button>
-              </div>
-            </div>
           </div>
+      </div>
         </div>
       </div>
     </div>

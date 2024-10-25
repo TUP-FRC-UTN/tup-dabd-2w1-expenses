@@ -1,7 +1,8 @@
 import { ChangeDetectorRef, Component, ElementRef, inject, OnInit, ViewChild  } from '@angular/core';
 
 import { Bill } from '../../models/bill';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
+
 import { CommonModule } from '@angular/common';
 
 //Imports para el DataTable
@@ -14,6 +15,7 @@ import { Instalmentlist } from '../../models/installmentList';
 import { BillService } from '../../services/billServices/bill.service';
 import { CategoryService } from '../../services/expensesCategoryServices/category.service';
 import { ExpenseCategory } from '../../models/expense-category';
+import { Category } from '../../models/category';
 
 @Component({
   selector: 'app-expenses-view-category',
@@ -34,9 +36,9 @@ export class ExpensesViewCategoryComponent implements OnInit {
   constructor(private cdRef: ChangeDetectorRef) {}
   private readonly categoryService = inject(CategoryService)
 
-  category: ExpenseCategory[] = [];
-  filterCategory: ExpenseCategory[] = [];
-  
+  category: Category[] = [];
+  filterCategory: Category[] = [];
+  expenseCategory: Category =new Category();
 
 
   filters ={
@@ -79,7 +81,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
       );
   }
 
-  showModalToNoteCredit() {
+  showModalToAddCategory() {
     this.showErrorModal = true;
     this.cdRef.detectChanges();
     setTimeout(() => {
@@ -197,9 +199,9 @@ export class ExpensesViewCategoryComponent implements OnInit {
   </svg>
     </button>
     <ul class="dropdown-menu">
-      <li><a class="dropdown-item" href="#">Action</a></li>
-      <li><a class="dropdown-item" href="#">Another action</a></li>
-      <li><a class="dropdown-item" href="#">Something else here</a></li>
+      <li><a class="dropdown-item add" href="#">Agregar</a></li>
+      <li><a class="dropdown-item" href="#">Editar</a></li>
+      <li><a class="dropdown-item" href="#">Eliminar</a></li>
     </ul>
   </div>`
         }
@@ -221,14 +223,31 @@ export class ExpensesViewCategoryComponent implements OnInit {
           last: "Último"
         }
       }
-    });
+    })
     // Acción para el botón de acciones
-   /* $('#myTable tbody').on('click', '.btn-secondary', (event) => {
+    $('#myTable tbody').on('click', '.add', (event) => {
       const row = $(event.currentTarget).closest('tr');
       const rowData = $('#myTable').DataTable().row(row).data();
-      this.showModalToNoteCredit();
+      this.showModalToAddCategory();
     });
-  }*/}
+  }
+
+   //guardar caregoria
+   save(form : NgForm) : void{
+    if(form.invalid){
+      alert("Formulario Invalido");
+      return;
+    }
+    
+
+    //aca iria otro if que verifica si la categoria ya existe en el back.(con la misma descripcion)
+    //con un alert o algo del estilo form.value.descripcion == si esta en el array
+
+    //se llama al metodo add del service pasandole como parametro el valor del form
+   // this.categoryService.add(form.value);
+    form.reset();
+    this.closeModal();
+  }
 
 
 }
