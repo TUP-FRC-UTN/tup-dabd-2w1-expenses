@@ -31,7 +31,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
 
   
   failedBillId: number =0;
-  showErrorModal = false;
+  showModal = false;
  @ViewChild('errorModal') errorModal: ElementRef | undefined;
   constructor(private cdRef: ChangeDetectorRef) {}
   private readonly categoryService = inject(CategoryService)
@@ -89,7 +89,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
   // }
 
   closeModal() {
-    this.showErrorModal = false;
+    this.showModal = false;
     if (this.errorModal) {
       this.errorModal.nativeElement.style.display = 'none';
       this.errorModal.nativeElement.classList.remove('show');
@@ -204,7 +204,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
     $('#myTable tbody').on('click', '.edit', (event) => {
       const row = $(event.currentTarget).closest('tr');
       const rowData = $('#myTable').DataTable().row(row).data();
-      this.showModalToAddCategory();
+      this.showModalToEditCategory(rowData);
     });
   }
 
@@ -254,10 +254,10 @@ export class ExpensesViewCategoryComponent implements OnInit {
   }
 
   showModalToAddCategory() {
-    this.showErrorModal = true;
+    this.showModal = true;
     this.cdRef.detectChanges();
     setTimeout(() => {
-      const modalElement = document.getElementById('errorModal');
+      const modalElement = document.getElementById('addModal');
       if (modalElement) {
         modalElement.style.display = 'block';
         modalElement.classList.add('show');
@@ -266,10 +266,11 @@ export class ExpensesViewCategoryComponent implements OnInit {
   }
 
   showModalToEditCategory(description:string) {
-    this.showErrorModal = true;
+    this.showModal = true;
     this.cdRef.detectChanges();
+    console.log(this.showModal)
     setTimeout(() => {
-      const modalElement = document.getElementById('errorModal');
+      const modalElement = document.getElementById('addModal');
       this.expenseCategory.description=description;
       if (modalElement) {
         modalElement.style.display = 'block';
