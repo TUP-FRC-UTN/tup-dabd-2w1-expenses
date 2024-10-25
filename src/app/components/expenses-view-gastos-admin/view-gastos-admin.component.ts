@@ -33,6 +33,7 @@ export class ViewGastosAdminComponent implements OnInit {
   private dateChangeSubject = new Subject<{ from: string, to: string }>();
   private unsubscribe$ = new Subject<void>();
   @ViewChild('modalNoteCredit') modalNoteCredit!: ElementRef;
+  @ViewChild('modalError') modalError!: ElementRef;
   @ViewChild('modalConfirmDelete') modalConfirmDelete!: ElementRef;
 
 
@@ -138,7 +139,7 @@ private setupDateChangeObservable() {
         if (error.error.status == 409 && error.error.message == "Expense has related bill installments") {
           this.openModal(this.modalNoteCredit)
         } else {
-          alert('Ocurrió un error al eliminar el gasto');
+          this.openModal(this.modalError)
         }
       }
     });
@@ -223,28 +224,33 @@ private setupDateChangeObservable() {
           className: 'text-center',
           render: function(data, type, row) {
             return `
-               <div class="dropdown">
-      <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        Opciones
-      </button>
-      <ul class="dropdown-menu">
-        <li>
-          <a class="dropdown-item text-info btn-view" href="#">
-            <i class="fas fa-eye"></i> Ver más
-          </a>
-        </li>
-        <li>
-          <a class="dropdown-item text-secondary btn-edit" href="#">
-            <i class="fas fa-edit"></i> Editar
-          </a>
-        </li>
-        <li>
-          <a class="dropdown-item text-danger btn-delete" href="#">
-            <i class="fas fa-trash"></i> Eliminar
-          </a>
-        </li>
-      </ul>
-    </div>
+         <div class="dropdown">
+  <button class="btn btn-light border border-black rounded-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-dots-vertical" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+      <path d="M12 19m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+      <path d="M12 5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+    </svg>
+  </button>
+  <ul class="dropdown-menu">
+    <li>
+      <a class="dropdown-item text-info btn-view" href="#">
+        <i class="fas fa-eye"></i> Ver más
+      </a>
+    </li>
+    <li>
+      <a class="dropdown-item text-secondary btn-edit" href="#">
+        <i class="fas fa-edit"></i> Editar
+      </a>
+    </li>
+    <li>
+      <a class="dropdown-item text-danger btn-delete" href="#">
+        <i class="fas fa-trash"></i> Eliminar
+      </a>
+    </li>
+  </ul>
+</div>
             `;
           }
       },
