@@ -4,7 +4,7 @@ import { ViewGastosAdminComponent } from './components/expenses-view-gastos-admi
 import { ViewOwnerExpenseComponent } from './components/expenses-view-owner/view-owner-expense/view-owner-expense.component';
 
 export const routes: Routes = [
-  { path: '', component:ViewGastosAdminComponent },
+  { path: 'viewExpenseAdmin', component:ViewGastosAdminComponent },
   { path: 'registerExpense', component: ExpensesRegisterExpenseComponent },
-  { path: 'viewGastos', component: ViewOwnerExpenseComponent }  
+  { path: 'viewExpenseOwner', component: ViewOwnerExpenseComponent }  
 ];
