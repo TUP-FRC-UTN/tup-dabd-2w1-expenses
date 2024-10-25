@@ -53,7 +53,14 @@ export class ExpensesNavbarComponent {
           //botón Lista Categoria de Gastos
           icon: "bi bi-list-task",
           title: "Categorías de Gastos",
-          route: "", //falta el routing
+          route: "viewCategory", //falta el routing
+          roles: ["SuperAdmin", "FinanceAdmin"]
+        },
+        {
+          //botón Registrar Gasto
+          icon: "bi bi-journal-arrow-up",
+          title: "Registrar Gasto",
+          route: "registerExpense", //falta el routing
           roles: ["SuperAdmin", "FinanceAdmin"]
         },
         {
