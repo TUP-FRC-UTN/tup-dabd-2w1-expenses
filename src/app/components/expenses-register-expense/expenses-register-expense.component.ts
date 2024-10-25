@@ -60,6 +60,8 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     this.loadProviders();
     this.loadDate();
     this.loadExpenseCategories();
+    this.expense.typeExpense = 'COMUN';
+    this.expense.installments = 1;  
   }
   toUpperCase() {
     this.expense.typeExpense = this.expense.typeExpense.toUpperCase();
@@ -200,19 +202,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     });
   }
   clearForm(): void {
-    this.expense = {
-      description: '',
-      providerId: 1,
-      expenseDate: '',
-      invoiceNumber: '',
-      typeExpense: '',
-      categoryId: 0,
-      amount: 0,
-      installments: 0,
-      distributions: [],
-    };
-    this.selectedFile = null;
-    this.selectedOwnerId = 0;
+    this.ngOnInit();
     this.alreadysent = false;
     this.form.resetForm();
     this.loadDate();
