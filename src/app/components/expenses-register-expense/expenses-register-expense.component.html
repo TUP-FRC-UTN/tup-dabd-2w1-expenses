@@ -1,7 +1,7 @@
 <div class="container mt-4">
   <div class="card border">
     <div class="card-body">
-      <h3 class="card-title mb-4">Registrar Gasto</h3>
+      <h3 class="card-title mt-3 mb-4">Registrar Gasto</h3>
       <form #form="ngForm" (ngSubmit)="save()">
         <div class="mb-3 row">
           <div class="col">
@@ -146,13 +146,12 @@
                 <label for="amount" class="form-lable">Monto * </label>
               </div>
               <input
-                type="number"
+                currencyMask [options]="{ prefix: '$ ', thousands: '.', decimal: ',' , allowNegative : false}"
                 name="amount"
                 [(ngModel)]="expense.amount"
                 id="amount"
                 class="form-control"
                 (keypress)="allowOnlyPositiveNumbers($event)"
-                style="text-align: end"
                 [min]="1"
                 #amount="ngModel"
                 required

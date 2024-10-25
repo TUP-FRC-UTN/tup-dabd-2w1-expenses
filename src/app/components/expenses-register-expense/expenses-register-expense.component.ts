@@ -18,13 +18,14 @@ import { ProviderService } from '../../services/provider.service';
 import { CommonModule, DatePipe, NgFor, NgIf } from '@angular/common';
 import { Provider } from '../../models/provider';
 import { RouterOutlet } from '@angular/router';
+import { CurrencyMaskModule } from "ng2-currency-mask";
 
 @Component({
   selector: 'app-expenses-register-expense',
   templateUrl: './expenses-register-expense.component.html',
   standalone: true,
   providers: [ExpenseService, OwnerService, ProviderService],
-  imports: [FormsModule, DatePipe, NgFor, NgIf, CommonModule, RouterOutlet,ReactiveFormsModule],
+  imports: [FormsModule, DatePipe, NgFor, NgIf, CommonModule, RouterOutlet,ReactiveFormsModule,CurrencyMaskModule],
   styleUrls: ['./expenses-register-expense.component.css'],
 })
 export class ExpensesRegisterExpenseComponent implements OnInit {
