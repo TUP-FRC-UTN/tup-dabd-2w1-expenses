@@ -16,6 +16,7 @@ import { ExpensesRegisterExpenseComponent } from "./components/expenses-register
 import { ViewOwnerExpenseComponent } from "./components/expenses-view-owner/view-owner-expense/view-owner-expense.component";
 import { appConfig } from './app.config';
 import { ExpensesViewCategoryComponent } from "./components/expenses-view-category/expenses-view-category.component";
+import { ExpensesNavbarComponent } from "./components/expenses-navbar/expenses-navbar.component";
 
 @Component({
   selector: 'app-root',
@@ -27,7 +28,8 @@ import { ExpensesViewCategoryComponent } from "./components/expenses-view-catego
     HttpClientModule,
     ExpensesRegisterExpenseComponent,
     ViewOwnerExpenseComponent,
-    ExpensesViewCategoryComponent
+    ExpensesViewCategoryComponent,
+    ExpensesNavbarComponent
 ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
