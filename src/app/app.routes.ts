@@ -5,9 +5,9 @@ import { ViewOwnerExpenseComponent } from './components/expenses-view-owner/view
 import { ExpensesViewCategoryComponent } from './components/expenses-view-category/expenses-view-category.component';
 
 export const routes: Routes = [
-  { path: 'viewExpenseAdmin', component:ViewGastosAdminComponent },
+  { path: 'viewExpenseAdmin', component: ViewGastosAdminComponent },
+  { path: 'registerExpense/:id', component: ExpensesRegisterExpenseComponent },
   { path: 'registerExpense', component: ExpensesRegisterExpenseComponent },
   { path: 'viewCategory', component: ExpensesViewCategoryComponent },
   { path: 'viewExpenseOwner', component: ViewOwnerExpenseComponent }
-  
 ];

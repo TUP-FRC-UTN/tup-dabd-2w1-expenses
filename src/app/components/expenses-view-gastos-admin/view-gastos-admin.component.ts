@@ -11,6 +11,7 @@ import { DistributionList } from '../../models/distributionList';
 import { Instalmentlist } from '../../models/installmentList';
 import { BillService } from '../../services/billServices/bill.service';
 import { debounceTime, distinctUntilChanged, filter, finalize, mergeMap, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -44,7 +45,8 @@ export class ViewGastosAdminComponent implements OnInit {
   expenseTypes: string[] = [];
   constructor(
     private cdRef: ChangeDetectorRef,
-    private billService: BillService
+    private billService: BillService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -235,17 +237,17 @@ private setupDateChangeObservable() {
   </button>
   <ul class="dropdown-menu">
     <li>
-      <a class="dropdown-item text-info btn-view" href="#">
+      <a class="dropdown-item text-info btn-view">
         <i class="fas fa-eye"></i> Ver más
       </a>
     </li>
     <li>
-      <a class="dropdown-item text-secondary btn-edit" href="#">
+      <a class="dropdown-item text-secondary btn-edit" >
         <i class="fas fa-edit"></i> Editar
       </a>
     </li>
     <li>
-      <a class="dropdown-item text-danger btn-delete" href="#">
+      <a class="dropdown-item text-danger btn-delete" >
         <i class="fas fa-trash"></i> Eliminar
       </a>
     </li>
@@ -282,9 +284,11 @@ private setupDateChangeObservable() {
     });
 
     $('#myTable tbody').on('click', '.btn-edit', (event) => {
-      const row = $(event.currentTarget).closest('tr');
-      const rowData = table.row(row).data();
-      this.editBill(rowData.id);
+      const row = table.row($(event.currentTarget).parents('tr'));
+      const rowData = row.data();
+      if (rowData) {
+        this.editBill(rowData.id)
+      }
     });
 
     $('#myTable tbody').on('click', '.btn-delete', (event) => {
@@ -297,7 +301,8 @@ private setupDateChangeObservable() {
     
   }
   editBill(id: any) {
-    throw new Error('Method not implemented.');
+    console.log(id); // Esto mostrará el id en la consola
+    this.router.navigate(['/registerExpense',id]); // Navega a /viewExpenseAdmin/id
   }
   viewBillDetails(id: any) {
     throw new Error('Method not implemented.');

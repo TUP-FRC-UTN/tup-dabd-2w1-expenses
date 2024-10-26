@@ -17,7 +17,8 @@ import { OwnerService } from '../../services/owner.service';
 import { ProviderService } from '../../services/provider.service';
 import { CommonModule, DatePipe, NgFor, NgIf } from '@angular/common';
 import { Provider } from '../../models/provider';
-import { RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
+import { ExpenseGetById } from '../../models/expenseGetById';
 
 @Component({
   selector: 'app-expenses-register-expense',
@@ -47,22 +48,149 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   listOwner: Owner[] = [];
   selectedOwnerId: number = 0;
   listProviders: Provider[] = [];
-  today:string='';
+  today: string = '';
   alreadysent = false;
   expenseCategoryList: ExpenseCategory[] = [];
+  isEditMode = false;
+  pageTitle = 'Registrar Gasto';
+
   private cdRef = inject(ChangeDetectorRef);
   private readonly expenseService = inject(ExpenseService);
   private readonly propietarioService = inject(OwnerService);
   private readonly providerService = inject(ProviderService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   ngOnInit(): void {
+    this.loadInitialData();
+    this.checkForEditMode();
+  }
+  checkForEditMode() {
+    this.route.params.subscribe(params => {
+      const id = params['id'];
+      if (id) {
+        this.isEditMode = true;
+        this.pageTitle = 'Editar Gasto';
+        this.loadExpense(id);
+      }
+    });
+  }
+ 
+  private loadExpense(id: number): void {
+    this.expenseService.getById(id).subscribe({
+      next: (expenseData: ExpenseGetById) => {
+        console.log('Datos recibidos:', expenseData); // Para debug
+        // Mapear la respuesta al modelo Expense
+        this.mapExpenseDataToModel(expenseData);
+        this.cdRef.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error loading expense', error);
+        alert('No se pudo cargar el gasto');
+        this.router.navigate(['/expenses']);
+      }
+    });
+  }
+
+  private mapExpenseDataToModel(data: ExpenseGetById): void {
+    if (!data) {
+      console.error('No se recibieron datos del gasto');
+      return;
+    }
+
+    try {
+      // Encontrar el ID del proveedor basado en la descripción
+      const provider = this.listProviders.find(p => p.description === data.provider);
+      
+      // Encontrar el ID de la categoría basado en la descripción
+      const category = this.expenseCategoryList.find(c => c.description === data.category);
+
+      
+      // Determinar el número de cuotas basado en installmentList
+      const installments = data.installmentList?.length || 1;
+
+      // Mapear al modelo Expense con validaciones para cada campo
+      this.expense = {
+        id: data.id ?? 0,
+        description: data.description,
+        providerId: 1,//TODO VER COMO MANEJAR PROVIDER
+        expenseDate: this.formatDate(data.expenseDate ?? new Date().toISOString()),
+        invoiceNumber: String(data.invoiceNumber ?? ''), // Convertir a string de manera segura
+        typeExpense: this.mapExpenseType(data.expenseType ?? 'COMUN'),
+        categoryId: Number(category?.id) || 0,
+        amount: data.amount ?? 0,
+        installments: installments,
+        distributions: this.mapDistributions(data.distributionList)   
+      };
+
+      console.log('Expense mapeado:', this.expense); // Para debug
+    } catch (error) {
+      console.error('Error durante el mapeo:', error);
+      // Inicializar con valores por defecto en caso de error
+      this.initializeDefaultExpense();
+    }
+  }
+  private mapDistributions(distributionList: any[]): Distributions[] {
+    if (!distributionList?.length) return []; 
+    return distributionList.map(dist => ({
+      ownerId: dist.ownerId,
+      proportion: (dist.proportion * 100) // Convertir a porcentaje
+    }));
+  }
+
+  private initializeDefaultExpense(): void {
+    this.expense = {
+      description: '',
+      providerId: 0,
+      expenseDate: this.formatDate(new Date().toISOString()),
+      invoiceNumber: '',
+      typeExpense: 'COMUN',
+      categoryId: 0,
+      amount: 0,
+      installments: 1,
+      distributions: [],
+    };
+  }
+
+  private formatDate(dateString: string): string {
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        // Si la fecha no es válida, retornar la fecha actual
+        const today = new Date();
+        return this.formatDateToString(today);
+      }
+      return this.formatDateToString(date);
+    } catch {
+      // En caso de error, retornar la fecha actual
+      const today = new Date();
+      return this.formatDateToString(today);
+    }
+  }
+
+  private formatDateToString(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private mapExpenseType(type: string): string {
+    const typeMap: { [key: string]: string } = {
+      'COMUN': 'COMUN',
+      'INDIVIDUAL': 'INDIVIDUAL',
+      'EXTRAORDINARIO': 'EXTRAORDINARIO'
+    };
+    return typeMap[type] || type;
+  }
+  loadInitialData() {
     this.loadOwners();
     this.loadProviders();
     this.loadDate();
     this.loadExpenseCategories();
     this.expense.typeExpense = 'COMUN';
     this.expense.providerId = 0;
-    this.expense.installments = 1;  
+    this.expense.installments = 1;
   }
   toUpperCase() {
     this.expense.typeExpense = this.expense.typeExpense.toUpperCase();
@@ -208,26 +336,29 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     }
 
     // Llamamos al servicio para registrar el gasto
-    this.expenseService
-      .registerExpense(this.expense, this.selectedFile ?? undefined)
-      .subscribe(
-        (response) => {
-          // Asegúrate de que estás verificando correctamente la estructura de la respuesta
-          if(response && response.status === 200) {
-            console.log('Respuesta exitosa');  // Esto te ayudará a ver si se ejecuta más de una vez
-            alert('Se registró correctamente');
-            this.clearForm();
-          } else {
-            console.log('Respuesta inesperada', response);
-          }
-          console.log('Gasto registrado exitosamente', response);
-          this.isSubmitting = false; // Rehabilita el botón
-        },
-        (error) => {
-          alert('Se produjo un error al registrar gastos');
-          console.error('Error al registrar el gasto', error);
-          this.isSubmitting = false; // Rehabilita el botón
-        }
-      );
+    const serviceCall = this.isEditMode
+    ? this.expenseService.updateExpense(this.expense, this.selectedFile ?? undefined)
+    : this.expenseService.registerExpense(this.expense, this.selectedFile ?? undefined);
+
+  serviceCall.subscribe({
+    next: (response) => {
+      if (response && response.status === 200) {
+        console.log(`${this.isEditMode ? 'Actualización' : 'Registro'} exitoso`);
+        alert(`Se ${this.isEditMode ? 'actualizó' : 'registró'} correctamente`);
+        this.clearForm();
+      } else {
+        console.log('Respuesta inesperada', response);
+        alert(`Error al ${this.isEditMode ? 'actualizar' : 'registrar'} el gasto`);
+      }
+    },
+    error: (error) => {
+      console.error(`Error al ${this.isEditMode ? 'actualizar' : 'registrar'} el gasto`, error);
+      alert(`Se produjo un error al ${this.isEditMode ? 'actualizar' : 'registrar'} el gasto`);
+    },
+    complete: () => {
+      this.isSubmitting = false;
+      console.log('Operación completada');
+    }
+  });
   }
 }

@@ -1,6 +1,7 @@
 import { Distributions } from "./distributions";
 
 export interface Expense {
+    id?:number;
     description: string;
     providerId: number;
     expenseDate: string;
