@@ -8,11 +8,13 @@ import 'bootstrap';
 import $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-bs5';
+import * as XLSX from 'xlsx'; 
 import { DistributionList } from '../../models/distributionList';
 import { Instalmentlist } from '../../models/installmentList';
 import { BillService } from '../../services/billServices/bill.service';
 import { debounceTime, distinctUntilChanged, filter, finalize, mergeMap, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { Router } from '@angular/router';
+import jsPDF from 'jspdf';
 
 
 @Component({
@@ -25,6 +27,7 @@ import { Router } from '@angular/router';
 })
 export class ViewGastosAdminComponent implements OnInit {
 
+
   dateFrom: string = '';
   dateTo: string = '';
   maxDateTo: string = '';
@@ -32,6 +35,8 @@ export class ViewGastosAdminComponent implements OnInit {
   installmentList: Instalmentlist[] = [];
   failedBillId: number = 0;
   isLoading = false;
+  table : any;
+  searchTerm : string='';
   private dateChangeSubject = new Subject<{ from: string, to: string }>();
   private unsubscribe$ = new Subject<void>();
   @ViewChild('modalNoteCredit') modalNoteCredit!: ElementRef;
@@ -56,6 +61,15 @@ export class ViewGastosAdminComponent implements OnInit {
   this.configDataTable();
   this.filterDataOnInit();
 }
+onSearch(event: any) {
+  const searchValue = event.target.value;
+
+  if (searchValue.length >= 3) {
+    this.table.search(searchValue).draw();
+  } else if (searchValue.length === 0) {
+    this.table.search('').draw();
+  }
+}
 
 filterDataOnInit() {
   this.isLoading = true;  // Activar spinner
@@ -74,7 +88,9 @@ filterDataOnInit() {
     }
   });
 }
-
+redirect(path: string) {
+  this.router.navigate([path]); 
+}
 ngOnDestroy(): void {
   this.unsubscribe$.next();
   this.unsubscribe$.complete();
@@ -115,6 +131,97 @@ private setupDateChangeObservable() {
     }
   });
 }
+  // Exportar a PDF
+  exportToPDF(): void {
+    const doc = new jsPDF();
+  
+    const pageTitle = 'Listado de Gastos';
+    doc.setFontSize(18);
+    doc.text(pageTitle, 15, 10);
+    doc.setFontSize(12);
+  
+    doc.text(`Fechas: Desde ${moment(this.dateFrom).format('DD/MM/YYYY')} hasta ${moment(this.dateTo).format('DD/MM/YYYY')}`, 15, 20);
+  
+    const table = $('#myTable').DataTable();
+    const filteredData = table.rows({ search: 'applied' }).data().toArray();
+  
+    const pdfData = filteredData.map(bill => {
+      const [category, ...rest] = bill.description.split(' - ');
+      return [
+        rest.join(' - '),
+        category,
+        bill.providerId,
+        bill.expenseType,
+        moment(bill.expenseDate).format('DD/MM/YYYY'),
+        `$${bill.amount}`
+      ];
+    });
+  
+    let pageCount = 0;
+  
+    (doc as any).autoTable({
+      head: [['Descripción', 'Categoría', 'Proveedor', 'Tipo de Gasto', 'Fecha', 'Monto']],
+      body: pdfData,
+      startY: 30, 
+      theme: 'grid',
+      margin: { top: 30, bottom: 20 },
+      didDrawPage: function (data: any) {
+        pageCount++;
+        const pageSize = doc.internal.pageSize;
+        const pageHeight = pageSize.height || pageSize.getHeight();
+  
+        doc.setFontSize(10);
+        const text = `Página ${pageCount}`;
+        const textWidth = doc.getTextWidth(text);
+        doc.text(text, (pageSize.width / 2) - (textWidth / 2), pageHeight - 10);
+      }
+    });
+  
+    doc.save('listado_gastos.pdf');
+  }
+  
+  //Exportar a Excel
+  exportToExcel(): void {
+    const table = $('#myTable').DataTable();
+    const filteredData = table.rows({ search: 'applied' }).data().toArray();
+  
+    const encabezado = [
+      [`Listado de Gastos`],
+      [`Fechas: Desde ${moment(this.dateFrom).format('DD/MM/YYYY')} hasta ${moment(this.dateTo).format('DD/MM/YYYY')}`],
+      [],
+      ['Descripción', 'Categoría', 'Proveedor', 'Tipo de Gasto', 'Fecha', 'Monto']
+    ];
+  
+    const excelData = filteredData.map(bill => {
+      const [category, ...rest] = bill.description.split(' - ');
+      return [
+        rest.join(' - '),
+        category,
+        bill.providerId,
+        bill.expenseType === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : bill.expenseType,
+        moment(bill.expenseDate).format('DD/MM/YYYY'),
+        `$${bill.amount}`
+      ];
+    });
+  
+    const worksheetData = [...encabezado, ...excelData];
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+    
+    worksheet['!cols'] = [
+      { wch: 30 },  // Ancho de la columna de descripción
+      { wch: 20 },  // Ancho de la columna de categoría
+      { wch: 20 },  // Ancho de la columna de proveedor
+      { wch: 20 },  // Ancho de la columna de tipo de gasto
+      { wch: 15 },  // Ancho de la columna de fecha
+      { wch: 10 }   // Ancho de la columna de monto
+    ];
+  
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Gastos');
+  
+    XLSX.writeFile(workbook, `listado_gastos_${moment(this.dateFrom).format('YYYYMMDD')}_${moment(this.dateTo).format('YYYYMMDD')}.xlsx`);
+  }
+  
 
   filterDataOnChange() {
     this.dateChangeSubject.next({ from: this.dateFrom, to: this.dateTo });
@@ -183,41 +290,64 @@ private setupDateChangeObservable() {
       }
     });
   }
-
   configDataTable() {
-    $.fn.dataTable.ext.type.order['date-moment-pre'] = (d: string) => moment(d, 'DD/MM/YYYY').unix();
-
+    $.fn.dataTable.ext.type.order['date-moment-pre'] = (d: string) => moment(d, 'YYYY-MM-DD').unix();
+  
     if ($.fn.DataTable.isDataTable('#myTable')) {
-      $('#myTable').DataTable().destroy();
+      $('#myTable').DataTable().clear().destroy();
     }
-
-    $('#myTable').DataTable({
+  
+    this.table = $('#myTable').DataTable({
+      // Atributos de la tabla
       paging: true,
       searching: true,
       ordering: true,
-      lengthChange: false,
-      info: true,
+      lengthChange: true,
+      order: [4, 'desc'], // Ordenar por fecha por defecto
+      lengthMenu: [10, 25, 50],
       pageLength: 10,
       data: this.bills,
+  
+      // Columnas de la tabla
       columns: [
-        { title: "ID", data: 'id', visible: false },
-        { 
-          title: "Tipo de Gasto", 
-          data: "expenseType",
-          render: (data) => data === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : data
+        {
+          data: 'id',
+          visible: false
         },
-        { title: "Categoría", data: "category" },
-        { title: "Proveedor", data: "provider" },
-        { 
-          title: "Fecha", 
-          data: "expenseDate", 
+        {
+          data: 'expenseType',
+          title: 'Tipo de Gasto',
+          className: 'align-middle',
+          render: function(data) {
+            return `<div>${data === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : data}</div>`
+          }
+        },
+        {
+          data: 'category',
+          title: 'Categoría',
+          className: 'align-middle',
+          render: (data) => `<div>${data}</div>`
+        },
+        {
+          data: 'provider',
+          title: 'Proveedor',
+          className: 'align-middle',
+          render: function(data) {
+            return `<div>empresa anonima</div>`
+          }
+        },
+        {
+          data: 'expenseDate',
+          title: 'Fecha',
+          className: 'align-middle',
           render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
           type: 'date-moment'
         },
-        { 
-          title: "Monto", 
-          data: "amount",
-          render: (data) => `$${data}`
+        {
+          data: 'amount',
+          title: 'Monto',
+          className: 'align-middle',
+          render: (data) => `<div>$${data}</div>`
         },
         {
           title: "Opciones",
@@ -226,79 +356,74 @@ private setupDateChangeObservable() {
           className: 'text-center',
           render: function(data, type, row) {
             return `
-         <div class="dropdown">
-  <button class="btn btn-light border border-black rounded-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-dots-vertical" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-      <path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
-      <path d="M12 19m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
-      <path d="M12 5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
-    </svg>
-  </button>
-  <ul class="dropdown-menu">
-    <li>
-      <a class="dropdown-item text-info btn-view">
-        <i class="fas fa-eye"></i> Ver más
-      </a>
-    </li>
-    <li>
-      <a class="dropdown-item text-secondary btn-edit" >
-        <i class="fas fa-edit"></i> Editar
-      </a>
-    </li>
-    <li>
-      <a class="dropdown-item text-danger btn-delete" >
-        <i class="fas fa-trash"></i> Eliminar
-      </a>
-    </li>
-  </ul>
-</div>
-            `;
+              <div class="text-center">
+                <div class="btn-group">
+                  <div class="dropdown">
+                    <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
+                    <ul class="dropdown-menu">
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a class="dropdown-item btn-view">Ver más</a></li>
+                      <li><a class="dropdown-item btn-edit">Editar</a></li>
+                      <li><a class="dropdown-item btn-delete">Eliminar</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>`;
           }
-      },
+        }
       ],
+  
+      // Configuración del DOM y diseño
+      dom:
+        '<"mb-3"t>' +                           // Tabla
+        '<"d-flex justify-content-between"lp>', // Paginación
+  
+      // Configuración del lenguaje
       language: {
-        processing: "Procesando...",
-        search: "Buscar:",
-        lengthMenu: "Mostrar MENU registros",
-        info: "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+        lengthMenu: `
+          <select class="form-select">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>`,
+        search: 'Buscar:',
+        info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
         infoEmpty: "Mostrando 0 registros",
         infoFiltered: "(filtrado de _MAX_ registros totales)",
-        loadingRecords: "Cargando...",
-        zeroRecords: "No se encontraron resultados",
-        emptyTable: "No hay datos disponibles en la tabla",
         paginate: {
-          first: "Primero",
-          previous: "Anterior",
-          next: "Siguiente",
-          last: "Último"
+          first: 'Primero',
+          last: 'Último',
+          next: 'Siguiente',
+          previous: 'Anterior'
+        },
+        zeroRecords: 'No se encontraron resultados',
+        emptyTable: 'No hay datos disponibles',
+        loadingRecords: "Cargando...",
+        processing: "Procesando..."
       }
-    }
     });
-    const table = $('#myTable').DataTable();
-
+  
+    // Event handlers
     $('#myTable tbody').on('click', '.btn-view', (event) => {
       const row = $(event.currentTarget).closest('tr');
-      const rowData = table.row(row).data();
+      const rowData = this.table.row(row).data();
       this.viewBillDetails(rowData.id);
     });
-
+  
     $('#myTable tbody').on('click', '.btn-edit', (event) => {
-      const row = table.row($(event.currentTarget).parents('tr'));
+      const row = this.table.row($(event.currentTarget).parents('tr'));
       const rowData = row.data();
       if (rowData) {
         this.editBill(rowData.id)
       }
     });
-
+  
     $('#myTable tbody').on('click', '.btn-delete', (event) => {
       const row = $(event.currentTarget).closest('tr');
-      const rowData = table.row(row).data();
-      this.failedBillId= rowData.id
-      this.openModal(this.modalConfirmDelete)
+      const rowData = this.table.row(row).data();
+      this.failedBillId = rowData.id;
+      this.openModal(this.modalConfirmDelete);
     });
-    
-    
   }
   editBill(id: any) {
     console.log(id); // Esto mostrará el id en la consola

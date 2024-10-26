@@ -23,6 +23,7 @@ import { debounceTime, distinctUntilChanged, switchMap, tap, finalize, takeUntil
   styleUrls: ['./view-owner-expense.component.scss'],
 })
 export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
+  
   bills: BillViewOwner[] = [];
   filteredBills: BillViewOwner[] = [];
   providersMap: { [key: string]: string } = {};
@@ -30,6 +31,8 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
   fechaDesde: string = '';
   fechaHasta: string = '';
   maxDateTo: string = '';
+  table : any;
+  searchTerm : string='';
 
   private dateChangeSubject = new Subject<{ from: string, to: string }>();
   private unsubscribe$ = new Subject<void>();
@@ -39,7 +42,15 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     private billService: BillViewOwnerService,
     private providerService: ProviderViewOwnerService
   ) { }
-
+  onSearch(event: any) {
+    const searchValue = event.target.value;
+  
+    if (searchValue.length >= 3) {
+      this.table.search(searchValue).draw();
+    } else if (searchValue.length === 0) {
+      this.table.search('').draw();
+    }
+  }
   ngOnInit(): void {
     this.loadDates();
     this.setupDateChangeObservable();
@@ -133,7 +144,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     let pageCount = 0;
   
     (doc as any).autoTable({
-      head: [['Descripción', 'Categoría', 'Proveedor', 'Tipo de Gasto', 'Fecha', 'Monto']],
+      head: [['Descripción', 'Categoria', 'Proveedor', 'Tipo de Gasto', 'Fecha', 'Monto']],
       body: pdfData,
       startY: 30, 
       theme: 'grid',
@@ -198,49 +209,102 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
 
   // Actualizar la tabla DataTable con los nuevos datos
   configDataTable() {
+    $.fn.dataTable.ext.type.order['date-moment-pre'] = (d: string) => moment(d, 'DD/MM/YYYY').unix();
     console.log(this.bills);
     if ($.fn.DataTable.isDataTable('#myTable')) {
-      const table = $('#myTable').DataTable();
-      table.clear();
-      table.rows.add(this.bills);
-      table.draw();
-      return;
+      $('#myTable').DataTable().clear().destroy();
     }
-  
-    $('#myTable').DataTable({
+
+    this.table = $('#myTable').DataTable({
+      // Atributos de la tabla
       paging: true,
       searching: true,
       ordering: true,
-      lengthChange: false,
+      lengthChange: true,
+      order: [5, 'desc'], // Ordenar por fecha por defecto
+      lengthMenu: [10, 25, 50],
       pageLength: 10,
       data: this.bills,
+
+      // Columnas de la tabla
       columns: [
-        { data: 'category.description', title: 'Categoría' },
-        { data: 'providerId', title: 'Proveedor',render: function(data){
-          return "empresa anonima"
-        } },
-        { data: 'expenseType', title: 'Tipo de Gasto',render: function(data) {
-          return data === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : data;
-        } },
-        { data: 'description', title: 'Descripción' },
-        
-        {
+        { 
+          data: 'category.description',
+          title: 'Categoría',
+          className: 'align-middle',
+          render: (data) => `<div>${data}</div>`
+        },
+        { 
+          data: 'providerId',
+          title: 'Proveedor',
+          className: 'align-middle',
+          render: function(data) {
+            return `<div>empresa anonima</div>`
+          }
+        },
+        { 
+          data: 'expenseType',
+          title: 'Tipo de Gasto',
+          className: 'align-middle',
+          render: function(data) {
+            return `<div>${data === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : data}</div>`
+          }
+        },
+        { 
+          data: 'description',
+          title: 'Descripción',
+          className: 'align-middle',
+          render: (data) => `<div>${data}</div>`
+        },
+        { 
           data: 'amount',
           title: 'Monto',
-          render: (data) => `$${data}`,
+          className: 'align-middle',
+          render: (data) => `<div>$${data}</div>`
         },
-        
         { 
-          title: "Fecha", 
-          data: "expenseDate", 
-          render: function(data) {
-            return moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY');
-          },
+          data: 'expenseDate',
+          title: 'Fecha',
+          className: 'align-middle',
+          render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
           type: 'date-moment'
         },
+        {
+          title: "Opciones",
+          data: null,
+          orderable: false,
+          className: 'text-center',
+          render: function(data, type, row) {
+            return `
+              <div class="text-center">
+                <div class="btn-group">
+                  <div class="dropdown">
+                    <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
+                    <ul class="dropdown-menu">
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a class="dropdown-item" btn-view>Ver más</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>`;
+          }
+        }
         
       ],
+
+      // Configuración del DOM y diseño
+      dom:
+        '<"mb-3"t>' +                           // Tabla
+        '<"d-flex justify-content-between"lp>', // Paginación
+
+      // Configuración del lenguaje
       language: {
+        lengthMenu:
+          `<select class="form-select">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>`,
         search: 'Buscar:',
         info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
         paginate: {
@@ -250,8 +314,13 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
           previous: 'Anterior'
         },
         zeroRecords: 'No se encontraron resultados',
-        emptyTable: 'No hay datos disponibles'
-      }
-    });
-  } 
+        emptyTable: 'No hay datos disponibles',
+        loadingRecords: "Cargando...",
+        processing: "Procesando..."
+      }})
+
+      // Configuración de botones de exportación
+      
+      
+}
 }
