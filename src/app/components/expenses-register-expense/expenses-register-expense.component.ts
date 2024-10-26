@@ -227,6 +227,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     this.form.controls['amount'].markAsPristine();
     this.form.controls['description'].markAsPristine();
     this.form.controls['invoiceNumber'].markAsPristine();
+    this.formSubmitted = false;
     this.initialForm();
   }
   validateForm(): boolean {
