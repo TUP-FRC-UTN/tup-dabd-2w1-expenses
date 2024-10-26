@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 //Imports para el DataTable
 import moment from 'moment';
+import 'bootstrap';
 import $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-bs5';
@@ -147,7 +148,6 @@ private setupDateChangeObservable() {
     });
   }
 
- 
   openModal(modal: ElementRef | HTMLDivElement) {
     const element = modal instanceof ElementRef ? modal.nativeElement : modal;
     element.style.display = 'block';
