@@ -7,7 +7,7 @@
           <div class="col">
             <div class="d-flex justify-content-start align-items-center mb-2">
               <div class="col-3">
-                <label for="typeExpense" class="form-lable">Tipo *  </label>
+                <label for="typeExpense" class="Text Start">Tipo *  </label>
               </div>
               <select
                 name="typeExpense"
@@ -36,7 +36,7 @@
                 name="expenseDate"
                 [(ngModel)]="expense.expenseDate"
                 id="expenseDate"
-                class="form-control"
+                class="form-control "
                 [max]="today | date : 'yyyy-MM-dd'"
                 #fecha="ngModel"
                 required
@@ -82,7 +82,7 @@
                 name="categoryId"
                 [(ngModel)]="expense.categoryId"
                 id="categoryId"
-                class="form-select"
+                class="form-select "
                 #categoryId="ngModel"
                 required
               >
@@ -317,7 +317,7 @@
             <button
               class="btn btn-secondary"
               type="button"
-              style="width: 100%"
+              style="width: 40%; align-self: self-end;"
               (click)="clearForm()"
             >
               Cancelar
@@ -327,7 +327,7 @@
             <button
               class="btn btn-success"
               type="submit"
-              style="width: 100%"
+              style="width: 40%; align-self: self-start;"
               >
               Registrar
             </button>

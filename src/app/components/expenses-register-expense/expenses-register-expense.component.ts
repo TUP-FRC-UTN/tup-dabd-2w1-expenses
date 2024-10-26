@@ -18,14 +18,25 @@ import { ProviderService } from '../../services/provider.service';
 import { CommonModule, DatePipe, NgFor, NgIf } from '@angular/common';
 import { Provider } from '../../models/provider';
 import { RouterOutlet } from '@angular/router';
-import { CurrencyMaskModule } from "ng2-currency-mask";
+import { CurrencyMaskModule } from 'ng2-currency-mask';
+import { catchError } from 'rxjs/operators';
+import { of, throwError } from 'rxjs';
 
 @Component({
   selector: 'app-expenses-register-expense',
   templateUrl: './expenses-register-expense.component.html',
   standalone: true,
   providers: [ExpenseService, OwnerService, ProviderService],
-  imports: [FormsModule, DatePipe, NgFor, NgIf, CommonModule, RouterOutlet,ReactiveFormsModule,CurrencyMaskModule],
+  imports: [
+    FormsModule,
+    DatePipe,
+    NgFor,
+    NgIf,
+    CommonModule,
+    RouterOutlet,
+    ReactiveFormsModule,
+    CurrencyMaskModule,
+  ],
   styleUrls: ['./expenses-register-expense.component.css'],
 })
 export class ExpensesRegisterExpenseComponent implements OnInit {
@@ -51,12 +62,12 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     installments: 0,
     distributions: this.distributions,
   };
-  
+
   selectedFile: File | null = null;
   listOwner: Owner[] = [];
   selectedOwnerId: number = 0;
   listProviders: Provider[] = [];
-  today:string='';
+  today: string = '';
   alreadysent = false;
   expenseCategoryList: ExpenseCategory[] = [];
   private cdRef = inject(ChangeDetectorRef);
@@ -91,7 +102,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   allowOnlyPositiveNumbers(event: KeyboardEvent): void {
     const charCode = event.which ? event.which : event.keyCode;
     const inputValue: string = (event.target as HTMLInputElement).value;
-  
+
     // Permitir números, la tecla de borrar (backspace), y el punto decimal (.)
     if (
       (charCode < 48 || charCode > 57) && // No es un número
@@ -100,7 +111,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     ) {
       event.preventDefault();
     }
-  
+
     // Evitar que se ingrese más de un punto decimal
     if (charCode === 46 && inputValue.includes('.')) {
       event.preventDefault();
@@ -119,7 +130,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
     this.expense.expenseDate = `${yyyy}-${mm}-${dd}`;
-    this.today=`${yyyy}-${mm}-${dd}`;
+    this.today = `${yyyy}-${mm}-${dd}`;
     console.log(this.today);
     console.log(this.expense.expenseDate);
   }
@@ -175,7 +186,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     this.distributions[index].proportion = value;
     this.validateTotalProportion();
   }
-  
+
   onBlur(event: any, index: number): void {
     const value = this.distributions[index].proportion;
     if (value > 100) {
@@ -213,13 +224,16 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     this.form.controls['amount'].markAsUntouched();
     this.form.controls['description'].markAsUntouched();
     this.form.controls['invoiceNumber'].markAsUntouched();
-    this.initialForm()
+    this.form.controls['amount'].markAsPristine();
+    this.form.controls['description'].markAsPristine();
+    this.form.controls['invoiceNumber'].markAsPristine();
+    this.initialForm();
   }
   validateForm(): boolean {
     this.formSubmitted = true;
-    
+
     if (!this.form.valid) {
-      Object.keys(this.form.controls).forEach(key => {
+      Object.keys(this.form.controls).forEach((key) => {
         const control = this.form.controls[key];
         control.markAsTouched();
       });
@@ -281,21 +295,37 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     // Llamamos al servicio para registrar el gasto
     this.expenseService
       .registerExpense(this.expense, this.selectedFile ?? undefined)
-      .subscribe(
-        (response) => {
-          // Asegúrate de que estás verificando correctamente la estructura de la respuesta
-          if(response && response.status === 200) {
-            this.showSuccessModal('Se registró correctamente el gasto');
-            this.clearForm();
+      .pipe(
+        catchError((error) => {
+          // Manejar errores específicos aca
+          if (error.status === 400) {
+            this.showErrorModal(
+              'Solicitud incorrecta. Por favor, revise los datos ingresados.'
+            );
+          } else if (error.status === 401) {
+            this.showErrorModal('No autorizado. Por favor, inicie sesión.');
+          } else if (error.status === 404) {
+            this.showErrorModal('Recurso no encontrado.');
+          } else if (error.status === 500) {
+            this.showErrorModal(
+              'Error interno del servidor. Por favor, intente más tarde.'
+            );
           } else {
-            this.showErrorModal('Respuesta inesperada del servidor');
+            this.showErrorModal('Se produjo un error al registrar el gasto.');
           }
-        },
-        (error) => {
-          this.showErrorModal('Se produjo un error al registrar el gasto');
           console.error('Error al registrar el gasto', error);
           this.repairDistributions();
+          return throwError(error); // O puedes retornar `of(null)` si no quieres propagar el error
+        })
+      )
+      .subscribe((response) => {
+        // Asegúrate de que estás verificando correctamente la estructura de la respuesta
+        if (response && response.status === 200) {
+          this.showSuccessModal('Se registró correctamente el gasto');
+          this.clearForm();
+        } else {
+          this.showErrorModal('Respuesta inesperada del servidor');
         }
-      );
+      });
   }
 }
