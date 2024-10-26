@@ -65,7 +65,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
 
   filterData() {
       
-      debugger
+      
       this.categoryService.getCategory().subscribe(
         (filteredCategory) => {
           this.category = filteredCategory; 
@@ -157,7 +157,6 @@ export class ExpensesViewCategoryComponent implements OnInit {
   </svg>
     </button>
     <ul class="dropdown-menu">
-      <li><button class="dropdown-item view" >Ver Mas</button></li>
       <li><button class="dropdown-item edit" >Editar</button></li>
       <li><button class="dropdown-item delete" >Eliminar</button></li>
 
@@ -186,6 +185,15 @@ export class ExpensesViewCategoryComponent implements OnInit {
     }
     });
     const table = $('#myTable').DataTable();
+
+    $('#myTable tbody').on('click', '.view', (event) => {
+      const row = $(event.currentTarget).closest('tr');
+      const rowData = table.row(row).data();
+      this.expenseCategory.description= rowData.description
+      this.expenseCategory.id=rowData.id
+      this.showModalToAddCategory()
+    });
+
 
     $('#myTable tbody').on('click', '.edit', (event) => {
       const row = $(event.currentTarget).closest('tr');
@@ -245,6 +253,12 @@ export class ExpensesViewCategoryComponent implements OnInit {
     console.log(this.expenseCategory)
     form.reset();
     this.closeModalAdd();
+    $.fn.dataTable.ext.type.order['date-moment-pre'] = function (d: string) {
+      return moment(d, 'DD/MM/YYYY').unix();  // Convertir la fecha a timestamp para que pueda ordenarse
+    };
+
+   this.configDataTable();
+    this.filterData();
   }
 
   delete(id:number){
@@ -278,7 +292,9 @@ export class ExpensesViewCategoryComponent implements OnInit {
       }
     );
   }
-
+entre(){
+  console.log('entre')
+}
   showModalToAddCategory() {
     this.showModal = true;
     this.cdRef.detectChanges();

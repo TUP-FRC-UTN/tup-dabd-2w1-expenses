@@ -17,9 +17,10 @@ export class CategoryService {
   }
 
   add(expenseCategory: Category): Observable<Category> {
-    
-    return this.http.post<Category>(this.url, expenseCategory.description)
-  }
+    console.log(expenseCategory);
+    return this.http.post<Category>(`${this.url}/postCategory?description=${expenseCategory.description}`, expenseCategory.description);
+}
+
 
   deleteCategory(id: number): Observable<void> {
     const url=this.url+'/delete?id='+id;
