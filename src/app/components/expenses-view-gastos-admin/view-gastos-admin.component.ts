@@ -33,7 +33,7 @@ export class ViewGastosAdminComponent implements OnInit {
   private dateChangeSubject = new Subject<{ from: string, to: string }>();
   private unsubscribe$ = new Subject<void>();
   @ViewChild('modalNoteCredit') modalNoteCredit!: ElementRef;
-  @ViewChild('modalConfirmDelete') modalConfirmDelete!: ElementRef;
+  @ViewChild('modalConfirmDelete')  modalConfirmDelete!: ElementRef;
 
 
   bills: Bill[] = [];

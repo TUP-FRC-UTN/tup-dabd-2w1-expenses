@@ -32,4 +32,10 @@ export class CategoryService {
   getCategoryById(id: number): Observable<Category> {
     return this.http.get<Category>(`${this.url}/${id}`);
   }
+
+  editCategory(id:number):Observable<void>{
+    const url=this.url+'/edit?id='+id;
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.put<void>(url, { headers });
+  }
 }
