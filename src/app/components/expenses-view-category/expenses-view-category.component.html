@@ -146,7 +146,7 @@
                       type="submit"
                       class="btn btn-success"
                       [disabled]="form.invalid"
-                      (click)="edit(expenseCategory.id)"
+                      (click)="edit()"
                     >
                       Guardar
                     </button>
@@ -181,7 +181,7 @@
                 >
                   Cancelar
                 </button>
-                <button type="button" class="btn btn-primary">Aceptar</button>
+                <button type="button" class="btn btn-primary" (click)="delete(expenseCategory.id)">Aceptar</button>
               </div>
             </div>
           </div>

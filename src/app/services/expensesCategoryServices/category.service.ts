@@ -22,10 +22,9 @@ export class CategoryService {
 }
 
 
-  deleteCategory(id: number): Observable<void> {
-    const url=this.url+'/delete?id='+id;
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.delete<void>(url, { headers });
+  deleteCategory(id: number): Observable<any> {
+    return this.http.delete(`${this.url}/deleteById?id=${id}`);
+
   }
   updateCategory(category: Category): Observable<any> {
     return this.http.put(`${this.url}/putById?id=${category.id}&description=${category.description}`, category);
