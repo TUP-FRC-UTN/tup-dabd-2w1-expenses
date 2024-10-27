@@ -228,7 +228,6 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   onFileSelected(event: any): void {
     this.selectedFile = event.target.files[0];
   }
-
   allowOnlyPositiveNumbers(event: KeyboardEvent): void {
     const charCode = event.which ? event.which : event.keyCode;
     const inputValue: string = (event.target as HTMLInputElement).value;

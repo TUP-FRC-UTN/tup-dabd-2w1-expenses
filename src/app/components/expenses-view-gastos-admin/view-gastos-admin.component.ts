@@ -27,7 +27,6 @@ import jsPDF from 'jspdf';
 })
 export class ViewGastosAdminComponent implements OnInit {
 
-
   dateFrom: string = '';
   dateTo: string = '';
   maxDateTo: string = '';
@@ -45,7 +44,7 @@ export class ViewGastosAdminComponent implements OnInit {
 
 
   bills: Bill[] = [];
-  filterBills: Bill[] = [];
+  filterBills: Bill[] = []; 
   categories: string[] = [];
   providers: string[] = [];
   expenseTypes: string[] = [];

@@ -38,6 +38,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
   private unsubscribe$ = new Subject<void>();
   isLoading = false;
 
+  
   constructor(
     private billService: BillViewOwnerService,
     private providerService: ProviderViewOwnerService

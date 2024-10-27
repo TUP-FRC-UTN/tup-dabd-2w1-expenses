@@ -16,9 +16,26 @@ export class CategoryService {
     return this.http.get<Category[]>(this.url+'/all');
   }
 
-  deleteCategory(id: number): Observable<void> {
-    const url=this.url+'/delete?id='+id;
+  add(expenseCategory: Category): Observable<Category> {
+    console.log(expenseCategory);
+    return this.http.post<Category>(`${this.url}/postCategory?description=${expenseCategory.description}`, expenseCategory.description);
+}
+
+
+  deleteCategory(id: number): Observable<any> {
+    return this.http.delete(`${this.url}/deleteById?id=${id}`);
+
+  }
+  updateCategory(category: Category): Observable<any> {
+    return this.http.put(`${this.url}/putById?id=${category.id}&description=${category.description}`, category);
+  }
+  getCategoryById(id: number): Observable<Category> {
+    return this.http.get<Category>(`${this.url}/${id}`);
+  }
+
+  editCategory(id:number):Observable<void>{
+    const url=this.url+'/edit?id='+id;
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.delete<void>(url, { headers });
+    return this.http.put<void>(url, { headers });
   }
 }
