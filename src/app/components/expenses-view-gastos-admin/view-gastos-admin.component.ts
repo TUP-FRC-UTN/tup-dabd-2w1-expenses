@@ -356,9 +356,9 @@ export class ViewGastosAdminComponent implements OnInit {
                     <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
                     <ul class="dropdown-menu">
                       <li><hr class="dropdown-divider"></li>
-                      <li><a class="dropdown-item btn-view">Ver más</a></li>
-                      <li><a class="dropdown-item btn-edit">Editar</a></li>
-                      <li><a class="dropdown-item btn-delete">Eliminar</a></li>
+                      <li><a class="dropdown-item btn-view" style="cursor: pointer">Ver más</a></li>
+                      <li><a class="dropdown-item btn-edit" style="cursor: pointer">Editar</a></li>
+                      <li><a class="dropdown-item btn-delete" style="cursor: pointer">Eliminar</a></li>
                     </ul>
                   </div>
                 </div>

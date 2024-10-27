@@ -96,7 +96,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       }
     });
   }
- 
+
   private loadExpense(id: number): void {
     this.expenseService.getById(id).subscribe({
       next: (expenseData: ExpenseGetById) => {
@@ -518,7 +518,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       complete: () => {
         console.log('Operación completada');
       }
-     });
+    });
   }
   showErrorAlert(message: string) {
     Swal.fire({
