@@ -15,6 +15,7 @@ import { BillService } from '../../services/billServices/bill.service';
 import { debounceTime, distinctUntilChanged, filter, finalize, mergeMap, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import jsPDF from 'jspdf';
+import Swal from 'sweetalert2';
 
 
 @Component({
@@ -222,7 +223,19 @@ export class ViewGastosAdminComponent implements OnInit {
     this.billService.deleteLogicBill(id).subscribe({
       next: () => {
         console.log(`Gasto con ID ${id} eliminada con éxito.`);
-        alert('Se eliminó con éxito el gasto');
+        Swal.fire({
+          title: '¡Expensa borrada!',
+          text: 'La expensa se ha eliminado correctamente.',
+          icon: 'success',
+          confirmButtonColor: '#4CAF50',
+          background: '#ffffff',
+          customClass: {
+            title: 'text-xl font-medium text-gray-900',
+            htmlContainer: 'text-sm text-gray-600',  // Changed from 'content' to 'htmlContainer'
+            confirmButton: 'px-4 py-2 text-white rounded-lg',
+            popup: 'swal2-popup'
+          }
+        });
         this.filterDataOnChange();
       },
       error: (error) => {

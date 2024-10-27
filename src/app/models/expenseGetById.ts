@@ -7,7 +7,7 @@ export interface ExpenseGetById{
   expenseType: string;
   expenseDate: string;
   fileId: string;
-  invoiceNumber: number;
+  invoiceNumber: string;
   distributionList: {
     ownerId: number;
     ownerFullName: string;

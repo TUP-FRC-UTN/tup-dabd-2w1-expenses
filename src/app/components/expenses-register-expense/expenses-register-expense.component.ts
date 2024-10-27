@@ -22,6 +22,7 @@ import { ExpenseGetById } from '../../models/expenseGetById';
 import { CurrencyMaskModule } from 'ng2-currency-mask';
 import { catchError } from 'rxjs/operators';
 import { of, throwError } from 'rxjs';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-expenses-register-expense',
@@ -106,7 +107,19 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading expense', error);
-        alert('No se pudo cargar el gasto');
+        Swal.fire({
+          title: '¡Error!',
+          text: 'No se pudo cargar el gasto. Inténtalo de nuevo.',
+          icon: 'error',
+          confirmButtonColor: '#f44336', // Color rojo para el botón de error
+          background: '#ffffff',
+          customClass: {
+            title: 'text-xl font-medium text-gray-900',
+            htmlContainer: 'text-sm text-gray-600',
+            confirmButton: 'px-4 py-2 text-white rounded-lg',
+            popup: 'swal2-popup'
+          }
+        });
         this.router.navigate(['/expenses']);
       }
     });
@@ -135,7 +148,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
         description: data.description,
         providerId: 1,//TODO VER COMO MANEJAR PROVIDER
         expenseDate: this.formatDate(data.expenseDate ?? new Date().toISOString()),
-        invoiceNumber: String(data.invoiceNumber ?? ''), // Convertir a string de manera segura
+        invoiceNumber: data.invoiceNumber, // Convertir a string de manera segura
         typeExpense: this.mapExpenseType(data.expenseType ?? 'COMUN'),
         categoryId: Number(category?.id) || 0,
         amount: data.amount ?? 0,
@@ -431,47 +444,74 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       next: (response) => {
         if (response && response.status === 200) {
           console.log(`${this.isEditMode ? 'Actualización' : 'Registro'} exitoso`);
-          this.showSuccessModal(`Se ${this.isEditMode ? 'actualizó' : 'registró'} correctamente`);
+          Swal.fire({
+            title: `¡${this.isEditMode ? 'Expensa actualizada' : 'Expensa registrada'}!`,
+            text: `La expensa se ha ${this.isEditMode ? 'actualizado' : 'registrado'} correctamente.`,
+            icon: 'success',
+            confirmButtonColor: '#4CAF50',
+            background: '#ffffff',
+            customClass: {
+              title: 'text-xl font-medium text-gray-900',
+              htmlContainer: 'text-sm text-gray-600',
+              confirmButton: 'px-4 py-2 text-white rounded-lg',
+              popup: 'swal2-popup'
+            }
+          });
           this.clearForm();
         } else {
           console.log('Respuesta inesperada', response);
-          this.showErrorModal(`Error al ${this.isEditMode ? 'actualizar' : 'registrar'} el gasto`);
+          this.showErrorAlert('Respuesta inesperada del servidor')
         }
       },
       error: (error) => {
         console.error(`Error al ${this.isEditMode ? 'actualizar' : 'registrar'} el gasto`, error);
         
+        const defaultErrorMessage = 'Error al procesar la solicitud.';
+
         if (this.isEditMode) {
           // Errores específicos para actualización
-          if (error.status === 400) {
-            this.showErrorModal('Los datos de actualización son incorrectos. Verifique los campos.');
-          } else if (error.status === 401) {
-            this.showErrorModal('Su sesión ha expirado. Por favor, vuelva a iniciar sesión.');
-          } else if (error.status === 404) {
-            this.showErrorModal('El gasto que intenta actualizar ya no existe.');
-          } else if (error.status === 409) {
-            this.showErrorModal('El gasto fue modificado por otro usuario. Por favor, recargue la página.');
-          } else if (error.status === 422) {
-            this.showErrorModal('Error en las distribuciones. Verifique que los datos sean correctos.');
-          } else if (error.status === 500) {
-            this.showErrorModal('Error en el servidor. Por favor, intente más tarde.');
-          } else {
-            this.showErrorModal('Error al actualizar el gasto.');
+          switch (error.status) {
+            case 400:
+              this.showErrorAlert('Los datos de actualización son incorrectos. Verifique los campos.');
+              break;
+            case 401:
+              this.showErrorAlert('Su sesión ha expirado. Por favor, vuelva a iniciar sesión.');
+              break;
+            case 404:
+              this.showErrorAlert('El gasto que intenta actualizar ya no existe.');
+              break;
+            case 409:
+              this.showErrorAlert('El gasto fue modificado por otro usuario. Por favor, recargue la página.');
+              break;
+            case 422:
+              this.showErrorAlert('Error en las distribuciones. Verifique que los datos sean correctos.');
+              break;
+            case 500:
+              this.showErrorAlert('Error en el servidor. Por favor, intente más tarde.');
+              break;
+            default:
+              this.showErrorAlert(defaultErrorMessage);
           }
         } else {
           // Errores específicos para nuevo registro
-          if (error.status === 400) {
-            this.showErrorModal('Los datos ingresados son incorrectos. Verifique los campos.');
-          } else if (error.status === 401) {
-            this.showErrorModal('No tiene autorización. Por favor, inicie sesión.');
-          } else if (error.status === 409) {
-            this.showErrorModal('Ya existe un gasto con este número de factura.');
-          } else if (error.status === 422) {
-            this.showErrorModal('Error en las distribuciones. La suma debe ser 100%.');
-          } else if (error.status === 500) {
-            this.showErrorModal('Error en el servidor. Por favor, intente más tarde.');
-          } else {
-            this.showErrorModal('Error al registrar el gasto.');
+          switch (error.status) {
+            case 400:
+              this.showErrorAlert('Los datos ingresados son incorrectos. Verifique los campos.');
+              break;
+            case 401:
+              this.showErrorAlert('No tiene autorización. Por favor, inicie sesión.');
+              break;
+            case 409:
+              this.showErrorAlert('Ya existe un gasto con este número de factura.');
+              break;
+            case 422:
+              this.showErrorAlert('Error en las distribuciones. La suma debe ser 100%.');
+              break;
+            case 500:
+              this.showErrorAlert('Error en el servidor. Por favor, intente más tarde.');
+              break;
+            default:
+              this.showErrorAlert(defaultErrorMessage);
           }
         }
       },
@@ -479,5 +519,20 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
         console.log('Operación completada');
       }
      });
+  }
+  showErrorAlert(message: string) {
+    Swal.fire({
+      title: '¡Error!',
+      text: message,
+      icon: 'error',
+      confirmButtonColor: '#f44336',
+      background: '#ffffff',
+      customClass: {
+        title: 'text-xl font-medium text-gray-900',
+        htmlContainer: 'text-sm text-gray-600',
+        confirmButton: 'px-4 py-2 text-white rounded-lg',
+        popup: 'swal2-popup'
+      }
+    });
   }
 }
