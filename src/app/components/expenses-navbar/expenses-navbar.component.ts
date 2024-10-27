@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { SideButton } from '../../models/sideButton';
 import { ExpensesSideButtonComponent } from '../expenses-side-button/expenses-side-button.component';
@@ -94,4 +94,5 @@ export class ExpensesNavbarComponent {
   setTitle(title: string) {
     this.pageTitle = title;
   }
+  
 }

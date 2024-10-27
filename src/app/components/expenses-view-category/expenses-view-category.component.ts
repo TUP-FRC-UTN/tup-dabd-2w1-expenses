@@ -153,7 +153,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
   </svg>
     </button>
     <ul class="dropdown-menu">
-      <li><button class="dropdown-item edit" >Editar</button></li>
+      <li><button type:"button" class="dropdown-item edit" >Editar</button></li>
       <li><button class="dropdown-item delete" >Eliminar</button></li>
 
     </ul>
@@ -234,7 +234,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
     this.categoryService.add(this.expenseCategory).subscribe({
       next: () => {
         console.log(`Categoria agregada con éxito.`);
-        alert('Se agrego con éxito el gasto');
+        alert('Se agrego con éxito la categoria');
       },
       error: (error) => {
         console.error(`Error al agregar:`, error);

@@ -89,74 +89,59 @@
       </div>
 
       <!-- Modal Edit -->
-      <div
-        #modalEdit
-        class="modal"
-        id="modalConfirrmationDeleteExpense"
-        tabindex="-1"
-        role="dialog"
-        >
-        <div class="container mt-4">
-          <div class="modal-dialog card border" role="document">
-            <div class="modal-content card-body">
-              <div class="modal-header card-title mb-4">
-                <h5 class="modal-title mb-3">Editar Categoria de Gasto</h5>
+<div #modalEdit class="modal" id="modalConfirrmationDeleteExpense" tabindex="-1" role="dialog">
+  <div class="container mt-4">
+    <div class="modal-dialog card border" role="document">
+      <div class="modal-content card-body">
+        <div class="modal-header card-title mb-4">
+          <h5 class="modal-title mb-3">Editar Categoria de Gasto</h5>
+        </div>
+        <div class="modal-body mb-3">
+          <!-- Cambia el (ngSubmit) a edit() -->
+          <form #editForm="ngForm">
+            <div class="row align-items-center">
+              <div class="col-auto d-flex align-items-center">
+                <label for="categoryName" class="col-form-label label-align mb-3">
+                  Nombre de Categoría
+                </label>
               </div>
-              <div class="modal-body mb-3">
-                <form #form="ngForm" (ngSubmit)="save(form)">
-                  <div class="row align-items-center">
-                    <div class="col-auto d-flex align-items-center">
-                      <label
-                        for="categoryName"
-                        class="col-form-label label-align mb-3"
-                        >Nombre de Categoría</label
-                      >
-                    </div>
-                    <div class="col-md-6">
-                      <input
-                        type="text"
-                        name="categoryName"
-                        id="categoryName"
-                        class="form-control"
-                        [(ngModel)]="expenseCategory.description"
-                        #category="ngModel"
-                        required
-                      />
-                      <div
-                        class="error-message"
-                        style="height: 20px; font-size: 0.875rem"
-                      >
-                        @if (category.touched && category.invalid) {
-                        <p class="text-danger m-0">
-                          El nombre de categoría es requerido
-                        </p>
-                        }
-                      </div>
-                    </div>
-                  </div>
-                  <div class="modal-footer">
-                    <button
-                      type="submit"
-                      class="btn btn-danger"
-                      (click)="closeModal(modalEdit)"
-                    >
-                      Cerrar
-                    </button>
-                    <button
-                      type="submit"
-                      class="btn btn-success"
-                      [disabled]="form.invalid"
-                      (click)="edit()"
-                    >
-                      Guardar
-                    </button>
-                  </div>
-                </form>
+              <div class="col-md-6">
+                <input
+                  type="text"
+                  name="categoryName"
+                  id="categoryName"
+                  class="form-control"
+                  [(ngModel)]="expenseCategory.description"
+                  #category="ngModel"
+                  required
+                />
+                <div class="error-message" style="height: 20px; font-size: 0.875rem">
+                  @if (category.touched && category.invalid) {
+                    <p class="text-danger m-0">El nombre de categoría es requerido</p>
+                  }
+                </div>
               </div>
             </div>
-          </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" (click)="closeModal(modalEdit)">
+                Cerrar
+              </button>
+              <!-- Cambia el type a "button" y agrega (click)="edit()" -->
+              <button
+                type="button"
+                class="btn btn-success"
+                [disabled]="editForm.invalid"
+                (click)="edit()"
+              >
+                Guardar
+              </button>
+            </div>
+          </form>
         </div>
       </div>
+    </div>
+  </div>
+</div>
         <!-- Modal Confirm Delete -->
         <div
           #modalConfirmDelete
