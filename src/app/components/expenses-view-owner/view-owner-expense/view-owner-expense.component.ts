@@ -9,9 +9,9 @@ import { FormsModule } from '@angular/forms';
 import { BillViewOwner } from '../../../models/viewOwnerModel/bill-view-owner.model';
 import { BillViewOwnerService } from '../../../services/viewOwnerServices/bill-view-owner.service';
 import { ProviderViewOwnerService } from '../../../services/viewOwnerServices/provider-view-owner.service';
-import * as XLSX from 'xlsx';   // Para exportar a Excel
-import jsPDF from 'jspdf';      // Para exportar a PDF
-import 'jspdf-autotable';       // Para generar tablas en PDF
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, tap, finalize, takeUntil } from 'rxjs/operators';
 
@@ -23,7 +23,7 @@ import { debounceTime, distinctUntilChanged, switchMap, tap, finalize, takeUntil
   styleUrls: ['./view-owner-expense.component.scss'],
 })
 export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
-  
+
   bills: BillViewOwner[] = [];
   filteredBills: BillViewOwner[] = [];
   providersMap: { [key: string]: string } = {};
@@ -31,21 +31,21 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
   fechaDesde: string = '';
   fechaHasta: string = '';
   maxDateTo: string = '';
-  table : any;
-  searchTerm : string='';
+  table: any;
+  searchTerm: string = '';
 
   private dateChangeSubject = new Subject<{ from: string, to: string }>();
   private unsubscribe$ = new Subject<void>();
   isLoading = false;
 
-  
+
   constructor(
     private billService: BillViewOwnerService,
     private providerService: ProviderViewOwnerService
   ) { }
   onSearch(event: any) {
     const searchValue = event.target.value;
-  
+
     if (searchValue.length >= 3) {
       this.table.search(searchValue).draw();
     } else if (searchValue.length === 0) {
@@ -55,7 +55,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadDates();
     this.setupDateChangeObservable();
-  
+
     this.filterDataOnChange();
   }
 
@@ -71,11 +71,11 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
         this.isLoading = true;
       }),
       debounceTime(1200),
-      distinctUntilChanged((prev, curr) => 
+      distinctUntilChanged((prev, curr) =>
         prev.from === curr.from && prev.to === curr.to
       ),
       switchMap(({ from, to }) => {
-        return this.billService.getBillsByOwnerIdAndDateFromDateTo(223, from, to);
+        return this.billService.getBillsWithProviders(223, from, to);
       }),
       takeUntil(this.unsubscribe$)
     ).subscribe({
@@ -99,19 +99,17 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     const dd = String(today.getDate()).padStart(2, '0');
     this.fechaHasta = `${yyyy}-${mm}-${dd}`;
     this.maxDateTo = `${yyyy}-${mm}-${dd}`;
-  
+
     const past = new Date();
     past.setMonth(past.getMonth() - 1);
     const pastyyyy = past.getFullYear();
     const pastmm = String(past.getMonth() + 1).padStart(2, '0');
     const pastdd = String(past.getDate()).padStart(2, '0');
     this.fechaDesde = `${pastyyyy}-${pastmm}-${pastdd}`;
-  
-    // Realizar la búsqueda automáticamente después de cargar las fechas por defecto
+
     this.filterDataOnChange();
   }
 
-  // Cuando cambia alguna de las fechas
   filterDataOnChange() {
     this.dateChangeSubject.next({ from: this.fechaDesde, to: this.fechaHasta });
   }
@@ -119,94 +117,69 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
   // Exportar a PDF
   exportToPDF(): void {
     const doc = new jsPDF();
-  
+
     const pageTitle = 'Listado de Gastos';
     doc.setFontSize(18);
     doc.text(pageTitle, 15, 10);
     doc.setFontSize(12);
-  
+
     doc.text(`Fechas: Desde ${moment(this.fechaDesde).format('DD/MM/YYYY')} hasta ${moment(this.fechaHasta).format('DD/MM/YYYY')}`, 15, 20);
-  
+
     const table = $('#myTable').DataTable();
     const filteredData = table.rows({ search: 'applied' }).data().toArray();
-  
-    const pdfData = filteredData.map(bill => {
-      const [category, ...rest] = bill.description.split(' - ');
-      return [
-        rest.join(' - '),
-        category,
-        bill.providerId,
-        bill.expenseType,
-        moment(bill.expenseDate).format('DD/MM/YYYY'),
-        `$${bill.amount}`
-      ];
-    });
-  
+
+    const pdfData = filteredData.map(bill => [
+      bill.category.description,
+      bill.providerName,
+      bill.expenseType === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : bill.expenseType,
+      bill.description,
+      `$${bill.amount}`,
+      moment(bill.expenseDate, 'YYYY-MM-DD').format('DD/MM/YYYY')
+    ]);
+
     let pageCount = 0;
-  
+
     (doc as any).autoTable({
-      head: [['Descripción', 'Categoria', 'Proveedor', 'Tipo de Gasto', 'Fecha', 'Monto']],
+      head: [['Categoría', 'Proveedor', 'Tipo de Gasto', 'Descripción', 'Monto', 'Fecha']],
       body: pdfData,
-      startY: 30, 
+      startY: 30,
       theme: 'grid',
       margin: { top: 30, bottom: 20 },
       didDrawPage: function (data: any) {
         pageCount++;
         const pageSize = doc.internal.pageSize;
         const pageHeight = pageSize.height || pageSize.getHeight();
-  
+
         doc.setFontSize(10);
         const text = `Página ${pageCount}`;
         const textWidth = doc.getTextWidth(text);
         doc.text(text, (pageSize.width / 2) - (textWidth / 2), pageHeight - 10);
       }
     });
-  
+
     doc.save('listado_gastos.pdf');
   }
-  
-  //Exportar a Excel
+
+  // Exportar a Excel
   exportToExcel(): void {
     const table = $('#myTable').DataTable();
     const filteredData = table.rows({ search: 'applied' }).data().toArray();
-  
-    const encabezado = [
-      [`Listado de Gastos`],
-      [`Fechas: Desde ${moment(this.fechaDesde).format('DD/MM/YYYY')} hasta ${moment(this.fechaHasta).format('DD/MM/YYYY')}`],
-      [],
-      ['Descripción', 'Categoría', 'Proveedor', 'Tipo de Gasto', 'Fecha', 'Monto']
-    ];
-  
-    const excelData = filteredData.map(bill => {
-      const [category, ...rest] = bill.description.split(' - ');
-      return [
-        rest.join(' - '),
-        category,
-        bill.providerId,
-        bill.expenseType === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : bill.expenseType,
-        moment(bill.expenseDate).format('DD/MM/YYYY'),
-        `$${bill.amount}`
-      ];
-    });
-  
-    const worksheetData = [...encabezado, ...excelData];
-    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
-    
-    worksheet['!cols'] = [
-      { wch: 30 },  // Ancho de la columna de descripción
-      { wch: 20 },  // Ancho de la columna de categoría
-      { wch: 20 },  // Ancho de la columna de proveedor
-      { wch: 20 },  // Ancho de la columna de tipo de gasto
-      { wch: 15 },  // Ancho de la columna de fecha
-      { wch: 10 }   // Ancho de la columna de monto
-    ];
-  
+
+    const excelData = filteredData.map(bill => ({
+      'Categoría': bill.category.description,
+      'Proveedor': bill.providerName,
+      'Tipo de Gasto': bill.expenseType === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : bill.expenseType,
+      'Descripción': bill.description,
+      'Monto': `$${bill.amount}`,
+      'Fecha': moment(bill.expenseDate, 'YYYY-MM-DD').format('DD/MM/YYYY')
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Gastos');
-  
-    XLSX.writeFile(workbook, `listado_gastos_${moment(this.fechaDesde).format('YYYYMMDD')}_${moment(this.fechaHasta).format('YYYYMMDD')}.xlsx`);
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Listado de Gastos');
+
+    XLSX.writeFile(workbook, 'listado_gastos.xlsx');
   }
-  
 
   // Actualizar la tabla DataTable con los nuevos datos
   configDataTable() {
@@ -217,53 +190,48 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     }
 
     this.table = $('#myTable').DataTable({
-      // Atributos de la tabla
       paging: true,
       searching: true,
       ordering: true,
       lengthChange: true,
-      order: [5, 'desc'], // Ordenar por fecha por defecto
+      order: [5, 'desc'],
       lengthMenu: [10, 25, 50],
       pageLength: 10,
       data: this.bills,
 
-      // Columnas de la tabla
       columns: [
-        { 
+        {
           data: 'category.description',
           title: 'Categoría',
           className: 'align-middle',
           render: (data) => `<div>${data}</div>`
         },
-        { 
-          data: 'providerId',
+        {
+          data: 'providerName',
           title: 'Proveedor',
           className: 'align-middle',
-          render: function(data) {
-            return `<div>empresa anonima</div>`
-          }
         },
-        { 
+        {
           data: 'expenseType',
           title: 'Tipo de Gasto',
           className: 'align-middle',
-          render: function(data) {
+          render: function (data) {
             return `<div>${data === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : data}</div>`
           }
         },
-        { 
+        {
           data: 'description',
           title: 'Descripción',
           className: 'align-middle',
           render: (data) => `<div>${data}</div>`
         },
-        { 
+        {
           data: 'amount',
           title: 'Monto',
           className: 'align-middle',
           render: (data) => `<div>$${data}</div>`
         },
-        { 
+        {
           data: 'expenseDate',
           title: 'Fecha',
           className: 'align-middle',
@@ -275,7 +243,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
           data: null,
           orderable: false,
           className: 'text-center',
-          render: function(data, type, row) {
+          render: function (data, type, row) {
             return `
               <div class="text-center">
                 <div class="btn-group">
@@ -290,15 +258,12 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
               </div>`;
           }
         }
-        
+
       ],
-
-      // Configuración del DOM y diseño
       dom:
-        '<"mb-3"t>' +                           // Tabla
-        '<"d-flex justify-content-between"lp>', // Paginación
+        '<"mb-3"t>' +
+        '<"d-flex justify-content-between"lp>',
 
-      // Configuración del lenguaje
       language: {
         lengthMenu:
           `<select class="form-select">
@@ -318,10 +283,11 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
         emptyTable: 'No hay datos disponibles',
         loadingRecords: "Cargando...",
         processing: "Procesando..."
-      }})
+      }
+    })
 
-      // Configuración de botones de exportación
-      
-      
-}
+    // Configuración de botones de exportación
+
+
+  }
 }

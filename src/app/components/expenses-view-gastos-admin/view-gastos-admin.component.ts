@@ -8,7 +8,7 @@ import 'bootstrap';
 import $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-bs5';
-import * as XLSX from 'xlsx'; 
+import * as XLSX from 'xlsx';
 import { DistributionList } from '../../models/distributionList';
 import { Instalmentlist } from '../../models/installmentList';
 import { BillService } from '../../services/billServices/bill.service';
@@ -20,7 +20,7 @@ import jsPDF from 'jspdf';
 @Component({
   selector: 'app-view-gastos-admin',
   standalone: true,
-  imports: [CommonModule,FormsModule],
+  imports: [CommonModule, FormsModule],
   providers: [BillService],
   templateUrl: './view-gastos-admin.component.html',
   styleUrl: './view-gastos-admin.component.scss'
@@ -34,8 +34,8 @@ export class ViewGastosAdminComponent implements OnInit {
   installmentList: Instalmentlist[] = [];
   failedBillId: number = 0;
   isLoading = false;
-  table : any;
-  searchTerm : string='';
+  table: any;
+  searchTerm: string = '';
   private dateChangeSubject = new Subject<{ from: string, to: string }>();
   private unsubscribe$ = new Subject<void>();
   @ViewChild('modalNoteCredit') modalNoteCredit!: ElementRef;
@@ -44,7 +44,7 @@ export class ViewGastosAdminComponent implements OnInit {
 
 
   bills: Bill[] = [];
-  filterBills: Bill[] = []; 
+  filterBills: Bill[] = [];
   categories: string[] = [];
   providers: string[] = [];
   expenseTypes: string[] = [];
@@ -52,175 +52,157 @@ export class ViewGastosAdminComponent implements OnInit {
     private cdRef: ChangeDetectorRef,
     private billService: BillService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-  this.loadDates();
-  this.setupDateChangeObservable();
-  this.configDataTable();
-  this.filterDataOnInit();
-}
-onSearch(event: any) {
-  const searchValue = event.target.value;
-
-  if (searchValue.length >= 3) {
-    this.table.search(searchValue).draw();
-  } else if (searchValue.length === 0) {
-    this.table.search('').draw();
+    this.loadDates();
+    this.setupDateChangeObservable();
+    this.configDataTable();
+    this.filterDataOnInit();
   }
-}
+  onSearch(event: any) {
+    const searchValue = event.target.value;
 
-filterDataOnInit() {
-  this.isLoading = true;  // Activar spinner
-  this.billService.getBillsByDateRange(this.dateFrom, this.dateTo).pipe(
-    finalize(() => {
-      this.isLoading = false;
-      this.cdRef.detectChanges();
-    })
-  ).subscribe({
-    next: (response: Bill[]) => {
-      this.bills = response;
-      this.loadBillsFiltered();
-    },
-    error: (error) => {
-      console.error('Error fetching initial bills:', error);
+    if (searchValue.length >= 3) {
+      this.table.search(searchValue).draw();
+    } else if (searchValue.length === 0) {
+      this.table.search('').draw();
     }
-  });
-}
-redirect(path: string) {
-  this.router.navigate([path]); 
-}
-ngOnDestroy(): void {
-  this.unsubscribe$.next();
-  this.unsubscribe$.complete();
-}
+  }
 
-private setupDateChangeObservable() {
-  // Set loading true immediately when method is called
-  this.isLoading = true;
-  this.cdRef.detectChanges();
+  filterDataOnInit() {
+    this.isLoading = true;  // Activar spinner
+    this.billService.getBillsByDateRange(this.dateFrom, this.dateTo).pipe(
+      finalize(() => {
+        this.isLoading = false;
+        this.cdRef.detectChanges();
+      })
+    ).subscribe({
+      next: (response: Bill[]) => {
+        this.bills = response;
+        this.loadBillsFiltered();
+      },
+      error: (error) => {
+        console.error('Error fetching initial bills:', error);
+      }
+    });
+  }
+  redirect(path: string) {
+    this.router.navigate([path]);
+  }
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
 
-  this.dateChangeSubject.pipe(
-    tap(() => {
-      // Set loading true on each new emission
-      this.isLoading = true;
-      this.cdRef.detectChanges();
-    }),
-    debounceTime(3000),
-    distinctUntilChanged((prev, curr) => 
-      prev.from === curr.from && prev.to === curr.to
-    ),
-    switchMap(({ from, to }) => {
-      this.isLoading=false
-      return this.billService.getBillsByDateRange(from, to);
-    }),
-    finalize(() => {
-      // Set loading false when the observable completes or errors
-      this.isLoading = false;
-      this.cdRef.detectChanges();
-    }),
-    takeUntil(this.unsubscribe$)
-  ).subscribe({
-    next: (response: Bill[]) => {
-      this.bills = response;
-      this.loadBillsFiltered();
-    },
-    error: (error) => {
-      console.error('Error fetching bills:', error);
-    }
-  });
-}
+  private setupDateChangeObservable() {
+    // Set loading true immediately when method is called
+    this.isLoading = true;
+    this.cdRef.detectChanges();
+
+    this.dateChangeSubject.pipe(
+      tap(() => {
+        // Set loading true on each new emission
+        this.isLoading = true;
+        this.cdRef.detectChanges();
+      }),
+      debounceTime(3000),
+      distinctUntilChanged((prev, curr) =>
+        prev.from === curr.from && prev.to === curr.to
+      ),
+      switchMap(({ from, to }) => {
+        this.isLoading = false
+        return this.billService.getBillsByDateRange(from, to);
+      }),
+      finalize(() => {
+        // Set loading false when the observable completes or errors
+        this.isLoading = false;
+        this.cdRef.detectChanges();
+      }),
+      takeUntil(this.unsubscribe$)
+    ).subscribe({
+      next: (response: Bill[]) => {
+        this.bills = response;
+        this.loadBillsFiltered();
+      },
+      error: (error) => {
+        console.error('Error fetching bills:', error);
+      }
+    });
+  }
+
   // Exportar a PDF
   exportToPDF(): void {
     const doc = new jsPDF();
-  
+
     const pageTitle = 'Listado de Gastos';
     doc.setFontSize(18);
     doc.text(pageTitle, 15, 10);
     doc.setFontSize(12);
-  
+
     doc.text(`Fechas: Desde ${moment(this.dateFrom).format('DD/MM/YYYY')} hasta ${moment(this.dateTo).format('DD/MM/YYYY')}`, 15, 20);
-  
+
     const table = $('#myTable').DataTable();
     const filteredData = table.rows({ search: 'applied' }).data().toArray();
-  
+
     const pdfData = filteredData.map(bill => {
-      const [category, ...rest] = bill.description.split(' - ');
+      const category = bill.category || 'Sin categoría';
+      const provider = bill.provider || 'Sin proveedor';
       return [
-        rest.join(' - '),
+        bill.expenseType === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : bill.expenseType,
         category,
-        bill.providerId,
-        bill.expenseType,
+        provider,
         moment(bill.expenseDate).format('DD/MM/YYYY'),
         `$${bill.amount}`
       ];
     });
-  
+
     let pageCount = 0;
-  
+
     (doc as any).autoTable({
-      head: [['Descripción', 'Categoría', 'Proveedor', 'Tipo de Gasto', 'Fecha', 'Monto']],
+      head: [['Tipo de Gasto', 'Categoría', 'Proveedor', 'Fecha', 'Monto']],
       body: pdfData,
-      startY: 30, 
+      startY: 30,
       theme: 'grid',
       margin: { top: 30, bottom: 20 },
       didDrawPage: function (data: any) {
         pageCount++;
         const pageSize = doc.internal.pageSize;
         const pageHeight = pageSize.height || pageSize.getHeight();
-  
+
         doc.setFontSize(10);
         const text = `Página ${pageCount}`;
         const textWidth = doc.getTextWidth(text);
         doc.text(text, (pageSize.width / 2) - (textWidth / 2), pageHeight - 10);
       }
     });
-  
+
     doc.save('listado_gastos.pdf');
   }
-  
-  //Exportar a Excel
+
+  // Exportar a Excel
   exportToExcel(): void {
     const table = $('#myTable').DataTable();
     const filteredData = table.rows({ search: 'applied' }).data().toArray();
   
-    const encabezado = [
-      [`Listado de Gastos`],
-      [`Fechas: Desde ${moment(this.dateFrom).format('DD/MM/YYYY')} hasta ${moment(this.dateTo).format('DD/MM/YYYY')}`],
-      [],
-      ['Descripción', 'Categoría', 'Proveedor', 'Tipo de Gasto', 'Fecha', 'Monto']
-    ];
-  
     const excelData = filteredData.map(bill => {
-      const [category, ...rest] = bill.description.split(' - ');
-      return [
-        rest.join(' - '),
-        category,
-        bill.providerId,
-        bill.expenseType === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : bill.expenseType,
-        moment(bill.expenseDate).format('DD/MM/YYYY'),
-        `$${bill.amount}`
-      ];
+      const category = bill.category || 'Sin categoría';
+      const provider = bill.provider || 'Sin proveedor';
+      return {
+        'Tipo de Gasto': bill.expenseType === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : bill.expenseType,
+        'Categoría': category,
+        'Proveedor': provider,
+        'Fecha': moment(bill.expenseDate).format('DD/MM/YYYY'),
+        'Monto': `$${bill.amount}`
+      };
     });
   
-    const worksheetData = [...encabezado, ...excelData];
-    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
-    
-    worksheet['!cols'] = [
-      { wch: 30 },  // Ancho de la columna de descripción
-      { wch: 20 },  // Ancho de la columna de categoría
-      { wch: 20 },  // Ancho de la columna de proveedor
-      { wch: 20 },  // Ancho de la columna de tipo de gasto
-      { wch: 15 },  // Ancho de la columna de fecha
-      { wch: 10 }   // Ancho de la columna de monto
-    ];
-  
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Gastos');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Listado de Gastos');
   
-    XLSX.writeFile(workbook, `listado_gastos_${moment(this.dateFrom).format('YYYYMMDD')}_${moment(this.dateTo).format('YYYYMMDD')}.xlsx`);
+    XLSX.writeFile(workbook, 'listado_gastos.xlsx');
   }
-  
 
   filterDataOnChange() {
     this.dateChangeSubject.next({ from: this.dateFrom, to: this.dateTo });
@@ -232,9 +214,9 @@ private setupDateChangeObservable() {
     this.maxDateTo = this.dateTo;
     this.dateFrom = today.subtract(1, 'month').format('YYYY-MM-DD');
   }
-  confirmDeleteExpense(){
-     this.deleteBill(this.failedBillId)
-     this.closeModal(this.modalConfirmDelete)
+  confirmDeleteExpense() {
+    this.deleteBill(this.failedBillId)
+    this.closeModal(this.modalConfirmDelete)
   }
   deleteBill(id: number) {
     this.billService.deleteLogicBill(id).subscribe({
@@ -291,11 +273,11 @@ private setupDateChangeObservable() {
   }
   configDataTable() {
     $.fn.dataTable.ext.type.order['date-moment-pre'] = (d: string) => moment(d, 'YYYY-MM-DD').unix();
-  
+
     if ($.fn.DataTable.isDataTable('#myTable')) {
       $('#myTable').DataTable().clear().destroy();
     }
-  
+
     this.table = $('#myTable').DataTable({
       // Atributos de la tabla
       paging: true,
@@ -306,7 +288,7 @@ private setupDateChangeObservable() {
       lengthMenu: [10, 25, 50],
       pageLength: 10,
       data: this.bills,
-  
+
       // Columnas de la tabla
       columns: [
         {
@@ -317,7 +299,7 @@ private setupDateChangeObservable() {
           data: 'expenseType',
           title: 'Tipo de Gasto',
           className: 'align-middle',
-          render: function(data) {
+          render: function (data) {
             return `<div>${data === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : data}</div>`
           }
         },
@@ -331,7 +313,7 @@ private setupDateChangeObservable() {
           data: 'provider',
           title: 'Proveedor',
           className: 'align-middle',
-          render: function(data) {
+          render: function (data) {
             return `<div>empresa anonima</div>`
           }
         },
@@ -353,7 +335,7 @@ private setupDateChangeObservable() {
           data: null,
           orderable: false,
           className: 'text-center',
-          render: function(data, type, row) {
+          render: function (data, type, row) {
             return `
               <div class="text-center">
                 <div class="btn-group">
@@ -371,12 +353,12 @@ private setupDateChangeObservable() {
           }
         }
       ],
-  
+
       // Configuración del DOM y diseño
       dom:
         '<"mb-3"t>' +                           // Tabla
         '<"d-flex justify-content-between"lp>', // Paginación
-  
+
       // Configuración del lenguaje
       language: {
         lengthMenu: `
@@ -401,14 +383,14 @@ private setupDateChangeObservable() {
         processing: "Procesando..."
       }
     });
-  
+
     // Event handlers
     $('#myTable tbody').on('click', '.btn-view', (event) => {
       const row = $(event.currentTarget).closest('tr');
       const rowData = this.table.row(row).data();
       this.viewBillDetails(rowData.id);
     });
-  
+
     $('#myTable tbody').on('click', '.btn-edit', (event) => {
       const row = this.table.row($(event.currentTarget).parents('tr'));
       const rowData = row.data();
@@ -416,7 +398,7 @@ private setupDateChangeObservable() {
         this.editBill(rowData.id)
       }
     });
-  
+
     $('#myTable tbody').on('click', '.btn-delete', (event) => {
       const row = $(event.currentTarget).closest('tr');
       const rowData = this.table.row(row).data();
@@ -426,13 +408,13 @@ private setupDateChangeObservable() {
   }
   editBill(id: any) {
     console.log(id); // Esto mostrará el id en la consola
-    this.router.navigate(['/registerExpense',id]); // Navega a /viewExpenseAdmin/id
+    this.router.navigate(['/registerExpense', id]); // Navega a /viewExpenseAdmin/id
   }
   viewBillDetails(id: any) {
     throw new Error('Method not implemented.');
   }
 }
- 
+
 
 
 

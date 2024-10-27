@@ -64,10 +64,10 @@ export class ExpensesNavbarComponent {
           roles: ["SuperAdmin", "FinanceAdmin"]
         },
         {
-          //botón Estadisticas/Graficos 
+          // botón Estadísticas
           icon: "bi bi-graph-up",
           title: "Estadísticas",
-          route: "", //falta el routing
+          route: "estadisticas",
           roles: ["SuperAdmin", "FinanceAdmin"]
         }
         ]
