@@ -115,9 +115,8 @@
                 [(ngModel)]="expense.invoiceNumber"
                 id="invoiceNumber"
                 class="form-control"
-                [maxlength]="6"
+                [maxlength]="50"
                 #invoiceNumber="ngModel"
-                (keypress)="allowOnlyPositiveNumbers($event)"
                 required
               />
             </div>
