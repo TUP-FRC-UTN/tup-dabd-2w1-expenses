@@ -159,7 +159,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
     try {
       const data = this.category.map(item => ({
         Categoría: item.description,
-        Estado: item.estate,
+        Estado: item.state,
         'Última Actualización': moment(item.lastUpdatedDatetime).format('DD/MM/YYYY')
       }));
 
@@ -169,7 +169,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
       
       XLSX.writeFile(wb, 'categorias.xlsx');
       
-      this.showSuccessAlert('Archivo Excel exportado con éxito');
+    
     } catch (error) {
       this.showErrorAlert('Error al exportar a Excel');
       console.error('Error al exportar a Excel:', error);
@@ -182,7 +182,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
       
       const tableData = this.category.map(item => [
         item.description,
-        item.estate,
+        item.state,
         moment(item.lastUpdatedDatetime).format('DD/MM/YYYY')
       ]);
 
@@ -193,7 +193,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
 
       doc.save('categorias.pdf');
       
-      this.showSuccessAlert('Archivo PDF exportado con éxito');
+      
     } catch (error) {
       this.showErrorAlert('Error al exportar a PDF');
       console.error('Error al exportar a PDF:', error);
