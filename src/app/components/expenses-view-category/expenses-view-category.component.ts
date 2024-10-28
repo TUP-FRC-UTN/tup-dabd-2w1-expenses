@@ -18,16 +18,20 @@ import jsPDF from 'jspdf';
 import 'bootstrap';
 import 'jspdf-autotable';
 import { ExpensesViewCategoryDetailsComponent } from '../expenses-view-category-details/expenses-view-category-details.component';
+import { ExpensesEditCategoryComponent } from "../expenses-edit-category/expenses-edit-category.component";
 declare let bootstrap: any;
 @Component({
   selector: 'app-expenses-view-category',
   standalone: true,
-  imports: [CommonModule, FormsModule,ExpensesViewCategoryDetailsComponent],
+  imports: [CommonModule, FormsModule, ExpensesViewCategoryDetailsComponent, ExpensesEditCategoryComponent],
   providers: [CategoryService],
   templateUrl: './expenses-view-category.component.html',
   styleUrl: './expenses-view-category.component.scss',
 })
 export class ExpensesViewCategoryComponent implements OnInit {
+addCategory() {
+throw new Error('Method not implemented.');
+}
   searchTerm: any;
   table: any;
 
@@ -107,36 +111,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
     });
   }
 
-  showAddEditForm(title: string, category?: Category) {
-    return Swal.fire({
-      title: title,
-      html: `
-        <input id="swal-description" class="swal2-input" placeholder="Descripción" value="${category?.description || ''}">
-      `,
-      showCancelButton: true,
-      confirmButtonText: category ? 'Actualizar' : 'Guardar',
-      cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#4caf50',
-      cancelButtonColor: '#9e9e9e',
-      focusConfirm: false,
-      background: '#ffffff',
-      customClass: {
-        title: 'text-xl font-medium text-gray-900',
-        htmlContainer: 'text-sm text-gray-600',
-        confirmButton: 'px-4 py-2 text-white rounded-lg',
-        cancelButton: 'px-4 py-2 text-white rounded-lg',
-        popup: 'swal2-popup'
-      },
-      preConfirm: () => {
-        const description = (document.getElementById('swal-description') as HTMLInputElement).value;
-        if (!description) {
-          Swal.showValidationMessage('Por favor complete todos los campos');
-          return false;
-        }
-        return { description };
-      }
-    });
-  }
+
 
   filterData() {
     this.categoryService.getCategory().subscribe({
@@ -161,44 +136,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
     }
   }
 
-  async addCategory() {
-    const result = await this.showAddEditForm('Agregar Categoría');
-    
-    if (result.isConfirmed) {
-      this.expenseCategory.description = result.value.description;
-      
-      this.categoryService.add(this.expenseCategory).subscribe({
-        next: () => {
-          this.showSuccessAlert('Categoría agregada con éxito');
-          this.filterData();
-        },
-        error: (error) => {
-          this.showErrorAlert('Error al agregar la categoría');
-          console.error('Error al agregar:', error);
-        }
-      });
-    }
-  }
-
-  async editCategory(category: Category) {
-    const result = await this.showAddEditForm('Editar Categoría', category);
-    
-    if (result.isConfirmed) {
-      this.expenseCategory.id = category.id;
-      this.expenseCategory.description = result.value.description;
-      
-      this.categoryService.updateCategory(this.expenseCategory).subscribe({
-        next: () => {
-          this.showSuccessAlert('Categoría actualizada con éxito');
-          this.filterData();
-        },
-        error: (error) => {
-          this.showErrorAlert('Error al actualizar la categoría');
-          console.error('Error al actualizar:', error);
-        }
-      });
-    }
-  }
+  
 
   async deleteCategory(id: number) {
     const result = await this.showDeleteConfirmation();
@@ -366,6 +304,14 @@ export class ExpensesViewCategoryComponent implements OnInit {
       const rowData = this.table.row(row).data();
       this.deleteCategory(rowData.id);
     });
+  }
+  editCategory(rowData: any) {
+     this.categorySelected=rowData
+     this.cdRef.detectChanges();
+     console.log(this.categorySelected)
+      const modalElement = document.getElementById('categoryEditModal');
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
   }
   viewSelectedCategory(rowData : any) {
     this.categorySelected=rowData
