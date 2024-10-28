@@ -14,19 +14,17 @@ import 'bootstrap';
 import 'jspdf-autotable';
 import { ExpensesViewCategoryDetailsComponent } from '../expenses-view-category-details/expenses-view-category-details.component';
 import { ExpensesEditCategoryComponent } from "../expenses-edit-category/expenses-edit-category.component";
+import { ExpenseRegisterCategoryComponent } from "../../expense-register-category/expense-register-category.component";
 declare let bootstrap: any;
 @Component({
   selector: 'app-expenses-view-category',
   standalone: true,
-  imports: [CommonModule, FormsModule, ExpensesViewCategoryDetailsComponent, ExpensesEditCategoryComponent],
+  imports: [CommonModule, FormsModule, ExpensesViewCategoryDetailsComponent, ExpensesEditCategoryComponent, ExpenseRegisterCategoryComponent],
   providers: [CategoryService],
   templateUrl: './expenses-view-category.component.html',
   styleUrl: './expenses-view-category.component.scss',
 })
 export class ExpensesViewCategoryComponent implements OnInit {
-addCategory() {
-throw new Error('Method not implemented.');
-}
   searchTerm: any;
   table: any;
 
@@ -82,8 +80,8 @@ throw new Error('Method not implemented.');
       }
     });
   }
-  loadAlertAndFilter() {
-   this.showSuccessAlert("Se actualizo con exito la categoria")
+  loadAlertAndFilter(msg : string) {
+   this.showSuccessAlert(msg)
    this.filterData()
   }
 
@@ -323,6 +321,11 @@ throw new Error('Method not implemented.');
     console.log(this.categorySelected)
     // Aquí puedes activar el modal más adelante si deseas
     const modalElement = document.getElementById('categoryViewModal');
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+  }
+  addCategory() {
+    const modalElement = document.getElementById('categoryRegisterModal');
     const modal = new bootstrap.Modal(modalElement);
     modal.show();
   }

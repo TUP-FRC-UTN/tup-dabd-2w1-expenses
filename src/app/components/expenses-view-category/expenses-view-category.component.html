@@ -36,4 +36,9 @@
   </div>
 </section>
 <app-expenses-view-category-details [category]="categorySelected" ></app-expenses-view-category-details>
-<app-expenses-edit-category [category]="categorySelected"(eventSucces)="loadAlertAndFilter()"></app-expenses-edit-category>
+<app-expenses-edit-category [category]="categorySelected"
+(eventSucces)="loadAlertAndFilter('Se actualizo la categoria con exito')"
+(eventError)="showErrorAlert('La categoria no se pudo actualizar')"></app-expenses-edit-category>
+<app-expense-register-category 
+(eventSucces)="loadAlertAndFilter('Se registro la categoria con exito')"
+(eventError)="showErrorAlert('La categoria no puedo registrarse')"></app-expense-register-category>

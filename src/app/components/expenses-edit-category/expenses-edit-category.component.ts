@@ -21,6 +21,8 @@ export class ExpensesEditCategoryComponent {
 
   @Input() category: Category | null = null;
   @Output() eventSucces = new EventEmitter<void>();
+  @Output() eventError = new EventEmitter<void>();
+
 
   edit() {
     if(this.category!=null)
@@ -28,8 +30,8 @@ export class ExpensesEditCategoryComponent {
       next: () => {
         this.eventSucces.emit()
       },
-      error: (error) => {
-        console.error('Error al eliminar:', error);
+      error: () => {
+        this.eventError.emit()
       }
     })
     }
