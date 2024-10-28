@@ -1,9 +1,4 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  OnInit,
-  inject
-} from '@angular/core';
+import {ChangeDetectorRef,Component,OnInit,inject} from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import moment from 'moment';
@@ -49,9 +44,7 @@ throw new Error('Method not implemented.');
   };
 
   ngOnInit(): void {
-    $.fn.dataTable.ext.type.order['date-moment-pre'] = function (d: string) {
-      return moment(d, 'DD/MM/YYYY').unix();
-    };
+    
 
     this.configDataTable();
     this.filterData();
@@ -117,13 +110,17 @@ throw new Error('Method not implemented.');
     this.categoryService.getCategory().subscribe({
       next: (filteredCategory) => {
         this.category = filteredCategory;
-        this.configDataTable();
+        this.loadCategory();
       },
       error: (error) => {
         this.showErrorAlert('Error al filtrar las categorías');
         console.error('Error al filtrar las categorías:', error);
       }
     });
+  }
+  loadCategory() {
+    const dataTable = $('#myTable').DataTable();
+    dataTable.clear().rows.add(this.category).draw();
   }
 
   onSearch(event: any) {
@@ -205,11 +202,7 @@ throw new Error('Method not implemented.');
     $.fn.dataTable.ext.type.order['date-moment-pre'] = (d: string) => moment(d, 'YYYY-MM-DD').unix();
 
     if ($.fn.DataTable.isDataTable('#myTable')) {
-      let table = $('#myTable').DataTable();
-      table.clear();
-      table.rows.add(this.category);
-      table.draw();
-      return;
+      $('#myTable').DataTable().clear().destroy();
     }
 
     this.table = $('#myTable').DataTable({
@@ -289,8 +282,10 @@ throw new Error('Method not implemented.');
     $('#myTable tbody').on('click', '.btn-view', (event) => {
       const row = $(event.currentTarget).closest('tr');
       const rowData = this.table.row(row).data();
-      debugger
-      this.viewSelectedCategory(rowData)
+      if (rowData) {
+        this.viewSelectedCategory(rowData)
+      }
+      
     });
 
     $('#myTable tbody').on('click', '.btn-edit', (event) => {
@@ -318,11 +313,9 @@ throw new Error('Method not implemented.');
     this.cdRef.detectChanges();
     console.log(this.categorySelected)
     // Aquí puedes activar el modal más adelante si deseas
-    setTimeout(() => {
-      const modalElement = document.getElementById('categoryViewModal');
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
-    }, 1000);
+    const modalElement = document.getElementById('categoryViewModal');
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
   }
 
 }
