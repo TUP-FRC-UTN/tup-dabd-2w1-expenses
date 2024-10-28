@@ -291,7 +291,7 @@ export class ViewGastosAdminComponent implements OnInit {
     });
   }
   configDataTable() {
-    $.fn.dataTable.ext.type.order['date-moment-pre'] = (d: string) => moment(d, 'YYYY-MM-DD').unix();
+    $.fn.dataTable.ext.type.order['date-moment-pre'] = (d: string) => moment(d, 'DD/MM/YYYY').unix();
 
     if ($.fn.DataTable.isDataTable('#myTable')) {
       $('#myTable').DataTable().clear().destroy();
@@ -315,14 +315,6 @@ export class ViewGastosAdminComponent implements OnInit {
         //   visible: false
         // },
         {
-          data: 'expenseType',
-          title: 'Tipo de Gasto',
-          className: 'align-middle',
-          render: function (data) {
-            return `<div>${data === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : data}</div>`
-          }
-        },
-        {
           data: 'category',
           title: 'Categoría',
           className: 'align-middle',
@@ -337,17 +329,25 @@ export class ViewGastosAdminComponent implements OnInit {
           }
         },
         {
-          data: 'expenseDate',
-          title: 'Fecha',
+          data: 'expenseType',
+          title: 'Tipo de Gasto',
           className: 'align-middle',
-          render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
-          type: 'date-moment'
+          render: function (data) {
+            return `<div>${data === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : data}</div>`
+          }
         },
         {
           data: 'amount',
           title: 'Monto',
           className: 'align-middle',
           render: (data) => `<div>$${data}</div>`
+        },
+        {
+          data: 'expenseDate',
+          title: 'Fecha',
+          className: 'align-middle',
+          render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
+          type: 'date-moment'
         },
         {
           title: "Opciones",
