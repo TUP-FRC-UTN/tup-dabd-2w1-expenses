@@ -119,6 +119,8 @@
                     class="form-control"
                     [maxlength]="50"
                     #invoiceNumber="ngModel"
+                    (keydown)="onInvoiceNumberInput($event)"
+                    (paste)="onInvoiceNumberPaste($event)"
                     required
                   />
                 </div>
@@ -137,6 +139,7 @@
                     type="file"
                     name="receipt"
                     id="receipt"
+                    #fileInput
                     class="form-control"
                     (change)="onFileSelected($event)"
                     accept="image/*,.pdf"
@@ -321,29 +324,43 @@
             <div class="mb-3 mt-5 row text-center">
               <div class="col d-flex justify-content-end gap-1">
                 <button
-                  class="btn btn-secondary"
+                  class="btn btn-secondary px-5 d-flex align-items-center justify-content-center"
                   type="button"
-                  style="width: auto;"
+                  style="width: 120px; height: 38px;"
                   (click)="clearForm()"
                 >
                   Cancelar
                 </button>
                 @if(isEditMode){
                   <button
-                    class="btn btn-success"
+                    class="btn btn-success px-5 d-flex align-items-center justify-content-center"
                     type="submit"
-                    style="width: auto;"
+                    style="width: 120px; height: 38px;"
                     [disabled]="!form.valid || (expense.typeExpense == 'INDIVIDUAL' && !validateTotalProportion())">
-                     Editar 
+                    @if(isLoading){
+                      <div class="spinner-border spinner-border-sm" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                      </div>
+                    }
+                    @else{
+                      Actualizar
+                    } 
                   </button>
                 }
                 @else {
                   <button
-                    class="btn btn-success"
+                    class="btn btn-success px-5 d-flex align-items-center justify-content-center"
                     type="submit"
-                    style="width: auto;"
-                    [disabled]="!form.valid || (expense.typeExpense == 'INDIVIDUAL' && !validateTotalProportion())">
-                    Registrar
+                    style="width: 120px; height: 38px;"
+                    [disabled]="!form.valid || (expense.typeExpense == 'INDIVIDUAL' && !validateTotalProportion()) || isLoading">
+                    @if(isLoading){
+                      <div class="spinner-border spinner-border-sm" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                      </div>
+                    }
+                    @else{
+                      Registrar
+                    }
                   </button>
                 }
               </div>

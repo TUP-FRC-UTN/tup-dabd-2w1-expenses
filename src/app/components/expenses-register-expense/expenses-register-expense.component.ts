@@ -6,6 +6,7 @@ import {
   ChangeDetectorRef,
   OnInit,
   ViewChild,
+  ElementRef
 } from '@angular/core';
 import { FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
 import { Distributions } from '../../models/distributions';
@@ -43,6 +44,8 @@ import Swal from 'sweetalert2';
 })
 export class ExpensesRegisterExpenseComponent implements OnInit {
   @ViewChild('form') form!: NgForm;
+  @ViewChild('fileInput') fileInput!: ElementRef;
+
   // Modal states
   showModal = false;
   modalMessage = '';
@@ -265,6 +268,92 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       }
     }
   }
+  //Metodo para permitir solo numeros y la letra F en invoiceNumber
+  onInvoiceNumberInput(event: KeyboardEvent): void {
+    const input = event.target as HTMLInputElement;
+    const key = event.key.toLowerCase();
+    const cursorPosition = input.selectionStart || 0;
+    const currentValue = this.expense.invoiceNumber || '';
+
+    // Permitir teclas de control siempre
+    if (['backspace', 'delete', 'arrowleft', 'arrowright', 'tab'].includes(key.toLowerCase())) {
+      return;
+    }
+
+    // Prevenir cualquier entrada que no sea número o 'f'
+    if (!/^\d|f$/.test(key)) {
+      event.preventDefault();
+      return;
+    }
+
+    // Manejo especial para la letra 'f'
+    if (key === 'f') {
+      // Solo permitir 'f' si:
+      // 1. El campo está vacío y el cursor está al inicio, o
+      // 2. Estamos reemplazando todo el contenido (selección completa)
+      const isFullSelection = input.selectionStart === 0 && input.selectionEnd === currentValue.length;
+      
+      if (!isFullSelection && (cursorPosition !== 0 || currentValue.includes('F'))) {
+        event.preventDefault();
+        return;
+      }
+
+      // Convertir a mayúscula
+      event.preventDefault();
+      const start = input.selectionStart || 0;
+      const end = input.selectionEnd || 0;
+      
+      this.expense.invoiceNumber = 
+        'F' + 
+        currentValue.substring(end).replace(/^F/, '');
+      
+      // Mantener el cursor en la posición correcta
+      setTimeout(() => {
+        input.setSelectionRange(1, 1);
+      }, 0);
+      return;
+    }
+
+    // Para números
+    if (/^\d$/.test(key)) {
+      // Si hay una 'F' al inicio y estamos en posición 0, mover el cursor después de la F
+      if (currentValue.startsWith('F') && cursorPosition === 0) {
+        event.preventDefault();
+        setTimeout(() => {
+          const newValue = currentValue + key;
+          this.expense.invoiceNumber = newValue;
+          input.setSelectionRange(newValue.length, newValue.length);
+        }, 0);
+      }
+    }
+  }
+
+  // Método para manejar el pegado de texto en invoiceNumber
+  onInvoiceNumberPaste(event: ClipboardEvent): void {
+    event.preventDefault();
+    const pastedText = event.clipboardData?.getData('text') || '';
+    const input = event.target as HTMLInputElement;
+    const currentValue = this.expense.invoiceNumber || '';
+    
+    // Limpiar el texto pegado (solo números y posiblemente una F al inicio)
+    let cleanedText = pastedText.replace(/[^0-9f]/gi, '');
+    
+    // Manejar la F inicial si existe
+    if (cleanedText.toLowerCase().includes('f')) {
+      cleanedText = cleanedText.replace(/f/gi, '');
+      if (input.selectionStart === 0 && !currentValue.includes('F')) {
+        cleanedText = 'F' + cleanedText;
+      }
+    }
+    
+    // Si ya hay una F al inicio, preservarla
+    if (currentValue.startsWith('F') && input.selectionStart! > 0) {
+      this.expense.invoiceNumber = 
+        'F' + cleanedText;
+    } else {
+      this.expense.invoiceNumber = cleanedText;
+    }
+  }
 
   loadDate() {
     const today = new Date();
@@ -323,6 +412,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     const owner = this.listOwner.find((o) => o.id == ownerId);
     return owner ? `${owner.name} ${owner.lastname}` : '';
   }
+
   onProportionChange(value: number, index: number): void {
     // Mantener el valor actualizado al escribir, pero limitarlo en el evento `blur`
     this.distributions[index].proportion = value;
@@ -362,6 +452,9 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     });
   }
   clearForm(): void {
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
     this.cdRef.detectChanges();
     this.form.controls['amount'].markAsUntouched();
     this.form.controls['description'].markAsUntouched();
@@ -370,6 +463,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     this.form.controls['description'].markAsPristine();
     this.form.controls['invoiceNumber'].markAsPristine();
     this.formSubmitted = false;
+    this.selectedFile = null;
     this.initialForm();
   }
   validateForm(): boolean {
@@ -420,8 +514,9 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       this.clearForm();
     }
   }
-
+  isLoading = false;
   save(): void {
+    
     if (!this.validateForm()) {
       return; // Evita múltiples envíos
     }
@@ -434,10 +529,12 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       // Si el tipo de gasto es COMUN o EXTRAORDINARIO, vaciamos las distribuciones
       this.expense.distributions = [];
     }
-
+    this.isLoading = true;
     // Llamamos al servicio para registrar el gasto
     const serviceCall = this.isEditMode
+    // Llamar al servicio de actualización si es true
     ? this.expenseService.updateExpense(this.expense, this.selectedFile ?? undefined)
+    // Llamar al servicio de registro si es false
     : this.expenseService.registerExpense(this.expense, this.selectedFile ?? undefined);
 
     serviceCall.subscribe({
@@ -456,16 +553,19 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
               confirmButton: 'px-4 py-2 text-white rounded-lg',
               popup: 'swal2-popup'
             }
+            
           });
           this.clearForm();
+          this.isLoading = false;
         } else {
           console.log('Respuesta inesperada', response);
           this.showErrorAlert('Respuesta inesperada del servidor')
+          this.isLoading = false;
         }
       },
       error: (error) => {
         console.error(`Error al ${this.isEditMode ? 'actualizar' : 'registrar'} el gasto`, error);
-        
+        this.isLoading = false;
         const defaultErrorMessage = 'Error al procesar la solicitud.';
 
         if (this.isEditMode) {
@@ -493,6 +593,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
               this.showErrorAlert(defaultErrorMessage);
           }
         } else {
+          this.isLoading = false;
           // Errores específicos para nuevo registro
           switch (error.status) {
             case 400:
@@ -517,8 +618,10 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       },
       complete: () => {
         console.log('Operación completada');
+        this.isLoading = false;
       }
     });
+    
   }
   showErrorAlert(message: string) {
     Swal.fire({
