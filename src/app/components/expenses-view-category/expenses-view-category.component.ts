@@ -15,52 +15,16 @@ import { CategoryService } from '../../services/expensesCategoryServices/categor
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
+import 'bootstrap';
 import 'jspdf-autotable';
-
+import { ExpensesViewCategoryDetailsComponent } from '../expenses-view-category-details/expenses-view-category-details.component';
+declare let bootstrap: any;
 @Component({
   selector: 'app-expenses-view-category',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,ExpensesViewCategoryDetailsComponent],
   providers: [CategoryService],
-  template: `
-    <section class="py-5">
-      <div class="container p-3 border border-2 rounded shadow-lg">
-        <!-- Botón de agregar -->
-        <div class="row mb-3 text-end">
-          <div class="col">
-            <button class="btn btn-primary" (click)="addCategory()">
-              <span class="bi-plus-lg"></span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Fila de botones de filtro -->
-        <div class="row mb-3">
-          <!-- Barra de busqueda -->
-          <div class="col">
-            <input
-              type="text"
-              placeholder="Buscar"
-              class="form-control"
-              [(ngModel)]="searchTerm"
-              (input)="onSearch($event)"
-            >
-          </div>
-
-          <!-- Botones de exportar -->
-          <div class="col-auto d-flex gap-1 text-end">
-            <button (click)="exportToExcel()" id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel"></button>
-            <button (click)="exportToPDF()" id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf"></button>
-          </div>
-        </div>
-
-        <table id="myTable" class="table table-striped border border-3 rounded">
-          <thead></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
-  `,
+  templateUrl: './expenses-view-category.component.html',
   styleUrl: './expenses-view-category.component.scss',
 })
 export class ExpensesViewCategoryComponent implements OnInit {
@@ -70,6 +34,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
   constructor(private cdRef: ChangeDetectorRef) {}
   private readonly categoryService = inject(CategoryService);
 
+  categorySelected : Category | null = null;
   category: Category[] = [];
   filterCategory: Category[] = [];
   expenseCategory: Category = new Category();
@@ -380,19 +345,14 @@ export class ExpensesViewCategoryComponent implements OnInit {
         loadingRecords: 'Cargando...',
         zeroRecords: 'No se encontraron resultados',
         emptyTable: 'No hay datos disponibles en la tabla',
-        paginate: {
-          first: 'Primero',
-          previous: 'Anterior',
-          next: 'Siguiente',
-          last: 'Último'
-        }
       }
     });
 
     $('#myTable tbody').on('click', '.btn-view', (event) => {
       const row = $(event.currentTarget).closest('tr');
       const rowData = this.table.row(row).data();
-      this.showCategoryDetails(rowData);
+      debugger
+      this.viewSelectedCategory(rowData)
     });
 
     $('#myTable tbody').on('click', '.btn-edit', (event) => {
@@ -407,51 +367,16 @@ export class ExpensesViewCategoryComponent implements OnInit {
       this.deleteCategory(rowData.id);
     });
   }
-  showCategoryDetails(category : Category) {
-    Swal.fire({
-        title: 'Detalles de la Categoría',
-        html: `
-            <div class="container-fluid p-0">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card border-0">
-                            <div class="card-body p-0">
-                                <div class="row mb-3">
-                                    <div class="col-12">
-                                        <label class="fw-bold">ID:</label>
-                                        <span class="ms-2">${category.id}</span>
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <div class="col-12">
-                                        <label class="fw-bold">Descripción:</label>
-                                        <span class="ms-2">${category.description}</span>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-12">
-                                        <label class="fw-bold">Última actualización:</label>
-                                        <span class="ms-2">${moment(category.lastUpdatedDatetime).format('DD/MM/YYYY')}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `,
-        width: '500px',
-        padding: '20px',
-        showCloseButton: true,
-        showConfirmButton: true,
-        confirmButtonText: 'Cerrar',
-        customClass: {
-            title: 'fs-4 fw-medium text-start mb-4',
-            htmlContainer: 'text-start',
-            popup: 'border-0',
-            confirmButton: 'btn btn-primary'
-        },
-        buttonsStyling: false
-    });
+  viewSelectedCategory(rowData : any) {
+    this.categorySelected=rowData
+    this.cdRef.detectChanges();
+    console.log(this.categorySelected)
+    // Aquí puedes activar el modal más adelante si deseas
+    setTimeout(() => {
+      const modalElement = document.getElementById('categoryViewModal');
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
+    }, 1000);
   }
+
 }

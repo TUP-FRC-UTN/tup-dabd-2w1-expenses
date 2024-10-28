@@ -3,7 +3,7 @@
     <!-- Botón de agregar -->
     <div class="row mb-3 text-end">
       <div class="col">
-        <button class="btn btn-primary" (click)="showModalToAddCategory()">
+        <button class="btn btn-primary" (click)="addCategory()">
           <span class="bi-plus-lg"></span>
         </button>
       </div>
@@ -13,10 +13,10 @@
     <div class="row mb-3">
       <!-- Barra de busqueda -->
       <div class="col">
-        <input 
-          type="text" 
-          placeholder="Buscar" 
-          class="form-control" 
+        <input
+          type="text"
+          placeholder="Buscar"
+          class="form-control"
           [(ngModel)]="searchTerm"
           (input)="onSearch($event)"
         >
@@ -35,4 +35,4 @@
     </table>
   </div>
 </section>
-
+<app-expenses-view-category-details [category]="categorySelected"></app-expenses-view-category-details>

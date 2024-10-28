@@ -283,12 +283,6 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
           </select>`,
         search: 'Buscar:',
         info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
-        paginate: {
-          first: 'Primero',
-          last: 'Último',
-          next: 'Siguiente',
-          previous: 'Anterior'
-        },
         zeroRecords: 'No se encontraron resultados',
         emptyTable: 'No hay datos disponibles',
         loadingRecords: "Cargando...",
