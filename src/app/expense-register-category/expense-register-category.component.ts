@@ -18,7 +18,7 @@ export class ExpenseRegisterCategoryComponent {
      description: '',
      id: 0,
      lastUpdatedDatetime: '',
-     estate: ''
+     state: ''
    }
   @Output() eventSucces = new EventEmitter<void>();
   @Output() eventError = new EventEmitter<void>();

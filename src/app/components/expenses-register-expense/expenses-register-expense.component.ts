@@ -24,6 +24,8 @@ import { CurrencyMaskModule } from 'ng2-currency-mask';
 import { catchError } from 'rxjs/operators';
 import { of, throwError } from 'rxjs';
 import Swal from 'sweetalert2';
+import { CategoryService } from '../../services/expensesCategoryServices/category.service';
+import { Category } from '../../models/category';
 
 @Component({
   selector: 'app-expenses-register-expense',
@@ -81,6 +83,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   private cdRef = inject(ChangeDetectorRef);
   private readonly expenseService = inject(ExpenseService);
   private readonly propietarioService = inject(OwnerService);
+  private readonly expenseCategoryService = inject(CategoryService);
   private readonly providerService = inject(ProviderService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -381,13 +384,20 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     });
   }
   private loadExpenseCategories() {
-    this.expenseCategoryList = [
-      { id: '1', description: 'Mantenimiento' },
-      { id: '2', description: 'Servicios' },
-      { id: '3', description: 'Reparaciones' },
-      { id: '4', description: 'Administración' },
-      { id: '5', description: 'Seguridad' },
-    ];
+    this.expenseCategoryService.getCategory().subscribe({
+      next: (categories: Category[]) => {
+        categories.forEach(cat => {
+          if(cat.state=='Activo')
+          {
+            const expenseCategory: ExpenseCategory = {
+              id: cat.id.toString(), // Convertimos el number a string ya que ExpenseCategory.id es string
+              description: cat.description
+            };
+            this.expenseCategoryList.push(expenseCategory);
+          }
+        });
+      },
+    });
   }
   public addDistribution(): void {
     if (this.selectedOwnerId !== 0) {
@@ -597,7 +607,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
           // Errores específicos para nuevo registro
           switch (error.status) {
             case 400:
-              this.showErrorAlert('Los datos ingresados son incorrectos. Verifique los campos.');
+              this.showErrorAlert('La expensa ya esta registrada. Verifique los campos.');
               break;
             case 401:
               this.showErrorAlert('No tiene autorización. Por favor, inicie sesión.');
