@@ -15,18 +15,22 @@ import 'datatables.net-bs5';
 import { ExpensesRegisterExpenseComponent } from "./components/expenses-register-expense/expenses-register-expense.component";
 import { ViewOwnerExpenseComponent } from "./components/expenses-view-owner/view-owner-expense/view-owner-expense.component";
 import { appConfig } from './app.config';
+import { ExpensesNavbarComponent } from "./components/expenses-navbar/expenses-navbar.component";
+import { ExpensesViewCategoryComponent } from "./components/expenses-view-category/expenses-view-category.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
     RouterOutlet,
-    NavbarComponent, 
-    ViewGastosAdminComponent, 
-    HttpClientModule, 
-    ExpensesRegisterExpenseComponent, 
-    ViewOwnerExpenseComponent
-  ],
+    NavbarComponent,
+    ViewGastosAdminComponent,
+    HttpClientModule,
+    ExpensesRegisterExpenseComponent,
+    ViewOwnerExpenseComponent,
+    ExpensesNavbarComponent,
+    ExpensesViewCategoryComponent
+],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
@@ -44,7 +48,8 @@ export class AppComponent implements OnInit {
   items: MenuItems[] = [
     { key: 'menu1', name: 'Registrar Gastos', active: true },
     { key: 'menu2', name: 'Consultar Gastos Administrador', active: true },
-    { key: 'menu3', name: 'Consultar Gastos Propietarios', active: true }
+    { key: 'menu3', name: 'Consultar Gastos Propietarios', active: true },
+    { key: 'menu4', name: 'Consultar Categorias Administrador', active: true }
   ];
 
   //navbar

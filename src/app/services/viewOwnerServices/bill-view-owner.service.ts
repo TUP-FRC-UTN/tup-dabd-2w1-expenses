@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BillViewOwner } from '../../models/viewOwnerModel/bill-view-owner.model';
+import { ProviderViewOwnerService } from './provider-view-owner.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,21 +11,28 @@ import { BillViewOwner } from '../../models/viewOwnerModel/bill-view-owner.model
 export class BillViewOwnerService {
   private apiUrl = 'http://localhost:8080/api/expenses/distributions/getAllByOwnerId';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private providerService: ProviderViewOwnerService
+  ) {}
 
+  getBillsWithProviders(ownerId: number, startDate: string, endDate: string): Observable<BillViewOwner[]> {
+    const urlWithFilters = `${this.apiUrl}?id=${ownerId}&startDate=${startDate}&endDate=${endDate}`;
+    return forkJoin({
+      bills: this.http.get<BillViewOwner[]>(urlWithFilters),
+      providers: this.providerService.getProviders()
+    }).pipe(
+      map(({ bills, providers }) => {
+        const providerMap = providers.reduce((map, provider) => {
+          map[provider.id] = provider.nombre || 'Proveedor Anónimo';
+          return map;
+        }, {} as { [key: string]: string });
 
-  getBillsOnInit(): Observable<BillViewOwner[]> {
-    const currentDate = new Date();
-    const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-    const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-    const dateFrom = firstDayOfMonth.toISOString().split('T')[0];
-    const dateTo = lastDayOfMonth.toISOString().split('T')[0];
-    const urlWithFilters = `${this.apiUrl}?id=223&startDate=${dateFrom}&endDate=${dateTo}`;
-    console.log(urlWithFilters)
-    return this.http.get<BillViewOwner[]>(urlWithFilters);
-  }
-  getBillsByOwnerIdAndDateFromDateTo(ownerId: number, fechaDesde: string, fechaHasta: string) : Observable<BillViewOwner[]> {
-     const urlWithFilters = `${this.apiUrl}?id=223&startDate=${fechaDesde}&endDate=${fechaHasta}`
-    return this.http.get<BillViewOwner[]>(urlWithFilters);
+        return bills.map(bill => ({
+          ...bill,
+          providerName: providerMap[bill.providerId] || 'Proveedor Anónimo'
+        }));
+      })
+    );
   }
 }
