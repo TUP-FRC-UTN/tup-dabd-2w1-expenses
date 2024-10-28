@@ -161,7 +161,7 @@ throw new Error('Method not implemented.');
     try {
       const data = this.category.map(item => ({
         Categoría: item.description,
-        Estado: item.estate,
+        Estado: item.state,
         'Última Actualización': moment(item.lastUpdatedDatetime).format('DD/MM/YYYY')
       }));
 
@@ -171,7 +171,7 @@ throw new Error('Method not implemented.');
       
       XLSX.writeFile(wb, 'categorias.xlsx');
       
-      this.showSuccessAlert('Archivo Excel exportado con éxito');
+    
     } catch (error) {
       this.showErrorAlert('Error al exportar a Excel');
       console.error('Error al exportar a Excel:', error);
@@ -184,7 +184,7 @@ throw new Error('Method not implemented.');
       
       const tableData = this.category.map(item => [
         item.description,
-        item.estate,
+        item.state,
         moment(item.lastUpdatedDatetime).format('DD/MM/YYYY')
       ]);
 
@@ -195,7 +195,7 @@ throw new Error('Method not implemented.');
 
       doc.save('categorias.pdf');
       
-      this.showSuccessAlert('Archivo PDF exportado con éxito');
+      
     } catch (error) {
       this.showErrorAlert('Error al exportar a PDF');
       console.error('Error al exportar a PDF:', error);
