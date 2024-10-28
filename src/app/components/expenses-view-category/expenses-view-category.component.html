@@ -35,5 +35,5 @@
     </table>
   </div>
 </section>
-<app-expenses-view-category-details [category]="categorySelected"></app-expenses-view-category-details>
-<app-expenses-edit-category [category]="categorySelected"></app-expenses-edit-category>
+<app-expenses-view-category-details [category]="categorySelected" ></app-expenses-view-category-details>
+<app-expenses-edit-category [category]="categorySelected"(eventSucces)="loadAlertAndFilter()"></app-expenses-edit-category>

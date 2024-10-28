@@ -82,6 +82,10 @@ throw new Error('Method not implemented.');
       }
     });
   }
+  loadAlertAndFilter() {
+   this.showSuccessAlert("Se actualizo con exito la categoria")
+   this.filterData()
+  }
 
   showDeleteConfirmation() {
     return Swal.fire({
@@ -291,19 +295,24 @@ throw new Error('Method not implemented.');
     $('#myTable tbody').on('click', '.btn-edit', (event) => {
       const row = $(event.currentTarget).closest('tr');
       const rowData = this.table.row(row).data();
-      this.editCategory(rowData);
+      if(rowData){
+        this.editCategory(rowData);
+      }
+      
     });
 
     $('#myTable tbody').on('click', '.btn-delete', (event) => {
       const row = $(event.currentTarget).closest('tr');
       const rowData = this.table.row(row).data();
-      this.deleteCategory(rowData.id);
+      if(rowData){
+        this.deleteCategory(rowData.id);
+      }
     });
   }
   editCategory(rowData: any) {
-     this.categorySelected=rowData
-     this.cdRef.detectChanges();
-     console.log(this.categorySelected)
+      this.categorySelected=rowData
+      this.cdRef.detectChanges();
+      console.log(this.categorySelected)
       const modalElement = document.getElementById('categoryEditModal');
       const modal = new bootstrap.Modal(modalElement);
       modal.show();

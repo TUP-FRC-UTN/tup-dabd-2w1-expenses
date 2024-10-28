@@ -1,8 +1,9 @@
-import { Component, Input, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { Category } from '../../models/category';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { CategoryService } from '../../services/expensesCategoryServices/category.service';
 
 @Component({
   selector: 'app-expenses-edit-category',
@@ -10,27 +11,26 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
   imports: [
     CommonModule,
     FormsModule,
+
   ],
   templateUrl: './expenses-edit-category.component.html',
   styleUrl: './expenses-edit-category.component.scss'
 })
 export class ExpensesEditCategoryComponent {
+  private readonly categoryService = inject(CategoryService);
+
   @Input() category: Category | null = null;
-  localCategory: Category | null = null;  // Copia local para edición
+  @Output() eventSucces = new EventEmitter<void>();
 
-  ngOnInit() {
-    this.initializeCategory();
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['category']) {
-      this.initializeCategory();
+  edit() {
+    if(this.category!=null)
+    this.categoryService.updateCategory(this.category).subscribe({
+      next: () => {
+        this.eventSucces.emit()
+      },
+      error: (error) => {
+        console.error('Error al eliminar:', error);
+      }
+    })
     }
-  }
-
-  private initializeCategory() {
-    if (this.category) {
-      this.localCategory = {...this.category};  // Crea una copia para edición
-    }
-  }
 }

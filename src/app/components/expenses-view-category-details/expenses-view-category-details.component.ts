@@ -23,7 +23,5 @@ export class ExpensesViewCategoryDetailsComponent implements OnInit {
 
   @Input() category: Category | null = null;
  
-  dalepa() {
-    console.log(this.category)
-    }
+  
 }
