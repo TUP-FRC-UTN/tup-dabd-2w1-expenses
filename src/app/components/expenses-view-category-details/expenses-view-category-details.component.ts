@@ -18,7 +18,7 @@ import { CommonModule, DatePipe, NgFor, NgIf } from '@angular/common';
 })
 export class ExpensesViewCategoryDetailsComponent implements OnInit {
   ngOnInit(): void {
-    throw new Error('Method not implemented.');
+    console.log(this.category)
   }
 
   @Input() category: Category | null = null;
