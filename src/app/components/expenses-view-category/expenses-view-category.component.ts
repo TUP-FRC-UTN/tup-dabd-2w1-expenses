@@ -129,7 +129,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
       showCancelButton: true,
       confirmButtonColor: '#f44336',
       cancelButtonColor: '#9e9e9e',
-      confirmButtonText: 'Sí, eliminar',
+      confirmButtonText: 'Eliminar',
       cancelButtonText: 'Cancelar',
       background: '#ffffff',
       customClass: {
