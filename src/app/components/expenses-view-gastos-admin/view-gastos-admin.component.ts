@@ -12,17 +12,21 @@ import * as XLSX from 'xlsx';
 import { DistributionList } from '../../models/distributionList';
 import { Instalmentlist } from '../../models/installmentList';
 import { BillService } from '../../services/billServices/bill.service';
+import { ExpenseViewService } from '../../services/expenseView/expenseView.service';
 import { debounceTime, distinctUntilChanged, filter, finalize, mergeMap, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import jsPDF from 'jspdf';
 import Swal from 'sweetalert2';
+import { ExpenseView } from '../../models/expenseView';
+import { ExpenseViewComponent } from "../expenses-view/expense-view/expense-view.component";
 
+declare let bootstrap: any;
 
 @Component({
   selector: 'app-view-gastos-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule],
-  providers: [BillService],
+  imports: [CommonModule, FormsModule, ExpenseViewComponent],
+  providers: [BillService,ExpenseViewService],
   templateUrl: './view-gastos-admin.component.html',
   styleUrl: './view-gastos-admin.component.scss'
 })
@@ -49,9 +53,11 @@ export class ViewGastosAdminComponent implements OnInit {
   categories: string[] = [];
   providers: string[] = [];
   expenseTypes: string[] = [];
+  selectedExpense: ExpenseView | null = null;
   constructor(
     private cdRef: ChangeDetectorRef,
     private billService: BillService,
+    private expenseViewService: ExpenseViewService,
     private router: Router
   ) { }
 
@@ -304,10 +310,10 @@ export class ViewGastosAdminComponent implements OnInit {
 
       // Columnas de la tabla
       columns: [
-        {
-          data: 'id',
-          visible: false
-        },
+        // {
+        //   data: 'id',
+        //   visible: false
+        // },
         {
           data: 'expenseType',
           title: 'Tipo de Gasto',
@@ -399,9 +405,12 @@ export class ViewGastosAdminComponent implements OnInit {
 
     // Event handlers
     $('#myTable tbody').on('click', '.btn-view', (event) => {
-      const row = $(event.currentTarget).closest('tr');
-      const rowData = this.table.row(row).data();
-      this.viewBillDetails(rowData.id);
+      const row = this.table.row($(event.currentTarget).parents('tr'));
+      const rowData = row.data();
+      if (rowData) {
+        this.viewBillDetails(rowData.id);
+      }
+      
     });
 
     $('#myTable tbody').on('click', '.btn-edit', (event) => {
@@ -424,7 +433,22 @@ export class ViewGastosAdminComponent implements OnInit {
     this.router.navigate(['/registerExpense', id]); // Navega a /viewExpenseAdmin/id
   }
   viewBillDetails(id: any) {
-    throw new Error('Method not implemented.');
+    console.log("ID de la expensa:", id);
+    this.expenseViewService.getById(id).subscribe({
+      next: (expense) => {
+        this.selectedExpense = expense;
+        this.cdRef.detectChanges();
+        console.log("Detalles de la expensa:", expense);
+        // Aquí puedes activar el modal más adelante si deseas
+        const modalElement = document.getElementById('expenseModal');
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+      },
+      error: (err) => {
+        console.error("Error al obtener los detalles de la expensa:", err);
+        // Aquí puedes manejar el error, como mostrar un mensaje en la UI
+      }
+    });
   }
 }
 

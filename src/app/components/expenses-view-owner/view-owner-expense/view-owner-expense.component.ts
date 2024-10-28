@@ -1,7 +1,8 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import 'datatables.net';
 import 'datatables.net-bs5';
 import moment from 'moment';
+import 'bootstrap';
 import $ from 'jquery';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
@@ -9,16 +10,20 @@ import { FormsModule } from '@angular/forms';
 import { BillViewOwner } from '../../../models/viewOwnerModel/bill-view-owner.model';
 import { BillViewOwnerService } from '../../../services/viewOwnerServices/bill-view-owner.service';
 import { ProviderViewOwnerService } from '../../../services/viewOwnerServices/provider-view-owner.service';
+import { ExpenseViewService } from '../../../services/expenseView/expenseView.service';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, tap, finalize, takeUntil } from 'rxjs/operators';
-
+import { ExpenseView } from '../../../models/expenseView';
+import { ExpenseViewComponent } from '../../expenses-view/expense-view/expense-view.component';
+declare let bootstrap: any;
 @Component({
   selector: 'app-view-owner-expense',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule],
+  imports: [CommonModule, HttpClientModule, FormsModule, ExpenseViewComponent],
+  providers: [ExpenseViewService],
   templateUrl: './view-owner-expense.component.html',
   styleUrls: ['./view-owner-expense.component.scss'],
 })
@@ -33,7 +38,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
   maxDateTo: string = '';
   table: any;
   searchTerm: string = '';
-
+  selectedExpense: ExpenseView | null = null;
   private dateChangeSubject = new Subject<{ from: string, to: string }>();
   private unsubscribe$ = new Subject<void>();
   isLoading = false;
@@ -41,7 +46,9 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
 
   constructor(
     private billService: BillViewOwnerService,
-    private providerService: ProviderViewOwnerService
+    private providerService: ProviderViewOwnerService,
+    private cdRef: ChangeDetectorRef,
+    private expenseViewService: ExpenseViewService
   ) { }
   onSearch(event: any) {
     const searchValue = event.target.value;
@@ -55,7 +62,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadDates();
     this.setupDateChangeObservable();
-
+    this.configDataTable();
     this.filterDataOnChange();
   }
 
@@ -81,7 +88,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (response: BillViewOwner[]) => {
         this.bills = response;
-        this.configDataTable();
+        this.loadBillsFiltered();
         this.isLoading = false;
       },
       error: (error) => {
@@ -90,7 +97,10 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
       }
     });
   }
-
+  loadBillsFiltered() {
+    const dataTable = $('#myTable').DataTable();
+    dataTable.clear().rows.add(this.bills).draw();
+  }
   // Cargar fechas por defecto (último mes hasta hoy)
   loadDates() {
     const today = new Date();
@@ -251,7 +261,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
                     <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
                     <ul class="dropdown-menu">
                       <li><hr class="dropdown-divider"></li>
-                      <li><a class="dropdown-item" btn-view>Ver más</a></li>
+                      <li><a class="dropdown-item btn-view" style="cursor: pointer">Ver más</a></li>
                     </ul>
                   </div>
                 </div>
@@ -288,6 +298,32 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
 
     // Configuración de botones de exportación
 
-
+    $('#myTable tbody').on('click', '.btn-view', (event) => {
+      const row = this.table.row($(event.currentTarget).parents('tr'));
+      const rowData = row.data();
+      if (rowData) {
+        this.viewBillDetails(rowData.expenseId);
+      }
+      
+    });
+    
+  }
+  viewBillDetails(id: any) {
+    console.log("ID de la expensa:", id);
+    this.expenseViewService.getById(id).subscribe({
+      next: (expense) => {
+        this.selectedExpense = expense;
+        this.cdRef.detectChanges();
+        console.log("Detalles de la expensa:", expense);
+        // Aquí puedes activar el modal más adelante si deseas
+        const modalElement = document.getElementById('expenseModal');
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+      },
+      error: (err) => {
+        console.error("Error al obtener los detalles de la expensa:", err);
+        // Aquí puedes manejar el error, como mostrar un mensaje en la UI
+      }
+    });
   }
 }
