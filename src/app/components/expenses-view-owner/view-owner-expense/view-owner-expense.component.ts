@@ -62,7 +62,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadDates();
     this.setupDateChangeObservable();
-
+    this.configDataTable();
     this.filterDataOnChange();
   }
 
@@ -88,7 +88,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (response: BillViewOwner[]) => {
         this.bills = response;
-        this.configDataTable();
+        this.loadBillsFiltered();
         this.isLoading = false;
       },
       error: (error) => {
@@ -97,7 +97,10 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
       }
     });
   }
-
+  loadBillsFiltered() {
+    const dataTable = $('#myTable').DataTable();
+    dataTable.clear().rows.add(this.bills).draw();
+  }
   // Cargar fechas por defecto (último mes hasta hoy)
   loadDates() {
     const today = new Date();
@@ -296,7 +299,6 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     // Configuración de botones de exportación
 
     $('#myTable tbody').on('click', '.btn-view', (event) => {
-      debugger
       const row = this.table.row($(event.currentTarget).parents('tr'));
       const rowData = row.data();
       if (rowData) {
