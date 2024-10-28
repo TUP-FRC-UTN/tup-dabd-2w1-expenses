@@ -564,6 +564,9 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
               popup: 'swal2-popup'
             }
             
+          }).then(() => {
+            // Redirigir después de confirmar el alert
+            this.router.navigate(['/viewExpenseAdmin']);
           });
           this.clearForm();
           this.isLoading = false;
