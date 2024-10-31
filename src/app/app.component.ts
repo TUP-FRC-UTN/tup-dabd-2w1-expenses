@@ -2,8 +2,8 @@ import { Component, importProvidersFrom, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from "ngx-dabd-2w1-core";
 import { MenuItems } from 'ngx-dabd-2w1-core';
-import { ViewGastosAdminComponent } from './components/expenses-view-gastos-admin/view-gastos-admin.component';
-import { BillService } from './services/billServices/bill.service';
+import { ViewGastosAdminComponent } from './components/expenses-components/expenses-view-expense-admin/expenses-view-expense-admin.component';
+import { BillService } from './services/expenses-services/billServices/bill.service';
 import { HttpClientModule } from '@angular/common/http';
 import { bootstrapApplication } from '@angular/platform-browser';
 
@@ -12,11 +12,11 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import $ from 'jquery';
 import 'datatables.net'
 import 'datatables.net-bs5';
-import { ExpensesRegisterExpenseComponent } from "./components/expenses-register-expense/expenses-register-expense.component";
-import { ViewOwnerExpenseComponent } from "./components/expenses-view-owner/view-owner-expense/view-owner-expense.component";
+import { ExpensesRegisterExpenseComponent } from './components/expenses-components/expenses-register-expense/expenses-register-expense.component';
+import { ViewOwnerExpenseComponent } from './components/expenses-components/expenses-view-expense-owner/expenses-view-expense-owner.component';
 import { appConfig } from './app.config';
-import { ExpensesNavbarComponent } from "./components/expenses-navbar/expenses-navbar.component";
-import { ExpensesViewCategoryComponent } from "./components/expenses-view-category/expenses-view-category.component";
+import { ExpensesNavbarComponent } from './components/expenses-components/expenses-navbar/expenses-navbar.component';
+import { ExpensesViewCategoryComponent } from "./components/expenses-components/expenses-view-category/expenses-view-category.component";
 
 @Component({
   selector: 'app-root',
@@ -29,7 +29,7 @@ import { ExpensesViewCategoryComponent } from "./components/expenses-view-catego
     ExpensesRegisterExpenseComponent,
     ViewOwnerExpenseComponent,
     ExpensesNavbarComponent,
-    ExpensesViewCategoryComponent
+    ExpensesViewCategoryComponent,
 ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
