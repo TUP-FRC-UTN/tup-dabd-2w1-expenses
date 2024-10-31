@@ -24,7 +24,7 @@ import { CurrencyMaskModule } from 'ng2-currency-mask';
 import { catchError } from 'rxjs/operators';
 import { of, throwError } from 'rxjs';
 import Swal from 'sweetalert2';
-import { ExpenseProviderSelectComponent } from "../expenses-providers-select/expense-provider-select/expense-provider-select.component";
+import { ExpenseProviderSelectComponent } from "../expenses-providers-seelect/expense-provider-select/expense-provider-select.component";
 import { ExpenseCategoriesSelectComponent } from "../expenses-categories-select/expense-categories-select/expense-categories-select.component";
 import { CategoryService } from '../../../services/expenses-services/expensesCategoryServices/category.service';
 import { Category } from '../../../models/expenses-models/category';

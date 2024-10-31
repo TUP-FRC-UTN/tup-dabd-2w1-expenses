@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { Provider } from '../../../models/provider';
-import { ProviderService } from '../../../services/provider.service';
+import { Provider } from '../../../../models/expenses-models/provider';
+import { ProviderService } from '../../../../services/expenses-services/providerServices/provider.service';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';

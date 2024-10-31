@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output,ViewChild  } from '@angular/core';
 import { FormsModule,NgModel  } from '@angular/forms';
-import { CategoryService } from '../../../services/expensesCategoryServices/category.service';
-import { Category } from '../../../models/category';
+import { CategoryService } from '../../../../services/expenses-services/expensesCategoryServices/category.service';
+import { Category } from '../../../../models/expenses-models/category';
 import { filter, map, Subject, takeUntil } from 'rxjs';
 
 @Component({
