@@ -26,6 +26,8 @@ import { of, throwError } from 'rxjs';
 import Swal from 'sweetalert2';
 import { CategoryService } from '../../services/expensesCategoryServices/category.service';
 import { Category } from '../../models/category';
+import { ExpenseProviderSelectComponent } from "../expenses-providers-select/expense-provider-select/expense-provider-select.component";
+import { ExpenseCategoriesSelectComponent } from "../expenses-categories-select/expense-categories-select/expense-categories-select.component";
 
 @Component({
   selector: 'app-expenses-register-expense',
@@ -41,13 +43,15 @@ import { Category } from '../../models/category';
     RouterOutlet,
     ReactiveFormsModule,
     CurrencyMaskModule,
-  ],
+    ExpenseProviderSelectComponent,
+    ExpenseCategoriesSelectComponent
+],
   styleUrls: ['./expenses-register-expense.component.css'],
 })
 export class ExpensesRegisterExpenseComponent implements OnInit {
   @ViewChild('form') form!: NgForm;
   @ViewChild('fileInput') fileInput!: ElementRef;
-
+  @ViewChild(ExpenseCategoriesSelectComponent) categorySelectComponent!: ExpenseCategoriesSelectComponent;
   // Modal states
   showModal = false;
   modalMessage = '';
@@ -91,6 +95,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   ngOnInit(): void {
     this.loadInitialData();
     this.checkForEditMode();
+    this.initializeDefaultExpense();
   }
   checkForEditMode() {
     this.route.params.subscribe(params => {
@@ -138,12 +143,6 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     }
 
     try {
-      // Encontrar el ID del proveedor basado en la descripción
-      const provider = this.listProviders.find(p => p.description === data.provider);
-      
-      // Encontrar el ID de la categoría basado en la descripción
-      const category = this.expenseCategoryList.find(c => c.description === data.category);
-
       
       // Determinar el número de cuotas basado en installmentList
       const installments = data.installmentList?.length || 1;
@@ -152,16 +151,15 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       this.expense = {
         id: data.id ?? 0,
         description: data.description,
-        providerId: 1,//TODO VER COMO MANEJAR PROVIDER
-        expenseDate: this.formatDate(data.expenseDate ?? new Date().toISOString()),
+        providerId: data.providerId ?? 0,
+        expenseDate: data.expenseDate ?? new Date().toISOString(),
         invoiceNumber: data.invoiceNumber, // Convertir a string de manera segura
         typeExpense: this.mapExpenseType(data.expenseType ?? 'COMUN'),
-        categoryId: Number(category?.id) || 0,
+        categoryId: data.categoryId,
         amount: data.amount ?? 0,
         installments: installments,
         distributions: this.mapDistributions(data.distributionList)   
       };
-
       console.log('Expense mapeado:', this.expense); // Para debug
     } catch (error) {
       console.error('Error durante el mapeo:', error);
@@ -184,7 +182,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       expenseDate: this.formatDate(new Date().toISOString()),
       invoiceNumber: '',
       typeExpense: 'COMUN',
-      categoryId: 0,
+      categoryId: 1,
       amount: 0,
       installments: 1,
       distributions: [],
@@ -228,19 +226,9 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   //Inicializa el formulario con valores deseados
   initialForm() {
     this.loadOwners();
-    this.loadProviders();
+    // this.loadProviders();
     this.loadDate();
-    this.loadExpenseCategories();
-    this.expense.providerId = 0;
-    this.expense.typeExpense = 'COMUN';
-    this.expense.providerId = 0;
-    this.expense.installments = 1;
-    this.expense.categoryId = 0;
-    this.expense.installments = 1;
-    this.expense.amount = 0;
-    this.expense.distributions = [];
-    this.expense.invoiceNumber = '';
-    this.expense.description = '';
+    //this.loadExpenseCategories();
     this.selectedOwnerId = 0;
   }
 
@@ -376,29 +364,29 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       },
     });
   }
-  private loadProviders() {
-    this.providerService.getProviders().subscribe({
-      next: (providers: Provider[]) => {
-        this.listProviders = providers;
-      },
-    });
-  }
-  private loadExpenseCategories() {
-    this.expenseCategoryService.getCategory().subscribe({
-      next: (categories: Category[]) => {
-        categories.forEach(cat => {
-          if(cat.state=='Activo')
-          {
-            const expenseCategory: ExpenseCategory = {
-              id: cat.id.toString(), // Convertimos el number a string ya que ExpenseCategory.id es string
-              description: cat.description
-            };
-            this.expenseCategoryList.push(expenseCategory);
-          }
-        });
-      },
-    });
-  }
+  // private loadProviders() {
+  //   this.providerService.getProviders().subscribe({
+  //     next: (providers: Provider[]) => {
+  //       this.listProviders = providers;
+  //     },
+  //   });
+  // }
+  // private loadExpenseCategories() {
+  //   this.expenseCategoryService.getCategory().subscribe({
+  //     next: (categories: Category[]) => {
+  //       categories.forEach(cat => {
+  //         if(cat.state=='Activo')
+  //         {
+  //           const expenseCategory: ExpenseCategory = {
+  //             id: cat.id.toString(), // Convertimos el number a string ya que ExpenseCategory.id es string
+  //             description: cat.description
+  //           };
+  //           this.expenseCategoryList.push(expenseCategory);
+  //         }
+  //       });
+  //     },
+  //   });
+  // }
   public addDistribution(): void {
     if (this.selectedOwnerId !== 0) {
       const exists = this.expense.distributions.some(
@@ -501,14 +489,18 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
 
     return true;
   }
+  isCategoryValid(): boolean {
+    // Este metodo no esta cumpliendo con el objetivo
+    return this.categorySelectComponent?.internalCategoryId?.valid ?? false;
+  }
 
   // Funciones para el modal
-  showSuccessModal(message: string): void {
-    this.modalTitle = 'Éxito';
-    this.modalMessage = message;
-    this.modalType = 'success';
-    this.showModal = true;
-  }
+  // showSuccessModal(message: string): void {
+  //   this.modalTitle = 'Éxito';
+  //   this.modalMessage = message;
+  //   this.modalType = 'success';
+  //   this.showModal = true;
+  // }
 
   showErrorModal(message: string): void {
     this.modalTitle = 'Error';
@@ -540,6 +532,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       this.expense.distributions = [];
     }
     this.isLoading = true;
+    debugger
     // Llamamos al servicio para registrar el gasto
     const serviceCall = this.isEditMode
     // Llamar al servicio de actualización si es true
@@ -549,6 +542,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
 
     serviceCall.subscribe({
       next: (response) => {
+        debugger
         if (response && response.status === 200) {
           console.log(`${this.isEditMode ? 'Actualización' : 'Registro'} exitoso`);
           Swal.fire({
