@@ -2,3 +2,19 @@
 
 /* Importing Bootstrap SCSS file. */
 @import 'bootstrap/scss/bootstrap';
+
+.floating-btn {
+    position: fixed;
+    top: 100px; /* Distancia desde la parte inferior */
+    right: 20px;  /* Distancia desde la derecha */
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 50% !important;
+    border: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+  
+    z-index: 15;
+  }
