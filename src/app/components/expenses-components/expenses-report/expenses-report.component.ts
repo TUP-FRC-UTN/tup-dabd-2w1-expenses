@@ -1,20 +1,29 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { GoogleChartInterface, Ng2GoogleChartsModule } from 'ng2-google-charts';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ExpenseReportService } from '../../../services/expenses-services/expenseReportServices/expense-report.service';
 import { ExpenseData } from '../../../models/expenses-models/ExpenseData';
 import { CategoryData } from '../../../models/expenses-models/CategoryData';
+import { ExpensesKpiComponent } from "../expenses-kpi/expenses-kpi.component";
+import { KpiServiceService } from '../../../services/expenses-services/kpi-service.service';
+import { kpiExpense } from '../../../models/expenses-models/kpiExpense';
 
 @Component({
   standalone: true,
   selector: 'app-report-expense',
-  imports: [CommonModule, FormsModule, Ng2GoogleChartsModule],
+  imports: [CommonModule, FormsModule, Ng2GoogleChartsModule, ExpensesKpiComponent],
   templateUrl: './expenses-report.component.html',
   styleUrls: ['./expenses-report.component.scss']
 })
 export class ReportExpenseComponent implements OnInit {
 
+  private readonly kpiService = inject(KpiServiceService);
+  expenseKpis : kpiExpense[] = []
+  amountCommon : number =0
+  amountExtraordinary : number = 0
+  amountIndividual : number = 0
+  constructor(private expenseReportService: ExpenseReportService,  private cdRef: ChangeDetectorRef,) { }
   // Gráfico combinado para comparar gastos por año
   public comboChart: GoogleChartInterface = {
     chartType: 'ComboChart',
@@ -95,12 +104,32 @@ export class ReportExpenseComponent implements OnInit {
   endDate: string = '2024-12-31';    // Fecha por defecto
   isLoading: boolean = false;
 
-  constructor(private expenseReportService: ExpenseReportService) { }
 
   ngOnInit() {
     this.updateCharts();
+    this.updateKpis();
   }
-
+  updateKpis() {
+    this.kpiService.getKpiData(this.startDate,this.endDate).subscribe({
+      next:(kpiExpenses: kpiExpense[])=>{
+        this.expenseKpis = kpiExpenses
+       this.amountCommon= this.sumAmounts('COMUN');
+        this.amountExtraordinary= this.sumAmounts('EXTRAORDINARIO');
+        this.amountIndividual= this.sumAmounts('INDIVIDUAL');
+      },
+      error(error){
+        console.log(error);
+      }
+    })
+  }
+  sumAmounts(expenseType : string): number{
+   const amountCommon =this.expenseKpis
+    .filter(m=>m.expenseType==expenseType)
+    .reduce((sum,current)=>sum+current.amount,0)
+    console.log(amountCommon)
+    return amountCommon
+  }
+ 
   // Función para actualizar ambos gráficos
   updateCharts() {
     this.updateComboChart();
