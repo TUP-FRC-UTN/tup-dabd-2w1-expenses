@@ -30,4 +30,8 @@
   <div *ngIf="donutChart?.dataTable && donutChart.dataTable.length > 1" class="mt-4">
     <google-chart [data]="donutChart"></google-chart>
   </div>
-  
+
+    <app-expenses-kpi [amount]="amountCommon" title="Comunes"></app-expenses-kpi>
+    <app-expenses-kpi [amount]="amountExtraordinary"title="Extraordinario"></app-expenses-kpi>
+    <app-expenses-kpi [amount]="amountIndividual" title="Individual"></app-expenses-kpi>
+   
