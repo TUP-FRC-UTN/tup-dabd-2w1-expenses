@@ -6,8 +6,9 @@ import { ExpenseReportService } from '../../../services/expenses-services/expens
 import { ExpenseData } from '../../../models/expenses-models/ExpenseData';
 import { CategoryData } from '../../../models/expenses-models/CategoryData';
 import { ExpensesKpiComponent } from "../expenses-kpi/expenses-kpi.component";
-import { KpiServiceService } from '../../../services/expenses-services/kpi-service.service';
+
 import { kpiExpense } from '../../../models/expenses-models/kpiExpense';
+import { LastBillRecord } from '../../../models/expenses-models/LastBillRecord';
 
 @Component({
   standalone: true,
@@ -18,12 +19,20 @@ import { kpiExpense } from '../../../models/expenses-models/kpiExpense';
 })
 export class ReportExpenseComponent implements OnInit {
 
-  private readonly kpiService = inject(KpiServiceService);
+
   expenseKpis : kpiExpense[] = []
+  lastBillRecord : LastBillRecord | null = null;
   amountCommon : number =0
   amountExtraordinary : number = 0
   amountIndividual : number = 0
-  constructor(private expenseReportService: ExpenseReportService,  private cdRef: ChangeDetectorRef,) { }
+  amountNoteCredit : number = 0
+
+  lastBillCommon: number=0;
+  lastBillExtraordinary : number = 0;
+  lastBillIndividual : number = 0;
+  lastBillNoteCredit: number = 0;
+
+  constructor(private expenseReportService: ExpenseReportService) {}
   // Gráfico combinado para comparar gastos por año
   public comboChart: GoogleChartInterface = {
     chartType: 'ComboChart',
@@ -108,14 +117,31 @@ export class ReportExpenseComponent implements OnInit {
   ngOnInit() {
     this.updateCharts();
     this.updateKpis();
+    this.updateLastBillRecord();
   }
   updateKpis() {
-    this.kpiService.getKpiData(this.startDate,this.endDate).subscribe({
+    this.expenseReportService.getKpiData(this.startDate,this.endDate).subscribe({
       next:(kpiExpenses: kpiExpense[])=>{
         this.expenseKpis = kpiExpenses
        this.amountCommon= this.sumAmounts('COMUN');
         this.amountExtraordinary= this.sumAmounts('EXTRAORDINARIO');
         this.amountIndividual= this.sumAmounts('INDIVIDUAL');
+        this.amountNoteCredit= this.sumAmounts('NOTE_OF_CREDIT');
+      },
+      error(error){
+        console.log(error);
+      }
+    })
+  }
+  updateLastBillRecord(){
+    this.expenseReportService.getLastBillRecord().subscribe({
+      next: (lastBillRecord: LastBillRecord)=>{
+        this.lastBillRecord = lastBillRecord
+       this.lastBillCommon= this.sumAmounts('COMUN');
+        this.lastBillExtraordinary= this.sumAmounts('EXTRAORDINARIO');
+        this.lastBillIndividual= this.sumAmounts('INDIVIDUAL');
+        this.lastBillNoteCredit= this.sumAmounts('NOTE_OF_CREDIT');
+
       },
       error(error){
         console.log(error);
