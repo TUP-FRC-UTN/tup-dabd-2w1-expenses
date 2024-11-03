@@ -123,10 +123,10 @@ export class ReportExpenseComponent implements OnInit {
     this.expenseReportService.getKpiData(this.startDate,this.endDate).subscribe({
       next:(kpiExpenses: kpiExpense[])=>{
         this.expenseKpis = kpiExpenses
-       this.amountCommon= this.sumAmounts('COMUN');
-        this.amountExtraordinary= this.sumAmounts('EXTRAORDINARIO');
-        this.amountIndividual= this.sumAmounts('INDIVIDUAL');
-        this.amountNoteCredit= this.sumAmounts('NOTE_OF_CREDIT');
+       this.amountCommon= this.sumAmounts('COMUN',this.expenseKpis);
+        this.amountExtraordinary= this.sumAmounts('EXTRAORDINARIO',this.expenseKpis);
+        this.amountIndividual= this.sumAmounts('INDIVIDUAL',this.expenseKpis);
+        this.amountNoteCredit= this.sumAmounts('NOTE_OF_CREDIT',this.expenseKpis);
       },
       error(error){
         console.log(error);
@@ -137,22 +137,20 @@ export class ReportExpenseComponent implements OnInit {
     this.expenseReportService.getLastBillRecord().subscribe({
       next: (lastBillRecord: LastBillRecord)=>{
         this.lastBillRecord = lastBillRecord
-       this.lastBillCommon= this.sumAmounts('COMUN');
-        this.lastBillExtraordinary= this.sumAmounts('EXTRAORDINARIO');
-        this.lastBillIndividual= this.sumAmounts('INDIVIDUAL');
-        this.lastBillNoteCredit= this.sumAmounts('NOTE_OF_CREDIT');
-
+       this.lastBillCommon= this.sumAmounts('COMUN',this.lastBillRecord.bills);
+        this.lastBillExtraordinary= this.sumAmounts('EXTRAORDINARIO',this.lastBillRecord.bills);
+        this.lastBillIndividual= this.sumAmounts('INDIVIDUAL',this.lastBillRecord.bills);
+        this.lastBillNoteCredit= this.sumAmounts('NOTE_OF_CREDIT',this.lastBillRecord.bills);
       },
       error(error){
         console.log(error);
       }
     })
   }
-  sumAmounts(expenseType : string): number{
-   const amountCommon =this.expenseKpis
+  sumAmounts(expenseType : string, list :any[]): number{
+   const amountCommon =list
     .filter(m=>m.expenseType==expenseType)
     .reduce((sum,current)=>sum+current.amount,0)
-    console.log(amountCommon)
     return amountCommon
   }
  
