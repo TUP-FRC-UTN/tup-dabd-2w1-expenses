@@ -14,7 +14,7 @@
     <div class="row mb-3">
 
       <!-- Barra de busqueda -->
-      <div class="col">
+      <div class="col-3">
         <input type="text" placeholder="Buscar" class="form-control" [(ngModel)]="searchTerm"
           (input)="onSearch($event)">
       </div>
@@ -36,7 +36,10 @@
       </div> -->
 
       <!-- Botones de exportar -->
-      <div class="col-auto d-flex gap-1 text-end">
+      <div class="col-auto d-flex gap-1 ms-auto">
+        <button  class="btn btn-primary" data-bs-toggle="modal" title="Filtros Avanzados" data-bs-target="#filtrosAvanzados">
+          <i class="bi bi-sort-down-alt"></i>
+    </button>
         <button (click)="exportToExcel()" id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel"></button>
         <button  (click)="exportToPDF()" id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf"></button>
       </div>
@@ -51,5 +54,10 @@
 
 </section>
 <app-expense-view [expense]="selectedExpense"></app-expense-view>
-
+<app-expenses-filters 
+ [(selectedCategories)]="selectedCategories"
+ [(selectedProviders)]="selectedProviders"
+ (selectedCategoriesChange)="loadBillsFilter()" 
+ (selectedProvidersChange)="loadBillsFilter()"
+ ></app-expenses-filters>
 

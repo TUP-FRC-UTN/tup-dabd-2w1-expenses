@@ -15,7 +15,7 @@
     <div class="row mb-3">
 
       <!-- Barra de busqueda -->
-      <div class="col">
+      <div class="col-3">
         <input type="text" placeholder="Buscar" class="form-control" [(ngModel)]="searchTerm"
           (input)="onSearch($event)">
       </div>
@@ -37,12 +37,13 @@
 
       <!-- Botones de exportar -->
       <div class="col-auto d-flex gap-1 text-end">
+        <button  class="btn btn-primary" data-bs-toggle="modal" title="Filtros Avanzados" data-bs-target="#filtrosAvanzados">
+          <i class="bi bi-sort-down-alt"></i>
+    </button>
         <button (click)="exportToExcel()" id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel"></button>
         <button  (click)="exportToPDF()" id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf"></button>
       </div>
     </div>
-    <app-expense-categories-ng-select [(selectedCategories)]="selectedCategories" (selectedCategoriesChange)="onSelectedCategoriesChange()"></app-expense-categories-ng-select>
-    <app-expense-providers-ng-select [(selectedProviders)]="selectedProviders" (selectedProvidersChange)="loadBillsFiltered()"></app-expense-providers-ng-select>
     <table id="myTable" class="table table-striped border border-3 rounded">
       <thead>
       </thead>
@@ -53,6 +54,14 @@
 </section>
 
 <app-expense-view [expense]="selectedExpense"></app-expense-view>
+<app-expenses-filters 
+ [(selectedCategories)]="selectedCategories"
+ [(selectedProviders)]="selectedProviders"
+ (selectedCategoriesChange)="loadBillsFiltered()" 
+ (selectedProvidersChange)="loadBillsFiltered()"
+ ></app-expenses-filters>
+
+
 <!-- Modal de info -->
 <div class="modal fade" id="infoModal" role="dialog">
   <div class="modal-dialog">
