@@ -3,4 +3,5 @@ export interface kpiExpense{
     categoryId: number;
     description: string;
     amount : number;
+    providerId: number;
 }
