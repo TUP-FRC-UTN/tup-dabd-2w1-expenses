@@ -41,7 +41,8 @@
         <button  (click)="exportToPDF()" id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf"></button>
       </div>
     </div>
-
+    <app-expense-categories-ng-select [(selectedCategories)]="selectedCategories" (selectedCategoriesChange)="onSelectedCategoriesChange()"></app-expense-categories-ng-select>
+    <app-expense-providers-ng-select [(selectedProviders)]="selectedProviders" (selectedProvidersChange)="loadBillsFiltered()"></app-expense-providers-ng-select>
     <table id="myTable" class="table table-striped border border-3 rounded">
       <thead>
       </thead>
