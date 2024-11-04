@@ -18,12 +18,16 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, tap, finalize, takeUntil } from 'rxjs/operators';
 import { ExpenseView } from '../../../models/expenses-models/expenseView';
 import { ExpenseViewComponent } from '../../expenses-components/expenses-view/expenses-view.component';
+import { ExpensesFiltersComponent } from "../expenses-filters/expenses-filters.component";
+import { Category } from '../../../models/expenses-models/category';
+import { Provider } from '../../../models/expenses-models/provider';
+import { Bill } from '../../../models/expenses-models/bill';
 
 declare let bootstrap: any;
 @Component({
   selector: 'app-view-owner-expense',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule, ExpenseViewComponent],
+  imports: [CommonModule, HttpClientModule, FormsModule, ExpenseViewComponent, ExpensesFiltersComponent],
   providers: [ExpenseViewService],
   templateUrl: './expenses-view-expense-owner.component.html',
   styleUrls: ['./expenses-view-expense-owner.component.scss'],
@@ -43,7 +47,8 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
   private dateChangeSubject = new Subject<{ from: string, to: string }>();
   private unsubscribe$ = new Subject<void>();
   isLoading = false;
-
+  selectedCategories: Category[] = [];
+  selectedProviders: Provider[] =[];
 
   constructor(
     private billService: BillViewOwnerService,
@@ -70,6 +75,31 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+  loadBillsFilter() {
+    const dataTable = $('#myTable').DataTable();
+    debugger
+    let billsFiltered = this.fileredByCategiries(this.bills.slice());
+    billsFiltered = this.fileredByProviders(billsFiltered);
+    dataTable.clear().rows.add(billsFiltered).draw();
+  }
+  fileredByCategiries(bills :BillViewOwner[]):BillViewOwner[]{
+    debugger
+    console.log(bills)
+    console.log(this.selectedCategories)
+    if (this.selectedCategories && this.selectedCategories.length>0){
+      const selectedCategoryIds = this.selectedCategories.map(category => category.id); 
+    return bills.filter(bill => selectedCategoryIds.includes(bill.categoryId)); // Filtrar solo los que tienen un id que coincida
+    }
+    return bills;
+  }
+  fileredByProviders(bills :BillViewOwner[]):BillViewOwner[]{
+    debugger
+    if (this.selectedProviders && this.selectedProviders.length>0){
+      const selectedProviderIds = this.selectedProviders.map(provider => provider.id as number); // Extraer los ids de las categorías seleccionadas
+    return bills.filter(bill => selectedProviderIds.includes(bill.providerId)); // Filtrar solo los que tienen un id que coincida
+    }
+    return bills;
   }
 
   // Configuración del observable para escuchar cambios en las fechas
@@ -212,7 +242,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
 
       columns: [
         {
-          data: 'category.description',
+          data: 'categoryDescription',
           title: 'Categoría',
           className: 'align-middle',
           render: (data) => `<div>${data}</div>`

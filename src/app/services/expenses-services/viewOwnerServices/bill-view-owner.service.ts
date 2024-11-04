@@ -18,8 +18,9 @@ export class BillViewOwnerService {
 
   getBillsWithProviders(ownerId: number, startDate: string, endDate: string): Observable<BillViewOwner[]> {
     const urlWithFilters = `${this.apiUrl}?id=${ownerId}&startDate=${startDate}&endDate=${endDate}`;
+  
     return forkJoin({
-      bills: this.http.get<BillViewOwner[]>(urlWithFilters),
+      bills: this.http.get<any[]>(urlWithFilters),
       providers: this.providerService.getProviders()
     }).pipe(
       map(({ bills, providers }) => {
@@ -27,10 +28,18 @@ export class BillViewOwnerService {
           map[provider.id] = provider.nombre || 'Proveedor Anónimo';
           return map;
         }, {} as { [key: string]: string });
-
+  
         return bills.map(bill => ({
-          ...bill,
-          providerName: providerMap[bill.providerId] || 'Proveedor Anónimo'
+          id: bill.id,
+          expenseId: bill.expenseId,
+          description: bill.description,
+          providerId: bill.providerId,
+          providerName: providerMap[bill.providerId] || 'Proveedor Anónimo',
+          expenseDate: bill.expenseDate,
+          expenseType: bill.expenseType,
+          categoryDescription: bill.category?.description || '',
+          categoryId: bill.category?.id || 0,
+          amount: bill.amount
         }));
       })
     );
