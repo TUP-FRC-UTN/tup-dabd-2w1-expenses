@@ -31,7 +31,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
   constructor(private cdRef: ChangeDetectorRef) {}
   private readonly categoryService = inject(CategoryService);
 
-  categorySelected : Category | null = null;
+  categorySelected : Category = new Category();
   category: Category[] = [];
   filterCategory: Category[] = [];
   expenseCategory: Category = new Category();
@@ -204,113 +204,118 @@ export class ExpensesViewCategoryComponent implements OnInit {
     $.fn.dataTable.ext.type.order['date-moment-pre'] = (d: string) => moment(d, 'YYYY-MM-DD').unix();
 
     if ($.fn.DataTable.isDataTable('#myTable')) {
-      $('#myTable').DataTable().clear().destroy();
+        $('#myTable').DataTable().clear().destroy();
     }
 
     this.table = $('#myTable').DataTable({
-      paging: true,
-      searching: true,
-      ordering: true,
-      lengthChange: true,
-      lengthMenu: [10, 25, 50],
-      pageLength: 10,
-      data: this.category,
-      columns: [
-        { 
-          title: 'ID', 
-          data: 'id', 
-          visible: false 
-        },
-        { 
-          title: 'Categoría', 
-          data: 'description',
-          className: 'align-middle',
-          render: (data) => `<div>${data}</div>`
-        },
-        { 
-          title: 'Estado', 
-          data: 'state',
-          className: 'align-middle',
-          render: (data) => `<div>${data}</div>`
-        },
-        {
-          title: 'Fecha',
-          data: 'lastUpdatedDatetime',
-          className: 'align-middle',
-          render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
-          type: 'date-moment'
-        },
-        {
-          title: 'Opciones',
-          data: null,
-          orderable: false,
-          className: 'text-center',
-          render: function (data, type, row) {
-            return  `
-            <div class="text-center">
-              <div class="btn-group">
-                <div class="dropdown">
-                  <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
-                  <ul class="dropdown-menu">
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item btn-view">Ver más</a></li>
-                    <li><a class="dropdown-item btn-edit">Editar</a></li>
-                    <li><a class="dropdown-item btn-delete">Eliminar</a></li>
-                  </ul>
-                </div>
-              </div>
-            </div>`;
-          }
+        paging: true,
+        searching: true,
+        ordering: true,
+        lengthChange: true,
+        lengthMenu: [10, 25, 50],
+        pageLength: 10,
+        data: this.category,
+        columns: [
+            { 
+                title: 'ID', 
+                data: 'id', 
+                visible: false 
+            },
+            { 
+                title: 'Categoría', 
+                data: 'description',
+                className: 'align-middle',
+                render: (data) => `<div>${data}</div>`
+            },
+            { 
+                title: 'Estado', 
+                data: 'state',
+                className: 'align-middle',
+                render: (data) => {
+                  if (data === 'Activo') {
+                      return `<span class="badge bg-success text-white rounded-pill px-3">${data}</span>`;
+                  } else {
+                      return `<span class="badge bg-secondary text-white rounded-pill px-3">${data}</span>`;
+                  }
+              }
+            },
+            {
+                title: 'Fecha',
+                data: 'lastUpdatedDatetime',
+                className: 'align-middle',
+                render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
+                type: 'date-moment'
+            },
+            {
+                title: 'Opciones',
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return  `
+                    <div class="text-center">
+                      <div class="btn-group">
+                        <div class="dropdown">
+                          <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
+                          <ul class="dropdown-menu">
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item btn-view">Ver más</a></li>
+                            <li><a class="dropdown-item btn-edit">Editar</a></li>
+                            <li><a class="dropdown-item btn-delete">Eliminar</a></li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>`;
+                }
+            }
+        ],
+        dom: '<"mb-3"t><"d-flex justify-content-between"lp>',
+        language: {
+            lengthMenu: `
+              <select class="form-select">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select>`,
+            search: 'Buscar:',
+            info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+            infoEmpty: 'Mostrando 0 registros',
+            infoFiltered: '(filtrado de _MAX_ registros totales)',
+            loadingRecords: 'Cargando...',
+            zeroRecords: 'No se encontraron resultados',
+            emptyTable: 'No hay datos disponibles en la tabla',
         }
-      ],
-      dom: '<"mb-3"t><"d-flex justify-content-between"lp>',
-      language: {
-        lengthMenu: `
-          <select class="form-select">
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-          </select>`,
-        search: 'Buscar:',
-        info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
-        infoEmpty: 'Mostrando 0 registros',
-        infoFiltered: '(filtrado de _MAX_ registros totales)',
-        loadingRecords: 'Cargando...',
-        zeroRecords: 'No se encontraron resultados',
-        emptyTable: 'No hay datos disponibles en la tabla',
-      }
     });
 
     $('#myTable tbody').on('click', '.btn-view', (event) => {
-      const row = $(event.currentTarget).closest('tr');
-      const rowData = this.table.row(row).data();
-      if (rowData) {
-        this.viewSelectedCategory(rowData)
-      }
-      
+        const row = $(event.currentTarget).closest('tr');
+        const rowData = this.table.row(row).data();
+        if (rowData) {
+            this.viewSelectedCategory(rowData);
+        }
     });
 
     $('#myTable tbody').on('click', '.btn-edit', (event) => {
-      const row = $(event.currentTarget).closest('tr');
-      const rowData = this.table.row(row).data();
-      if(rowData){
-        this.editCategory(rowData);
-      }
-      
+        const row = $(event.currentTarget).closest('tr');
+        const rowData = this.table.row(row).data();
+        if (rowData) {
+            this.editCategory(rowData);
+        }
     });
 
     $('#myTable tbody').on('click', '.btn-delete', (event) => {
-      const row = $(event.currentTarget).closest('tr');
-      const rowData = this.table.row(row).data();
-      if(rowData){
-        this.deleteCategory(rowData.id);
-      }
+        const row = $(event.currentTarget).closest('tr');
+        const rowData = this.table.row(row).data();
+        if (rowData) {
+            this.deleteCategory(rowData.id);
+        }
     });
-  }
+}
+
   editCategory(rowData: any) {
       this.categorySelected=rowData
       this.cdRef.detectChanges();
-      console.log(this.categorySelected)
+      
       const modalElement = document.getElementById('categoryEditModal');
       const modal = new bootstrap.Modal(modalElement);
       modal.show();
@@ -318,7 +323,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
   viewSelectedCategory(rowData : any) {
     this.categorySelected=rowData
     this.cdRef.detectChanges();
-    console.log(this.categorySelected)
+    
     // Aquí puedes activar el modal más adelante si deseas
     const modalElement = document.getElementById('categoryViewModal');
     const modal = new bootstrap.Modal(modalElement);
@@ -328,6 +333,17 @@ export class ExpensesViewCategoryComponent implements OnInit {
     const modalElement = document.getElementById('categoryRegisterModal');
     const modal = new bootstrap.Modal(modalElement);
     modal.show();
+  }
+
+  handleEditSuccess() {
+    const modalElement = document.getElementById('categoryEditModal');
+    const modal = bootstrap.Modal.getInstance(modalElement);
+    modal?.hide();
+    this.showSuccessAlert('Categoría actualizada con éxito');
+    this.filterData(); 
+  }
+  handleEditError() {
+    this.showErrorAlert('Error al actualizar la categoría');
   }
 
 }
