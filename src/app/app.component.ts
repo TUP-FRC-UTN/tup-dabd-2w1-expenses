@@ -39,7 +39,6 @@ export class AppComponent implements OnInit {
   constructor(public router: Router) { }
 
   ngOnInit(): void {
-
   }
   title = 'Gastos';
 
@@ -58,11 +57,11 @@ export class AppComponent implements OnInit {
   }
 
 }
-// Bootstrap la aplicación en modo standalone
-bootstrapApplication(AppComponent, {
-  providers: [
-    importProvidersFrom(HttpClientModule),
-    ...appConfig.providers
-  ]
-})
-.catch((err) => console.error(err));
+// // Bootstrap la aplicación en modo standalone
+// bootstrapApplication(AppComponent, {
+//   providers: [
+//     importProvidersFrom(HttpClientModule),
+//     ...appConfig.providers
+//   ]
+// })
+// .catch((err) => console.error(err));
