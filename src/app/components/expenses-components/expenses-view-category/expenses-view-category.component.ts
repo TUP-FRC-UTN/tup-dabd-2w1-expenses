@@ -231,7 +231,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
                 type: 'date-moment'
             },
             {
-                title: 'Opciones',
+                title: 'Acciones',
                 data: null,
                 orderable: false,
                 className: 'text-center',
