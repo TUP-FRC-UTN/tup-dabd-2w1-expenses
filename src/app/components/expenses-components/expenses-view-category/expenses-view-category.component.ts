@@ -137,22 +137,6 @@ export class ExpensesViewCategoryComponent implements OnInit {
 
   
 
-  async deleteCategory(id: number) {
-    const result = await this.showDeleteConfirmation();
-    
-    if (result.isConfirmed) {
-      this.categoryService.deleteCategory(id).subscribe({
-        next: () => {
-          this.showSuccessAlert('Categoría eliminada con éxito');
-          this.filterData();
-        },
-        error: (error) => {
-          this.showErrorAlert('Error al eliminar la categoría');
-          console.error('Error al eliminar:', error);
-        }
-      });
-    }
-  }
 
   // Export functions
   exportToExcel() {
@@ -261,7 +245,6 @@ export class ExpensesViewCategoryComponent implements OnInit {
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item btn-view" style="cursor: pointer;">Ver más</a></li>
                             <li><a class="dropdown-item btn-edit" style="cursor: pointer;">Editar</a></li>
-                            <li><a class="dropdown-item btn-delete" style="cursor: pointer;">Eliminar</a></li>
                           </ul>
                         </div>
                       </div>
@@ -303,13 +286,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
         }
     });
 
-    $('#myTable tbody').on('click', '.btn-delete', (event) => {
-        const row = $(event.currentTarget).closest('tr');
-        const rowData = this.table.row(row).data();
-        if (rowData) {
-            this.deleteCategory(rowData.id);
-        }
-    });
+    
 }
 
   editCategory(rowData: any) {
@@ -324,7 +301,6 @@ export class ExpensesViewCategoryComponent implements OnInit {
     this.categorySelected=rowData
     this.cdRef.detectChanges();
     
-    // Aquí puedes activar el modal más adelante si deseas
     const modalElement = document.getElementById('categoryViewModal');
     const modal = new bootstrap.Modal(modalElement);
     modal.show();
