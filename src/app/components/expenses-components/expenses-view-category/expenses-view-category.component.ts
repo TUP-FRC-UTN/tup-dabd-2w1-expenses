@@ -196,8 +196,8 @@ export class ExpensesViewCategoryComponent implements OnInit {
         searching: true,
         ordering: true,
         lengthChange: true,
-        lengthMenu: [10, 25, 50],
-        pageLength: 10,
+        lengthMenu: [5,10,25, 50],
+        pageLength: 5,
         data: this.category,
         columns: [
             { 
@@ -256,6 +256,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
         language: {
             lengthMenu: `
               <select class="form-select">
+                <option value="5">5</option>
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
