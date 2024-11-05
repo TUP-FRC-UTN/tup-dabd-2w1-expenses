@@ -473,9 +473,13 @@ export class ViewGastosAdminComponent implements OnInit {
       this.openModal(this.modalConfirmDelete);
     });
   }
-  openAdvancedFilters() {
-    throw new Error('Method not implemented.');
-    }
+  clearFiltered(){
+
+  this.selectedCategories=[];
+  this.selectedProviders=[];
+  this.selectedType=[];
+  this.loadBillsFiltered();
+  }
   editBill(id: any) {
     console.log(id); // Esto mostrará el id en la consola
     this.router.navigate(['/registerExpense', id]); // Navega a /viewExpenseAdmin/id
