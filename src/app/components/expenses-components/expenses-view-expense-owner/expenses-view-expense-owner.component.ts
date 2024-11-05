@@ -9,7 +9,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { BillViewOwner } from '../../../models/expenses-models/bill-view-owner.model';
 import { BillViewOwnerService } from '../../../services/expenses-services/viewOwnerServices/bill-view-owner.service';
-import { ProviderViewOwnerService } from '../../../services/expenses-services/viewOwnerServices/provider-view-owner.service';
 import { ExpenseViewService } from '../../../services/expenses-services/expenseView/expenseView.service';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
@@ -52,7 +51,6 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
 
   constructor(
     private billService: BillViewOwnerService,
-    private providerService: ProviderViewOwnerService,
     private cdRef: ChangeDetectorRef,
     private expenseViewService: ExpenseViewService
   ) { }
@@ -248,7 +246,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
           render: (data) => `<div>${data}</div>`
         },
         {
-          data: 'providerName',
+          data: 'providerDescription',
           title: 'Proveedor',
           className: 'align-middle',
         },

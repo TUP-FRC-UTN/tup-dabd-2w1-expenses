@@ -3,6 +3,7 @@ export interface BillViewOwner {
     expenseId: number;
     description: string;
     providerId: number;
+    providerDescription: string;
     expenseDate: [number, number, number];
     expenseType: string;
     categoryDescription: string;
