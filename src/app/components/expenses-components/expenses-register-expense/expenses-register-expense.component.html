@@ -16,7 +16,7 @@
                   <div class="col-3">
                     <label for="typeExpense" class="Text Start">Tipo *  </label>
                   </div>
-                  <select
+                  <!-- <select
                     name="typeExpense"
                     [(ngModel)]="expense.typeExpense"
                     id="typeExpense"
@@ -27,11 +27,12 @@
                     <option value="COMUN">Común</option>
                     <option value="INDIVIDUAL">Individual</option>
                     <option value="EXTRAORDINARIO">Extraordinario</option>
-                  </select>
+                  </select> -->
+                  <app-expenses-type-expense-ng-select [(selectedType)]="expense.typeExpense" [multiple]="false" [noteCredit]="false"></app-expenses-type-expense-ng-select>
                 </div>
-                @if(formSubmitted && typeExpense.invalid ) {
+                <!-- @if(formSubmitted && typeExpense.invalid ) {
                 <span class="text-danger">El tipo de gasto es requerido</span>
-                }
+                } -->
               </div>
               <div class="col">
                 <div class="d-flex justify-content-start align-items-center mb-2">
@@ -62,23 +63,8 @@
                       >Proveedor
                     </label>
                   </div>
-                  <!-- <select
-                    class="form-select"
-                    name="selectprovider"
-                    [(ngModel)]="expense.providerId"
-                    id="selectprovider"
-                    aria-label="Seleccione un proveedor:"
-                    #provider="ngModel"
-                  >
-                    <option value="0" selected></option>
-                    <option
-                      *ngFor="let provider of listProviders"
-                      [value]="provider.id"
-                    >
-                      {{ provider.description }}
-                    </option>
-                  </select> -->
-                  <app-expense-provider-select [(selectedProviderId)]="expense.providerId"></app-expense-provider-select>
+                  
+                  <app-expense-providers-ng-select [(selectedProvider)]="expense.providerId" [emptyValue]="true" [multiple]="false"></app-expense-providers-ng-select>
                 </div>
               </div>
               <div class="col">
@@ -86,22 +72,7 @@
                   <div class="col-3">
                     <label for="categoryId" class="form-lable">Categoría * </label>
                   </div>
-                  <!-- <select
-                    name="categoryId"
-                    [(ngModel)]="expense.categoryId"
-                    id="categoryId"
-                    class="form-select "
-                    #categoryId="ngModel"
-                    required
-                  >
-                    @for (expenseCategory of expenseCategoryList; track $index) {
-                    <option [value]="expenseCategory.id">
-                      {{ expenseCategory.description }}
-                    </option>
-                    }
-                  </select> -->
-                  <app-expense-categories-select 
-                  [(selectedCategoryId)]="expense.categoryId" [removeEmpty] = "true"></app-expense-categories-select>
+                  <app-expense-categories-ng-select [(selectedCategory)]="expense.categoryId" [multiple]="false"></app-expense-categories-ng-select>
                 </div>
                 @if(formSubmitted && !isCategoryValid()) {
                 <span class="text-danger">La categoría de gasto es requerida</span>
@@ -225,7 +196,7 @@
             <div class="mb-3 row">
               <div class="col-9">
                 <label for="owner" class="form-label">Propietarios</label>
-                <select
+                <!-- <select
                   name="owner"
                   id="owner"
                   [(ngModel)]="selectedOwnerId"
@@ -236,7 +207,8 @@
                   <option *ngFor="let owner of listOwner" [value]="owner.id">
                     {{ owner.name }} {{ owner.lastname }}
                   </option>
-                </select>
+                </select> -->
+                <app-expenses-owners-ng-select [(selectedOwner)]="selectedOwnerId" [multiple]="false"></app-expenses-owners-ng-select>
                 @if (formSubmitted && distributions.length == 0) {
                 <span class="text-danger"
                   >Se debe agregar al menos un propietario</span
