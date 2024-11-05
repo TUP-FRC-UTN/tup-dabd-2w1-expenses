@@ -22,7 +22,8 @@ export class OwnerService {
         owners.map(owner => ({
           id: owner.owner_id,  // Mapea el campo owner_id a id
           name: owner.name,  // Deja el nombre igual
-          lastname: owner.last_name  // Mapea last_name a lastname
+          lastname: owner.last_name,  // Mapea last_name a lastname
+          fullName: owner.last_name +' '+owner.name
         }))
       )
     );

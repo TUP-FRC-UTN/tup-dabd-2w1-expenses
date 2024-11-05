@@ -1,12 +1,12 @@
 <ng-select 
-  [items]="providersList" 
-  bindLabel="description" 
-  [placeholder]= "multiple ? 'Proveedores' : 'Proveedor'"
+  [items]="ownersList" 
+  bindLabel="fullName" 
+  [placeholder]= "multiple ? 'Propietarios' : 'Propietario'"
   [bindValue]="multiple ? '' : 'id'"
   [multiple]="multiple"
   [(ngModel)]="selectValue"
   [closeOnSelect]="!multiple"
-  (change)="onProviderChange()"
+  (change)="onOwnerChange()"
   [selectableGroup]="true"
   [clearable] = "multiple"
   >

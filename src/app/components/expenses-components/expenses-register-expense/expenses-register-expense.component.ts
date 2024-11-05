@@ -24,10 +24,13 @@ import { CurrencyMaskModule } from 'ng2-currency-mask';
 import { catchError } from 'rxjs/operators';
 import { of, throwError } from 'rxjs';
 import Swal from 'sweetalert2';
-import { ExpenseProviderSelectComponent } from "../expenses-providers-seelect/expense-provider-select/expense-provider-select.component";
-import { ExpenseCategoriesSelectComponent } from "../expenses-categories-select/expense-categories-select/expense-categories-select.component";
+
 import { CategoryService } from '../../../services/expenses-services/expensesCategoryServices/category.service';
 import { Category } from '../../../models/expenses-models/category';
+import { ExpenseCategoriesNgSelectComponent } from "../expenses-categories-ngSelect/expense-categories-ng-select/expense-categories-ng-select.component";
+import { ExpenseProvidersNgSelectComponent } from "../expenses-providers-ngSelect/expense-providers-ng-select/expense-providers-ng-select.component";
+import { ExpensesTypeExpenseNgSelectComponent } from "../expenses-type-expense-ng-select/expenses-type-expense-ng-select.component";
+import { ExpensesOwnersNgSelectComponent } from "../expenses-owners-ng-select/expenses-owners-ng-select.component";
 
 @Component({
   selector: 'app-expenses-register-expense',
@@ -43,15 +46,17 @@ import { Category } from '../../../models/expenses-models/category';
     RouterOutlet,
     ReactiveFormsModule,
     CurrencyMaskModule,
-    ExpenseProviderSelectComponent,
-    ExpenseCategoriesSelectComponent
+    ExpenseCategoriesNgSelectComponent,
+    ExpenseProvidersNgSelectComponent,
+    ExpensesTypeExpenseNgSelectComponent,
+    ExpensesOwnersNgSelectComponent
 ],
   styleUrls: ['./expenses-register-expense.component.css'],
 })
 export class ExpensesRegisterExpenseComponent implements OnInit {
   @ViewChild('form') form!: NgForm;
   @ViewChild('fileInput') fileInput!: ElementRef;
-  @ViewChild(ExpenseCategoriesSelectComponent) categorySelectComponent!: ExpenseCategoriesSelectComponent;
+
   // Modal states
   showModal = false;
   modalMessage = '';
@@ -62,18 +67,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   formSubmitted = false;
 
   distributions: Distributions[] = [];
-  expense: Expense = {
-    description: '',
-    providerId: 0,
-    expenseDate: '',
-    invoiceNumber: '',
-    typeExpense: '',
-    categoryId: 0,
-    amount: 0,
-    installments: 0,
-    distributions: this.distributions,
-  };
-
+  expense: Expense;
   selectedFile: File | null = null;
   listOwner: Owner[] = [];
   selectedOwnerId: number = 0;
@@ -92,10 +86,23 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
+  constructor(){
+    this.expense= {
+        description: '',
+        providerId: 0,
+        expenseDate: '',
+        invoiceNumber: '',
+        typeExpense: '',
+        categoryId: 0,
+        amount: 0,
+        installments: 0,
+        distributions: this.distributions,
+      };
+  }
   ngOnInit(): void {
     this.loadInitialData();
     this.checkForEditMode();
-    this.initializeDefaultExpense();
+    //this.initializeDefaultExpense();
   }
   checkForEditMode() {
     this.route.params.subscribe(params => {
@@ -104,6 +111,8 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
         this.isEditMode = true;
         this.pageTitle = 'Editar Gasto';
         this.loadExpense(id);
+      }else{
+        this.initializeDefaultExpense();
       }
     });
   }
@@ -364,29 +373,6 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       },
     });
   }
-  // private loadProviders() {
-  //   this.providerService.getProviders().subscribe({
-  //     next: (providers: Provider[]) => {
-  //       this.listProviders = providers;
-  //     },
-  //   });
-  // }
-  // private loadExpenseCategories() {
-  //   this.expenseCategoryService.getCategory().subscribe({
-  //     next: (categories: Category[]) => {
-  //       categories.forEach(cat => {
-  //         if(cat.state=='Activo')
-  //         {
-  //           const expenseCategory: ExpenseCategory = {
-  //             id: cat.id.toString(), // Convertimos el number a string ya que ExpenseCategory.id es string
-  //             description: cat.description
-  //           };
-  //           this.expenseCategoryList.push(expenseCategory);
-  //         }
-  //       });
-  //     },
-  //   });
-  // }
   public addDistribution(): void {
     if (this.selectedOwnerId !== 0) {
       const exists = this.expense.distributions.some(
@@ -490,17 +476,10 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     return true;
   }
   isCategoryValid(): boolean {
-    // Este metodo no esta cumpliendo con el objetivo
-    return this.categorySelectComponent?.internalCategoryId?.valid ?? false;
+    // Probar esto
+    return this.expense.categoryId>0 ? true : false;
   }
 
-  // Funciones para el modal
-  // showSuccessModal(message: string): void {
-  //   this.modalTitle = 'Éxito';
-  //   this.modalMessage = message;
-  //   this.modalType = 'success';
-  //   this.showModal = true;
-  // }
 
   showErrorModal(message: string): void {
     this.modalTitle = 'Error';

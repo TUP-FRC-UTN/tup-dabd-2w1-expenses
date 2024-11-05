@@ -21,6 +21,7 @@ import { ExpensesFiltersComponent } from "../expenses-filters/expenses-filters.c
 import { Category } from '../../../models/expenses-models/category';
 import { Provider } from '../../../models/expenses-models/provider';
 import { Bill } from '../../../models/expenses-models/bill';
+import { ExpenseType } from '../../../models/expenses-models/expenseType';
 
 declare let bootstrap: any;
 @Component({
@@ -48,6 +49,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
   isLoading = false;
   selectedCategories: Category[] = [];
   selectedProviders: Provider[] =[];
+  selectedType: ExpenseType[]=[];
 
   constructor(
     private billService: BillViewOwnerService,
@@ -74,32 +76,34 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
-  loadBillsFilter() {
-    const dataTable = $('#myTable').DataTable();
-    debugger
-    let billsFiltered = this.fileredByCategiries(this.bills.slice());
-    billsFiltered = this.fileredByProviders(billsFiltered);
-    dataTable.clear().rows.add(billsFiltered).draw();
-  }
-  fileredByCategiries(bills :BillViewOwner[]):BillViewOwner[]{
-    debugger
-    console.log(bills)
-    console.log(this.selectedCategories)
+  // loadBillsFilter() {
+  //   const dataTable = $('#myTable').DataTable();
+  //   debugger
+  //   let billsFiltered = this.fileredByCategiries(this.bills.slice());
+  //   billsFiltered = this.fileredByProviders(billsFiltered);
+  //   dataTable.clear().rows.add(billsFiltered).draw();
+  // }
+  filteredByCategiries(bills :BillViewOwner[]):BillViewOwner[]{
     if (this.selectedCategories && this.selectedCategories.length>0){
       const selectedCategoryIds = this.selectedCategories.map(category => category.id); 
     return bills.filter(bill => selectedCategoryIds.includes(bill.categoryId)); // Filtrar solo los que tienen un id que coincida
     }
     return bills;
   }
-  fileredByProviders(bills :BillViewOwner[]):BillViewOwner[]{
-    debugger
+  filteredByProviders(bills :BillViewOwner[]):BillViewOwner[]{
     if (this.selectedProviders && this.selectedProviders.length>0){
-      const selectedProviderIds = this.selectedProviders.map(provider => provider.id as number); // Extraer los ids de las categorías seleccionadas
+      const selectedProviderIds = this.selectedProviders.map(provider => provider.id); // Extraer los ids de las categorías seleccionadas
     return bills.filter(bill => selectedProviderIds.includes(bill.providerId)); // Filtrar solo los que tienen un id que coincida
     }
     return bills;
   }
-
+  filteredByType(bills :BillViewOwner[]):BillViewOwner[]{
+    if (this.selectedType && this.selectedType.length>0){
+      const selectedTypeIds = this.selectedType.map(type => type.id); // Extraer los ids de las categorías seleccionadas
+    return bills.filter(bill => selectedTypeIds.includes(bill.expenseType)); // Filtrar solo los que tienen un id que coincida
+    }
+    return bills;
+  }
   // Configuración del observable para escuchar cambios en las fechas
   private setupDateChangeObservable() {
     this.dateChangeSubject.pipe(
@@ -128,8 +132,18 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
   }
   loadBillsFiltered() {
     const dataTable = $('#myTable').DataTable();
-    dataTable.clear().rows.add(this.bills).draw();
+    let billsFiltered = this.filteredByType(this.bills.slice());
+    billsFiltered = this.filteredByCategiries(billsFiltered);
+    billsFiltered = this.filteredByProviders(billsFiltered);
+    dataTable.clear().rows.add(billsFiltered).draw();
   }
+  clearFiltered(){
+
+    this.selectedCategories=[];
+    this.selectedProviders=[];
+    this.selectedType=[];
+    this.loadBillsFiltered();
+    }
   // Cargar fechas por defecto (último mes hasta hoy)
   loadDates() {
     const today = new Date();

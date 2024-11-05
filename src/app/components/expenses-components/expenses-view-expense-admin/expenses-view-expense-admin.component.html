@@ -40,6 +40,7 @@
         <button  class="btn btn-primary" data-bs-toggle="modal" title="Filtros Avanzados" data-bs-target="#filtrosAvanzados">
           <i class="bi bi-sort-down-alt"></i>
     </button>
+        <button type="button" class="btn btn-secondary bi bi-trash" title="Limpiar Filtros" (click)="clearFiltered()"></button>
         <button (click)="exportToExcel()" id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel"></button>
         <button  (click)="exportToPDF()" id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf"></button>
       </div>
@@ -57,8 +58,10 @@
 <app-expenses-filters 
  [(selectedCategories)]="selectedCategories"
  [(selectedProviders)]="selectedProviders"
+ [(selectedTypes)]="selectedType"
  (selectedCategoriesChange)="loadBillsFiltered()" 
  (selectedProvidersChange)="loadBillsFiltered()"
+ (selectedTypesChange)="loadBillsFiltered()"
  ></app-expenses-filters>
 
 

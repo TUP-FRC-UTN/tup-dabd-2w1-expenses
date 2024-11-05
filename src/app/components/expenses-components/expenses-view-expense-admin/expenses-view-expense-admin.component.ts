@@ -24,6 +24,7 @@ import { ExpenseCategoriesNgSelectComponent } from "../expenses-categories-ngSel
 import { ExpenseProvidersNgSelectComponent } from "../expenses-providers-ngSelect/expense-providers-ng-select/expense-providers-ng-select.component";
 import { Provider } from '../../../models/expenses-models/provider';
 import { ExpensesFiltersComponent } from "../expenses-filters/expenses-filters.component";
+import { ExpenseType } from '../../../models/expenses-models/expenseType';
 
 declare let bootstrap: any;
 
@@ -63,6 +64,7 @@ export class ViewGastosAdminComponent implements OnInit {
   
   selectedCategories: Category[] = [];
   selectedProviders: Provider[] =[];
+  selectedType: ExpenseType[]=[];
   constructor(
     private cdRef: ChangeDetectorRef,
     private billService: BillService,
@@ -275,13 +277,13 @@ export class ViewGastosAdminComponent implements OnInit {
 
   loadBillsFiltered() {
     const dataTable = $('#myTable').DataTable();
-    debugger
-    let billsFiltered = this.fileredByCategiries(this.bills.slice());
-    billsFiltered = this.fileredByProviders(billsFiltered);
+    let billsFiltered = this.filteredbyType(this.bills.slice());
+    billsFiltered = this.filteredByCategiries(billsFiltered);
+    billsFiltered = this.filteredByProviders(billsFiltered);
     dataTable.clear().rows.add(billsFiltered).draw();
   }
-  fileredByCategiries(bills :Bill[]):Bill[]{
-    debugger
+  filteredByCategiries(bills :Bill[]):Bill[]{
+
     console.log(this.selectedCategories)
     if (this.selectedCategories && this.selectedCategories.length>0){
       const selectedCategoryIds = this.selectedCategories.map(category => category.id); // Extraer los ids de las categorías seleccionadas
@@ -289,14 +291,23 @@ export class ViewGastosAdminComponent implements OnInit {
     }
     return bills;
   }
-  fileredByProviders(bills :Bill[]):Bill[]{
-    debugger
+  filteredByProviders(bills :Bill[]):Bill[]{
+
     if (this.selectedProviders && this.selectedProviders.length>0){
       const selectedProviderIds = this.selectedProviders.map(provider => provider.id as number); // Extraer los ids de las categorías seleccionadas
     return bills.filter(bill => selectedProviderIds.includes(bill.providerId)); // Filtrar solo los que tienen un id que coincida
     }
     return bills;
   }
+  filteredbyType(bills :Bill[]):Bill[]{
+    debugger;
+    if (this.selectedType && this.selectedType.length>0){
+      const selectedTypeIds = this.selectedType.map(type => type.id);
+    return bills.filter(bill => selectedTypeIds.includes(bill.expenseType)); // Filtrar solo los que tienen un id que coincida
+    }
+    return bills;
+  }
+
   closeModal(modal: ElementRef | HTMLDivElement) {
     const element = modal instanceof ElementRef ? modal.nativeElement : modal;
     element.style.display = 'none';
@@ -461,9 +472,13 @@ export class ViewGastosAdminComponent implements OnInit {
       this.openModal(this.modalConfirmDelete);
     });
   }
-  openAdvancedFilters() {
-    throw new Error('Method not implemented.');
-    }
+  clearFiltered(){
+
+  this.selectedCategories=[];
+  this.selectedProviders=[];
+  this.selectedType=[];
+  this.loadBillsFiltered();
+  }
   editBill(id: any) {
     console.log(id); // Esto mostrará el id en la consola
     this.router.navigate(['/registerExpense', id]); // Navega a /viewExpenseAdmin/id
