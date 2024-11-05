@@ -384,7 +384,14 @@ export class ViewGastosAdminComponent implements OnInit {
           data: 'amount',
           title: 'Monto',
           className: 'align-middle',
-          render: (data) => `<div>$${data}</div>`
+          render: (data) => {
+            const formattedAmount = new Intl.NumberFormat('es-AR', {
+              style: 'currency',
+              currency: 'ARS',
+              minimumFractionDigits: 2
+            }).format(data);
+            return `<div>${formattedAmount}</div>`;
+          }
         },
         {
           data: 'expenseDate',
@@ -394,7 +401,7 @@ export class ViewGastosAdminComponent implements OnInit {
           type: 'date-moment'
         },
         {
-          title: "Opciones",
+          title: "Acciones",
           data: null,
           orderable: false,
           className: 'text-center',
