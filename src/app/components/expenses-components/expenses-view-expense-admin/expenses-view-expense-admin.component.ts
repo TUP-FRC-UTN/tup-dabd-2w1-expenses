@@ -98,6 +98,7 @@ export class ViewGastosAdminComponent implements OnInit {
     ).subscribe({
       next: (response: Bill[]) => {
         this.bills = response;
+        console.log(this.bills)
         this.loadBillsFiltered();
       },
       error: (error) => {
@@ -369,9 +370,7 @@ export class ViewGastosAdminComponent implements OnInit {
           data: 'provider',
           title: 'Proveedor',
           className: 'align-middle',
-          render: function (data) {
-            return `<div>empresa anonima</div>`
-          }
+          render: (data) => `<div>${data}</div>`
         },
         {
           data: 'expenseType',
