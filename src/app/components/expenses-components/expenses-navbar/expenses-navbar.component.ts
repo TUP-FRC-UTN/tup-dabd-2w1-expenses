@@ -19,7 +19,7 @@ export class ExpensesNavbarComponent {
   // private readonly authService = inject(AuthService);
 
   // userRoles: string[] =  this.authService.getUser().roles!; 
-  userRoles: string[] = ["FinanceAdmin", "Owner"]
+  userRoles: string[] = ["Propietario", "SuperAdmin"]
 
   //Lista de botones
   buttonsList: SideButton[] = [];
@@ -32,43 +32,49 @@ export class ExpensesNavbarComponent {
     this.buttonsList = [
       {
         //botón Listar Gastos para el Propietario
-        icon: "bi bi-house",
+        icon: "bi bi-currency-dollar",
+        name: "Mis Gastos",
         title: "Mis Gastos",
         route: "viewExpenseOwner",
-        roles: ["Owner"]
+        roles: ["Propietario"]
       },
       {
         //Boton General para el Administrador (padre)
         icon: "bi bi-person-gear",
-        title: "Administrador",
-        roles: ["SuperAdmin", "FinanceAdmin"],
+        name:"Gestion Gastos",
+        title: "Gastos",
+        roles: ["SuperAdmin", "Gerente Finanzas"],
         childButtons: [{
           //botón Listar Gastos para el Administrador
           icon: "bi bi-receipt-cutoff",
-          title: "Lista de Gastos",
+          name: "Visualizar Gastos",
+          title: "Visualizar",
           route: "viewExpenseAdmin",
-          roles: ["SuperAdmin", "FinanceAdmin"]
+          roles: ["SuperAdmin", "Gerente Finanzas"]
         },
         {
           //botón Lista Categoria de Gastos
           icon: "bi bi-list-task",
-          title: "Categorías de Gastos",
+          name: "Gestion Categoria Gastos",
+          title: "Categorias",
           route: "viewCategory",
-          roles: ["SuperAdmin", "FinanceAdmin"]
+          roles: ["SuperAdmin", "Gerente Finanzas"]
         },
         {
           //botón Registrar Gasto
           icon: "bi bi-journal-arrow-up",
-          title: "Registrar Gasto",
+          name: "Registrar Gasto",
+          title: "Registrar",
           route: "registerExpense",
-          roles: ["SuperAdmin", "FinanceAdmin"]
+          roles: ["SuperAdmin", "Gerente Finanzas"]
         },
         {
           // botón Estadísticas
           icon: "bi bi-graph-up",
-          title: "Estadísticas",
+          name: "Reporte Gastos",
+          title: "Reportes",
           route: "estadisticas",
-          roles: ["SuperAdmin", "FinanceAdmin"]
+          roles: ["SuperAdmin", "Gerente Finanzas"]
         }
         ]
       }
