@@ -624,4 +624,31 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       }
     });
   }
+
+  confirmCancel() {
+    Swal.fire({
+      title: '¿Seguro de que desea cancelar?',
+      text: 'Los cambios no guardados se perderán.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí',
+      cancelButtonText: 'No',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      background: '#ffffff',
+      customClass: {
+        title: 'text-xl font-medium text-gray-900',
+        htmlContainer: 'text-sm text-gray-600',
+        confirmButton: 'px-4 py-2 text-white rounded-lg',
+        cancelButton: 'px-4 py-2 text-white rounded-lg bg-blue-600',
+        popup: 'swal2-popup'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Redirigir a otra ruta si se confirma
+        this.router.navigate(['/viewExpenseAdmin']);
+      }
+    });
+  }
+
 }
