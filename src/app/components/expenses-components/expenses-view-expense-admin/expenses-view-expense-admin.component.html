@@ -57,8 +57,10 @@
 <app-expenses-filters 
  [(selectedCategories)]="selectedCategories"
  [(selectedProviders)]="selectedProviders"
+ [(selectedTypes)]="selectedType"
  (selectedCategoriesChange)="loadBillsFiltered()" 
  (selectedProvidersChange)="loadBillsFiltered()"
+ (selectedTypesChange)="loadBillsFiltered()"
  ></app-expenses-filters>
 
 
