@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { ProviderService } from '../../../../services/expenses-services/providerServices/provider.service';
@@ -13,16 +13,29 @@ import { Subject, takeUntil } from 'rxjs';
   templateUrl: './expense-providers-ng-select.component.html',
   styleUrl: './expense-providers-ng-select.component.scss'
 })
-export class ExpenseProvidersNgSelectComponent implements OnInit, OnDestroy {
-  constructor(private providerService: ProviderService){}
-  providersList : Provider[] = [];
-  @Input() selectedProviders: Provider[] =[];
-  @Output() selectedProvidersChange = new EventEmitter<Provider[]>();
-  private destroy$ = new Subject<void>();
+export class ExpenseProvidersNgSelectComponent implements OnInit, OnDestroy  {
 
+  @Input() selectedProviders: Provider[] =[];
+  @Input() selectedProvider: number=0;
+  @Input() multiple:Boolean=true;
+  @Input() emptyValue: Boolean= false;
+  @Output() selectedProvidersChange = new EventEmitter<Provider[]>();
+  @Output() selectedProviderChange = new EventEmitter<number>();
+  
+  
+  
+  providersList : Provider[] = [];
+  private destroy$ = new Subject<void>();
+  constructor(private providerService: ProviderService){}
   ngOnInit(): void {
     this.loadProviders();
+    console.log(this.selectedProvider)
   }
+  ngOnDestroy(): void {
+    this.destroy$.next(); 
+    this.destroy$.complete(); 
+  }
+
 
   loadProviders(): void {
     this.providerService.getProviders()
@@ -30,28 +43,32 @@ export class ExpenseProvidersNgSelectComponent implements OnInit, OnDestroy {
       .subscribe(
         (providers) => {
           this.providersList = providers;
+          if (this.emptyValue) {
+            this.providersList.push({ id: 0, description: '' });
+            this.providersList.sort((a, b) => a.description.localeCompare(b.description));
+          }
         },
         (error) => {
           console.error('Error loading providers:', error);
         }
       );
   }
-
-
-  // onProviderChange(): void {
-  //   this.selectedProvidersChange.emit(this.selectedProviders);
-  // }
   onProviderChange(): void {
-    this.selectedProvidersChange.emit(
-      this.selectedProviders.map(provider => ({
-        ...provider,
-        id: Number(provider.id)  // Forzar `id` como número
-      }))
-    );
+    if(this.multiple){
+      this.selectedProvidersChange.emit(this.selectedProviders);
+    }else{
+      this.selectedProviderChange.emit(this.selectedProvider);
+    }
   }
-
-  ngOnDestroy(): void {
-    this.destroy$.next(); 
-    this.destroy$.complete(); 
+  set selectValue(value:any){
+    if(this.multiple){
+      this.selectedProviders = value;
+    }else{
+      this.selectedProvider = value;
+    }
   }
+  get selectValue(){
+    return this.multiple ? this.selectedProviders : this.selectedProvider
+  }
+  
 }
