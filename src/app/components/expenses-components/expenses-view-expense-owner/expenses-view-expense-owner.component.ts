@@ -247,9 +247,9 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
       searching: true,
       ordering: true,
       lengthChange: true,
-      order: [5, 'desc'],
-      lengthMenu: [10, 25, 50],
-      pageLength: 10,
+      order: [4, 'desc'],
+      lengthMenu: [5, 10, 25, 50],
+      pageLength: 5,
       data: this.bills,
 
       columns: [
@@ -273,22 +273,14 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
           }
         },
         {
-          data: 'description',
-          title: 'Descripción',
-          className: 'align-middle',
-          render: (data) => `<div>${data}</div>`
-        },
-        {
           data: 'amount',
           title: 'Monto',
           className: 'align-middle',
           render: (data) => {
-            const formattedAmount = new Intl.NumberFormat('es-AR', {
-              style: 'currency',
-              currency: 'ARS',
+            let formattedAmount = new Intl.NumberFormat('es-AR', {
               minimumFractionDigits: 2
             }).format(data);
-            return `<div>${formattedAmount}</div>`;
+            return `<div>$ ${formattedAmount} </div>`;
           }
         },
         {
@@ -327,6 +319,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
       language: {
         lengthMenu:
           `<select class="form-select">
+            <option value="5">5</option>
             <option value="10">10</option>
             <option value="25">25</option>
             <option value="50">50</option>

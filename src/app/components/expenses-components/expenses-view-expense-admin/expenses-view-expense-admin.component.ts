@@ -350,8 +350,8 @@ export class ViewGastosAdminComponent implements OnInit {
       ordering: true,
       lengthChange: true,
       order: [4, 'desc'], // Ordenar por fecha por defecto
-      lengthMenu: [10, 25, 50],
-      pageLength: 10,
+      lengthMenu: [5, 10, 25, 50],
+      pageLength: 5,
       data: this.bills,
 
       // Columnas de la tabla
@@ -385,12 +385,11 @@ export class ViewGastosAdminComponent implements OnInit {
           title: 'Monto',
           className: 'align-middle',
           render: (data) => {
-            const formattedAmount = new Intl.NumberFormat('es-AR', {
-              style: 'currency',
-              currency: 'ARS',
-              minimumFractionDigits: 2
+            let formattedAmount = new Intl.NumberFormat('es-AR', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
             }).format(data);
-            return `<div>${formattedAmount}</div>`;
+            return `<div>$ ${formattedAmount} </div>`;
           }
         },
         {
@@ -433,6 +432,7 @@ export class ViewGastosAdminComponent implements OnInit {
       language: {
         lengthMenu: `
           <select class="form-select">
+          <option value="5">5</option>
             <option value="10">10</option>
             <option value="25">25</option>
             <option value="50">50</option>
@@ -441,12 +441,7 @@ export class ViewGastosAdminComponent implements OnInit {
         info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
         infoEmpty: "Mostrando 0 registros",
         infoFiltered: "(filtrado de _MAX_ registros totales)",
-        paginate: {
-          first: 'Primero',
-          last: 'Último',
-          next: 'Siguiente',
-          previous: 'Anterior'
-        },
+        
         zeroRecords: 'No se encontraron resultados',
         emptyTable: 'No hay datos disponibles',
         loadingRecords: "Cargando...",
