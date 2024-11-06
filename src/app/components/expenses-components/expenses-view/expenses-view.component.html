@@ -34,7 +34,7 @@
           </div>
           <div class="row">
             <div class="col">
-              <p><strong>Monto:</strong> {{ expense?.amount | currency }}</p>
+              <p><strong>Monto:</strong> {{ expense?.amount | currency: 'ARS':'symbol':'1.2-2':'es-AR' }}</p>
             </div>
             <div class="col">
               <p><strong>N° Cuotas:</strong> {{ expense?.installments}}</p>
