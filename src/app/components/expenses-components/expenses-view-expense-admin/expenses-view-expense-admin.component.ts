@@ -322,7 +322,19 @@ export class ViewGastosAdminComponent implements OnInit {
       next: () => {
         console.log(`Gasto con ID ${this.failedBillId} se le creó nota de crédito con éxito`);
         this.filterDataOnChange();
-        alert('Se realizó la nota de crédito con éxito');
+        Swal.fire({
+          title: '¡Nota de credito creada con exito!',
+          text: 'Se genero la nota de credito correctamente.',
+          icon: 'success',
+          confirmButtonColor: '#4CAF50',
+          background: '#ffffff',
+          customClass: {
+            title: 'text-xl font-medium text-gray-900',
+            htmlContainer: 'text-sm text-gray-600',  // Changed from 'content' to 'htmlContainer'
+            confirmButton: 'px-4 py-2 text-white rounded-lg',
+            popup: 'swal2-popup'
+          }
+        });
         this.closeModal(this.modalNoteCredit);
       },
       error: (error) => {

@@ -291,6 +291,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
 }
 
   editCategory(rowData: any) {
+    this.categorySelected={ id:1,description:'',lastUpdatedDatetime: '',state:''}
       this.categorySelected=rowData
       this.cdRef.detectChanges();
       
