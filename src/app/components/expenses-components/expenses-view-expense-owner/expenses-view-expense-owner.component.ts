@@ -212,7 +212,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
       }
     });
 
-    doc.save('listado_gastos.pdf');
+    doc.save(`${moment().format('YYYY-MM-DD')}_listado_gastos.pdf`);
   }
 
   // Exportar a Excel
@@ -233,7 +233,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Listado de Gastos');
 
-    XLSX.writeFile(workbook, 'listado_gastos.xlsx');
+    XLSX.writeFile(workbook, `${moment().format('YYYY-MM-DD')}_listado_gastos.xlsx`);
   }
 
   // Actualizar la tabla DataTable con los nuevos datos
