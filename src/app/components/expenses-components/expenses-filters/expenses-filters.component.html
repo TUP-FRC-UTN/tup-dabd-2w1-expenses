@@ -1,5 +1,5 @@
 <div class="modal fade" id="filtrosAvanzados" tabindex="-1" aria-labelledby="filtrosAvanzadosLabel" 
-aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
+aria-hidden="true" data-bs-keyboard="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -7,25 +7,40 @@ aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <!-- Min Amount -->
-          <div class="mb-3">
-            <label for="tipo" class="form-label">Tipo</label>
-            <app-expenses-type-expense-ng-select [(selectedTypes)]="selectedTypes" [noteCredit]="true" (selectedTypesChange)="onTypeChange()"></app-expenses-type-expense-ng-select>
+          <div class=" row d-flex justify-content-start align-items-center mb-3">
+            <div class="col-4">
+              <label for="tipo" class="form-label Text Start">Tipo</label>
+            </div>
+            <div class="col">
+              <app-expenses-type-expense-ng-select [(selectedTypes)]="selectedTypes" [noteCredit]="true" (selectedTypesChange)="onTypeChange()"></app-expenses-type-expense-ng-select>
+            </div>
           </div>
-          <div class="mb-3">
-            <label for="montoMinimo" class="form-label">Categoria</label>
-            <app-expense-categories-ng-select 
+          <div class="row d-flex justify-content-start align-items-center mb-3">
+            <div class="col-4">
+              <label for="categoria" class="form-label Text Start">Categoria</label>
+            </div>
+            <div class="col">
+              <app-expense-categories-ng-select 
             [(selectedCategories)]="selectedCategories" (selectedCategoriesChange)="onCategoryChange()"  ></app-expense-categories-ng-select>
+            </div>
           </div>
-          <div class="mb-3">
-            <label for="periodo" class="form-label">Proveedor</label>
-            <app-expense-providers-ng-select [(selectedProviders)]="selectedProviders"(selectedProvidersChange)="onProviderChange()"></app-expense-providers-ng-select>
+          <div class="row d-flex justify-content-start align-items-center mb-3">
+            <div class="col-4">
+              <label for="periodo" class="form-label Text Start">Proveedor</label>
+            </div>
+            <div class="col">
+              <app-expense-providers-ng-select [(selectedProviders)]="selectedProviders"(selectedProvidersChange)="onProviderChange()"></app-expense-providers-ng-select>
+            </div>
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-          <!-- <button type="button" class="btn btn-primary bi bi-trash" title="Limpiar Filtros" (click)="limpiarFiltros()"></button> -->
         </div>
       </div>
     </div>
   </div>
+
+
+
+
+  
