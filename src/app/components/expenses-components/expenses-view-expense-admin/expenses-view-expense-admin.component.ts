@@ -362,8 +362,8 @@ export class ViewGastosAdminComponent implements OnInit {
       ordering: true,
       lengthChange: true,
       order: [4, 'desc'], // Ordenar por fecha por defecto
-      lengthMenu: [10, 25, 50],
-      pageLength: 10,
+      lengthMenu: [5, 10, 25, 50],
+      pageLength: 5,
       data: this.bills,
 
       // Columnas de la tabla
@@ -396,7 +396,13 @@ export class ViewGastosAdminComponent implements OnInit {
           data: 'amount',
           title: 'Monto',
           className: 'align-middle',
-          render: (data) => `<div>$${data}</div>`
+          render: (data) => {
+            let formattedAmount = new Intl.NumberFormat('es-AR', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            }).format(data);
+            return `<div>$ ${formattedAmount} </div>`;
+          }
         },
         {
           data: 'expenseDate',
@@ -406,7 +412,7 @@ export class ViewGastosAdminComponent implements OnInit {
           type: 'date-moment'
         },
         {
-          title: "Opciones",
+          title: "Acciones",
           data: null,
           orderable: false,
           className: 'text-center',
@@ -438,6 +444,7 @@ export class ViewGastosAdminComponent implements OnInit {
       language: {
         lengthMenu: `
           <select class="form-select">
+          <option value="5">5</option>
             <option value="10">10</option>
             <option value="25">25</option>
             <option value="50">50</option>
@@ -446,12 +453,7 @@ export class ViewGastosAdminComponent implements OnInit {
         info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
         infoEmpty: "Mostrando 0 registros",
         infoFiltered: "(filtrado de _MAX_ registros totales)",
-        paginate: {
-          first: 'Primero',
-          last: 'Último',
-          next: 'Siguiente',
-          previous: 'Anterior'
-        },
+        
         zeroRecords: 'No se encontraron resultados',
         emptyTable: 'No hay datos disponibles',
         loadingRecords: "Cargando...",

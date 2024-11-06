@@ -1,13 +1,14 @@
 import { Component, inject, Input } from '@angular/core';
-import {CommonModule } from '@angular/common'
+import {CommonModule,registerLocaleData } from '@angular/common'
 import { ExpenseView } from '../../../models/expenses-models/expenseView';
 import { FileService } from '../../../services/expenses-services/expenseFileService/file.service';
-
-
+import localeEsAr from '@angular/common/locales/es-AR';
+registerLocaleData(localeEsAr, 'es-AR');
 @Component({
   selector: 'app-expense-view',
   standalone: true,
   imports: [CommonModule],
+  providers:[{ provide: 'LOCALE_ID', useValue: 'es-AR' }],
   templateUrl: './expenses-view.component.html',
   styleUrl: './expenses-view.component.css',
 
