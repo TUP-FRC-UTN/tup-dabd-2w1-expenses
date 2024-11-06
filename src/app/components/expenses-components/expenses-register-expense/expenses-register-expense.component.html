@@ -28,7 +28,7 @@
                     <option value="INDIVIDUAL">Individual</option>
                     <option value="EXTRAORDINARIO">Extraordinario</option>
                   </select> -->
-                  <app-expenses-type-expense-ng-select [(selectedType)]="expense.typeExpense" [multiple]="false" [noteCredit]="false"></app-expenses-type-expense-ng-select>
+                  <app-expenses-type-expense-ng-select [(selectedType)]="expense.typeExpense" [multiple]="false" [noteCredit]="false" style="width: 500px;"></app-expenses-type-expense-ng-select>
                 </div>
                 <!-- @if(formSubmitted && typeExpense.invalid ) {
                 <span class="text-danger">El tipo de gasto es requerido</span>
@@ -64,7 +64,7 @@
                     </label>
                   </div>
                   
-                  <app-expense-providers-ng-select [(selectedProvider)]="expense.providerId" [emptyValue]="true" [multiple]="false"></app-expense-providers-ng-select>
+                  <app-expense-providers-ng-select [(selectedProvider)]="expense.providerId" [emptyValue]="true" [multiple]="false" style="width: 500px;"></app-expense-providers-ng-select>
                 </div>
               </div>
               <div class="col">
@@ -72,7 +72,7 @@
                   <div class="col-3">
                     <label for="categoryId" class="form-lable">Categoría * </label>
                   </div>
-                  <app-expense-categories-ng-select [(selectedCategory)]="expense.categoryId" [multiple]="false"></app-expense-categories-ng-select>
+                  <app-expense-categories-ng-select [(selectedCategory)]="expense.categoryId" [multiple]="false" style="width: 500px;"></app-expense-categories-ng-select>
                 </div>
                 @if(formSubmitted && !isCategoryValid()) {
                 <span class="text-danger">La categoría de gasto es requerida</span>
@@ -173,7 +173,7 @@
               <div class="col">
                 <div class="d-flex justify-content-start align-items-center mb-2">
                   <div class="col-1 me-5">
-                    <label for="description" class="form-lable">Descripción *</label>
+                    <label for="description" class="form-lable">Descripción </label>
                   </div>
                   <textarea
                     name="description"
@@ -183,7 +183,6 @@
                     placeholder="Escribe una descripción..."
                     rows="2"
                     #description="ngModel"
-                    required
                   >
                   </textarea>
                 </div>
@@ -307,7 +306,7 @@
                 </button>
                 @if(isEditMode){
                   <button
-                    class="btn btn-success px-5 d-flex align-items-center justify-content-center"
+                    class="btn btn-primary px-5 d-flex align-items-center justify-content-center"
                     type="submit"
                     style="width: 120px; height: 38px;"
                     [disabled]="!form.valid || (expense.typeExpense == 'INDIVIDUAL' && !validateTotalProportion())">
@@ -317,7 +316,7 @@
                       </div>
                     }
                     @else{
-                      Actualizar
+                      Guardar
                     } 
                   </button>
                 }
