@@ -345,7 +345,7 @@ export class ViewGastosAdminComponent implements OnInit {
       searching: true,
       ordering: true,
       lengthChange: true,
-      order: [1, 'desc'], // Ordenar por fecha por defecto
+      order: [0, 'desc'], // Ordenar por fecha por defecto
       lengthMenu: [5, 10, 25, 50],
       pageLength: 5,
       data: this.bills,
