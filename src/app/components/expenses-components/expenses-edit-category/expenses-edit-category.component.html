@@ -1,5 +1,5 @@
 <div class="modal fade" id="categoryEditModal" tabindex="-1" aria-labelledby="expenseModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog ">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="expenseModalLabel">Editar Categoria</h5>
@@ -7,8 +7,8 @@
       </div>
       <div class="modal-body">
         <div class="row">
-          <div class="col">
-            <p>Descripcion:</p>
+          <div class="col-6 d-flex align-items-center">
+            <label class="me-2">Descripcion:</label>
             <input
               class="form-control"
               *ngIf="category"
@@ -16,7 +16,8 @@
               type="text"
             />
           </div>
-          <div class="col">
+          <div class="col-6 d-flex align-items-center">
+            <label class="me-2">Estado:</label>
             <div class="form-check form-switch">
               <input
                 type="checkbox"

@@ -273,12 +273,6 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
           }
         },
         {
-          data: 'description',
-          title: 'Descripción',
-          className: 'align-middle',
-          render: (data) => `<div>${data}</div>`
-        },
-        {
           data: 'amount',
           title: 'Monto',
           className: 'align-middle',

@@ -13,9 +13,9 @@
     </div> -->
 
     <!-- Fila de botones de filtro -->
-    <div class="row mb-3">
+    <div class="row mb-3" style="width: 100%;">
       <!-- Barra de busqueda -->
-      <div class="col">
+      <div class="col-3">
         <input
           type="text"
           placeholder="Buscar"
@@ -26,7 +26,7 @@
       </div>
 
       <!-- Botones de exportar -->
-      <div class="col-auto d-flex gap-1 text-end">
+      <div class="col d-flex gap-1  justify-content-end"style="width: 100%;">
         <button (click)="exportToExcel()" id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel"></button>
         <button (click)="exportToPDF()" id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf"></button>
       </div>
