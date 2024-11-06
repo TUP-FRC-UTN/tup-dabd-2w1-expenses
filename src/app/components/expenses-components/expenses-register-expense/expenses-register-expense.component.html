@@ -368,3 +368,27 @@
 
 <!-- Backdrop para el modal -->
 <div class="modal-backdrop fade show" *ngIf="showModal"></div>
+
+<!-- Modal de info -->
+<div class="modal fade" id="infoModal" role="dialog" [ngClass]="{'show': showModal}" [style.display]="showModal ? 'block' : 'none'" tabindex="-1" style="z-index: 1055;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Registrar gasto</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          En esta página podrá registrar un nuevo gasto, contando con la posibilidad de asignarle
+          al gasto un tipo, una fecha, adjuntar comprobantes, entre otros.
+        </p>
+        <p>
+          En caso de que el tipo de expensa seleccionado sea de tipo <strong>individual</strong>,
+          entonces aparecerá un campo para añadir individualmente a los propietarios.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>

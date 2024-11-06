@@ -60,15 +60,33 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Listado de denuncias</h5>        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <h5 class="modal-title" id="exampleModalLabel">Listado de expensas</h5>        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         <p>
-          En este listado podrá buscar y filtrar las denuncias existentes.
+          En este listado podrá visualizar, buscar y ordenar sus expensas existentes.
         </p>
         <p>
-          Además, en las acciones, cuenta con la posibilidad de modificar el estado o ver más detalles sobre las denuncias, incluyendo las pruebas relacionadas.
-        </p>  
+          Además, en las acciones, cuenta con la posibilidad de ver más información de cada expensa.
+        </p>
+        <p>
+          La tabla también incluye una barra de búsqueda, filtros de fecha desde y hasta, y opciones de paginación, lo que facilita la navegación y el filtrado de los datos disponibles.
+        </p>
+        <ul>
+          <li>
+            <strong>Tabla de Expensas</strong>: Muestra la información de las expensas, con columnas para la categoría, proveedor, tipo de gasto, monto, fecha y opciones de acciones.
+          </li>
+          <li>
+            <strong>Botones</strong>:
+            <ul>
+              <li><button class="btn btn-success mt-2 bi-file-earmark-excel mb-2"></button> Exporta el contenido de la tabla a Excel.</li>
+              <li><button class="btn btn-danger bi-file-earmark-pdf mb-2"></button> Exporta el contenido de la tabla a PDF.</li>
+              <li><button  class="btn btn-primary bi bi-sort-down-alt mb-2"></button> Permite aplicar filtros avanzados.</li>
+              <li><button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros avanzados aplicados.</li>
+            </ul>
+          </li>
+        </ul>
+       
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
