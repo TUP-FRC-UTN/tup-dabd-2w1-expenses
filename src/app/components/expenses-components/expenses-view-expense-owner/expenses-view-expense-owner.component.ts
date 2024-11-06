@@ -92,14 +92,14 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
   }
   filteredByProviders(bills :BillViewOwner[]):BillViewOwner[]{
     if (this.selectedProviders && this.selectedProviders.length>0){
-      const selectedProviderIds = this.selectedProviders.map(provider => provider.id); // Extraer los ids de las categorías seleccionadas
+      const selectedProviderIds = this.selectedProviders.map(provider => provider.id); // Extraer los ids de los proveedores seleccionadas
     return bills.filter(bill => selectedProviderIds.includes(bill.providerId)); // Filtrar solo los que tienen un id que coincida
     }
     return bills;
   }
   filteredByType(bills :BillViewOwner[]):BillViewOwner[]{
     if (this.selectedType && this.selectedType.length>0){
-      const selectedTypeIds = this.selectedType.map(type => type.id); // Extraer los ids de las categorías seleccionadas
+      const selectedTypeIds = this.selectedType.map(type => type.id); // Extraer los ids de los tipo seleccionadas
     return bills.filter(bill => selectedTypeIds.includes(bill.expenseType)); // Filtrar solo los que tienen un id que coincida
     }
     return bills;
@@ -132,6 +132,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
   }
   loadBillsFiltered() {
     const dataTable = $('#myTable').DataTable();
+    //this.bills es la lista filtrada por fecha desde la API, esa no se toca
     let billsFiltered = this.filteredByType(this.bills.slice());
     billsFiltered = this.filteredByCategiries(billsFiltered);
     billsFiltered = this.filteredByProviders(billsFiltered);
@@ -142,7 +143,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     this.selectedCategories=[];
     this.selectedProviders=[];
     this.selectedType=[];
-    this.loadBillsFiltered();
+    this.loadDates();
     }
   // Cargar fechas por defecto (último mes hasta hoy)
   loadDates() {
