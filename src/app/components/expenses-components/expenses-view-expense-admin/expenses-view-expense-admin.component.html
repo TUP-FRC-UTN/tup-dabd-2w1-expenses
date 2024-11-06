@@ -37,9 +37,9 @@
 
       <!-- Botones de exportar -->
       <div class="col-auto d-flex gap-1 text-end">
-        <button  class="btn btn-primary" data-bs-toggle="modal" title="Filtros Avanzados" data-bs-target="#filtrosAvanzados">
-          <i class="bi bi-sort-down-alt"></i>
-    </button>
+        <button class="btn btn-primary" data-bs-toggle="modal" title="Filtros Avanzados" data-bs-target="#filtrosAvanzados">
+          <i class="bi bi-funnel-fill"></i>
+        </button>
         <button type="button" class="btn btn-secondary bi bi-trash" title="Limpiar Filtros" (click)="clearFiltered()"></button>
         <button (click)="exportToExcel()" id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel"></button>
         <button  (click)="exportToPDF()" id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf"></button>
@@ -132,36 +132,7 @@
    </div>
  </div>
   <!--Modal show operation successfuly-->
-  <div
-  #operationSuccessfullyDelete
-  class="modal"
-  id="operationSuccessfully"
-  tabindex="-1"
-  role="dialog"
- >
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Confirmación</h5>
-      </div>
-      <div class="modal-body">
-        Se realizo con exito la eliminacion del gasto
-      </div>
-      <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-secondary">
-          Cancelar
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary">
-          Aceptar
-        </button>
-      </div>
-    </div>
-  </div>
- </div>
+  
  
  <!-- Modal Note Credit -->
  <div
@@ -182,18 +153,18 @@
        <div class="modal-footer">
          <button
            type="button"
-           class="btn btn-secondary"
-           (click)="closeModal(modalNoteCredit)"
-         >
-           Cancelar
-         </button>
-         <button
-           type="button"
            class="btn btn-danger"
            (click)="deleteWithNoteCredit()"
          >
            Eliminar
          </button>
+         <button
+         type="button"
+         class="btn btn-secondary"
+         (click)="closeModal(modalNoteCredit)"
+       >
+         Cancelar
+       </button>
        </div>
      </div>
    </div>

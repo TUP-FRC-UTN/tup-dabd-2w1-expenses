@@ -196,7 +196,7 @@ export class ViewGastosAdminComponent implements OnInit {
       }
     });
 
-    doc.save('listado_gastos.pdf');
+    doc.save(`${moment().format('YYYY-MM-DD')}_listado_gastos.pdf`);
   }
 
   // Exportar a Excel
@@ -220,7 +220,7 @@ export class ViewGastosAdminComponent implements OnInit {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Listado de Gastos');
   
-    XLSX.writeFile(workbook, 'listado_gastos.xlsx');
+    XLSX.writeFile(workbook, `${moment().format('YYYY-MM-DD')}_listado_gastos.xlsx`);
   }
 
   filterDataOnChange() {
@@ -242,18 +242,10 @@ export class ViewGastosAdminComponent implements OnInit {
       next: () => {
         console.log(`Gasto con ID ${id} eliminada con éxito.`);
         Swal.fire({
-          title: '¡Expensa borrada!',
-          text: 'La expensa se ha eliminado correctamente.',
-          icon: 'success',
-          confirmButtonColor: '#4CAF50',
-          background: '#ffffff',
-          customClass: {
-            title: 'text-xl font-medium text-gray-900',
-            htmlContainer: 'text-sm text-gray-600',  // Changed from 'content' to 'htmlContainer'
-            confirmButton: 'px-4 py-2 text-white rounded-lg',
-            popup: 'swal2-popup'
-          }
-        });
+          icon: 'success',               // Icono de éxito
+          title: 'Éxito',                // Título del mensaje
+          text: 'Los cambios se guardaron correctamente', // Mensaje de confirmación
+        })
         this.filterDataOnChange();
       },
       error: (error) => {
@@ -323,18 +315,10 @@ export class ViewGastosAdminComponent implements OnInit {
         console.log(`Gasto con ID ${this.failedBillId} se le creó nota de crédito con éxito`);
         this.filterDataOnChange();
         Swal.fire({
-          title: '¡Nota de credito creada con exito!',
-          text: 'Se genero la nota de credito correctamente.',
-          icon: 'success',
-          confirmButtonColor: '#4CAF50',
-          background: '#ffffff',
-          customClass: {
-            title: 'text-xl font-medium text-gray-900',
-            htmlContainer: 'text-sm text-gray-600',  // Changed from 'content' to 'htmlContainer'
-            confirmButton: 'px-4 py-2 text-white rounded-lg',
-            popup: 'swal2-popup'
-          }
-        });
+          icon: 'success',               // Icono de éxito
+          title: 'Éxito',                // Título del mensaje
+          text: 'Los cambios se guardaron correctamente', // Mensaje de confirmación
+        })
         this.closeModal(this.modalNoteCredit);
       },
       error: (error) => {
@@ -361,17 +345,28 @@ export class ViewGastosAdminComponent implements OnInit {
       searching: true,
       ordering: true,
       lengthChange: true,
-      order: [4, 'desc'], // Ordenar por fecha por defecto
+      order: [1, 'desc'], // Ordenar por fecha por defecto
       lengthMenu: [5, 10, 25, 50],
       pageLength: 5,
       data: this.bills,
 
       // Columnas de la tabla
       columns: [
-        // {
-        //   data: 'id',
-        //   visible: false
-        // },
+        {
+          data: 'expenseDate',
+          title: 'Fecha',
+          className: 'align-middle',
+          render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
+          type: 'date-moment'
+        },
+        {
+          data: 'expenseType',
+          title: 'Tipo de Gasto',
+          className: 'align-middle',
+          render: function (data) {
+            return `<div>${data === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : data}</div>`
+          }
+        },
         {
           data: 'category',
           title: 'Categoría',
@@ -383,14 +378,6 @@ export class ViewGastosAdminComponent implements OnInit {
           title: 'Proveedor',
           className: 'align-middle',
           render: (data) => `<div>${data}</div>`
-        },
-        {
-          data: 'expenseType',
-          title: 'Tipo de Gasto',
-          className: 'align-middle',
-          render: function (data) {
-            return `<div>${data === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : data}</div>`
-          }
         },
         {
           data: 'amount',
@@ -405,13 +392,6 @@ export class ViewGastosAdminComponent implements OnInit {
           }
         },
         {
-          data: 'expenseDate',
-          title: 'Fecha',
-          className: 'align-middle',
-          render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
-          type: 'date-moment'
-        },
-        {
           title: "Acciones",
           data: null,
           orderable: false,
@@ -423,10 +403,10 @@ export class ViewGastosAdminComponent implements OnInit {
                   <div class="dropdown">
                     <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
                     <ul class="dropdown-menu">
-                      <li><hr class="dropdown-divider"></li>
                       <li><a class="dropdown-item btn-view" style="cursor: pointer">Ver más</a></li>
+                       <li><hr class="dropdown-divider"></li>
                       <li><a class="dropdown-item btn-edit" style="cursor: pointer">Editar</a></li>
-                      <li><a class="dropdown-item btn-delete" style="cursor: pointer">Eliminar</a></li>
+                       <li><a class="dropdown-item btn-delete" style="cursor: pointer">Eliminar</a></li>
                     </ul>
                   </div>
                 </div>
@@ -491,7 +471,8 @@ export class ViewGastosAdminComponent implements OnInit {
   this.selectedCategories=[];
   this.selectedProviders=[];
   this.selectedType=[];
-  this.loadBillsFiltered();
+  this.loadDates()
+  this.filterDataOnChange()
   }
   editBill(id: any) {
     console.log(id); // Esto mostrará el id en la consola

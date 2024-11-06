@@ -523,29 +523,21 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       next: (response) => {
         debugger
         if (response && response.status === 200) {
-          console.log(`${this.isEditMode ? 'Actualización' : 'Registro'} exitoso`);
+          // Mensaje de éxito estándar
           Swal.fire({
-            title: `¡${this.isEditMode ? 'Expensa actualizada' : 'Expensa registrada'}!`,
-            text: `La expensa se ha ${this.isEditMode ? 'actualizado' : 'registrado'} correctamente.`,
-            icon: 'success',
-            confirmButtonColor: '#4CAF50',
-            background: '#ffffff',
-            customClass: {
-              title: 'text-xl font-medium text-gray-900',
-              htmlContainer: 'text-sm text-gray-600',
-              confirmButton: 'px-4 py-2 text-white rounded-lg',
-              popup: 'swal2-popup'
-            }
-            
+            icon: 'success',               // Icono de éxito
+            title: 'Éxito',                // Título del mensaje
+            text: 'Los cambios se guardaron correctamente', // Mensaje de confirmación
           }).then(() => {
             // Redirigir después de confirmar el alert
             this.router.navigate(['/viewExpenseAdmin']);
           });
+    
           this.clearForm();
           this.isLoading = false;
         } else {
           console.log('Respuesta inesperada', response);
-          this.showErrorAlert('Respuesta inesperada del servidor')
+          this.showErrorAlert('Respuesta inesperada del servidor');
           this.isLoading = false;
         }
       },
@@ -625,7 +617,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     });
   }
 
-  confirmCancel() {
+  confirmCancel() { //TODO HACER ESTO CON MODAL 
     Swal.fire({
       title: '¿Seguro de que desea cancelar?',
       text: 'Los cambios no guardados se perderán.',
