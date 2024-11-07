@@ -24,10 +24,6 @@ export class ExpensesNavbarComponent {
   //Lista de botones
   buttonsList: SideButton[] = [];
 
-  // setName(){
-  //   return this.authService.getUser().name + " " + this.authService.getUser().lastname;
-  // }
-
   async ngOnInit(): Promise<void> {
     this.buttonsList = [
       {
