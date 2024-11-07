@@ -56,7 +56,7 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
       title: 'Distribución de Gastos por Categoría',
       pieHole: 0.4,
       chartArea: { width: '90%', height: '90%' },
-      colors: ['#4CAF50', '#FF9800', '#03A9F4', '#f44336', '#9C27B0'],
+      //colors: ['#4CAF50', '#FF9800', '#03A9F4', '#f44336', '#9C27B0'],
     }
   };
   chartLastBill={
@@ -66,7 +66,7 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
       title: 'Distribución de Gastos por Categoría',
       pieHole: 0.4,
       chartArea: { width: '90%', height: '90%' },
-      colors: ['#4CAF50', '#FF9800', '#03A9F4', '#f44336', '#9C27B0'],
+      //colors: ['#4CAF50', '#FF9800', '#03A9F4', '#f44336', '#9C27B0'],
     }
   }
   chartCompareYearMonth = {
@@ -281,6 +281,7 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
     date.setMonth(month - 1);
     return date.toLocaleString('default', { month: 'long' });
   }
-
-  
+  clearFiltered(){
+    
+  }
 }
