@@ -24,6 +24,7 @@
     "@types/google.visualization": "^0.0.74",
     "angular-google-charts": "^16.0.1",
     "bootstrap": "^5.3.3",
+    "bootstrap-icons": "^1.11.3",
     "datatables.net": "^2.1.8",
     "datatables.net-bs5": "^2.1.8",
     "datatables.net-dt": "^2.1.8",
