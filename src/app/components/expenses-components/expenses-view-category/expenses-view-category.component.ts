@@ -15,11 +15,12 @@ import 'jspdf-autotable';
 import { ExpensesViewCategoryDetailsComponent } from '../expenses-view-category-details/expenses-view-category-details.component';
 import { ExpensesEditCategoryComponent } from "../expenses-edit-category/expenses-edit-category.component";
 import { ExpenseRegisterCategoryComponent } from "../expenses-register-category/expenses-register-category.component";
+import { ExpensesStateCategoryNgSelectComponent } from "../expenses-state-category-ng-select/expenses-state-category-ng-select.component";
 declare let bootstrap: any;
 @Component({
   selector: 'app-expenses-view-category',
   standalone: true,
-  imports: [CommonModule, FormsModule, ExpensesViewCategoryDetailsComponent, ExpensesEditCategoryComponent, ExpenseRegisterCategoryComponent],
+  imports: [CommonModule, FormsModule, ExpensesViewCategoryDetailsComponent, ExpensesEditCategoryComponent, ExpenseRegisterCategoryComponent, ExpensesStateCategoryNgSelectComponent],
   providers: [CategoryService],
   templateUrl: './expenses-view-category.component.html',
   styleUrl: './expenses-view-category.component.scss',
@@ -31,6 +32,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
   constructor(private cdRef: ChangeDetectorRef) {}
   private readonly categoryService = inject(CategoryService);
 
+  selectedStates: any[]=[]
   categorySelected : Category = new Category();
   category: Category[] = [];
   filterCategory: Category[] = [];
@@ -200,16 +202,12 @@ export class ExpensesViewCategoryComponent implements OnInit {
         pageLength: 5,
         data: this.category,
         columns: [
-            { 
-                title: 'ID', 
-                data: 'id', 
-                visible: false 
-            },
-            { 
-                title: 'Categoría', 
-                data: 'description',
+            {
+                title: 'Fecha',
+                data: 'lastUpdatedDatetime',
                 className: 'align-middle',
-                render: (data) => `<div>${data}</div>`
+                render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
+                type: 'date-moment'
             },
             { 
                 title: 'Estado', 
@@ -223,12 +221,11 @@ export class ExpensesViewCategoryComponent implements OnInit {
                   }
               }
             },
-            {
-                title: 'Fecha',
-                data: 'lastUpdatedDatetime',
+            { 
+                title: 'Categoría', 
+                data: 'description',
                 className: 'align-middle',
-                render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
-                type: 'date-moment'
+                render: (data) => `<div>${data}</div>`
             },
             {
                 title: 'Acciones',
@@ -242,8 +239,8 @@ export class ExpensesViewCategoryComponent implements OnInit {
                         <div class="dropdown">
                           <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
                           <ul class="dropdown-menu">
-                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item btn-view" style="cursor: pointer;">Ver más</a></li>
+                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item btn-edit" style="cursor: pointer;">Editar</a></li>
                           </ul>
                         </div>
@@ -286,9 +283,8 @@ export class ExpensesViewCategoryComponent implements OnInit {
             this.editCategory(rowData);
         }
     });
-
-    
 }
+
 
   editCategory(rowData: any) {
     this.categorySelected={ id:1,description:'',lastUpdatedDatetime: '',state:''}

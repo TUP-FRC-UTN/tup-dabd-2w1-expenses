@@ -24,6 +24,9 @@
           (input)="onSearch($event)"
         >
       </div>
+      <div class="col-3">
+     <app-expenses-state-category-ng-select [(selectedStates)]="selectedStates" [multiple]="true"></app-expenses-state-category-ng-select>
+      </div>
 
       <!-- Botones de exportar -->
       <div class="col d-flex gap-1  justify-content-end"style="width: 100%;">

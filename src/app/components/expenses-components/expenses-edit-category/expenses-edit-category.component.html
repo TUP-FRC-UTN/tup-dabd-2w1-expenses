@@ -1,5 +1,5 @@
 <div class="modal fade" id="categoryEditModal" tabindex="-1" aria-labelledby="expenseModalLabel" aria-hidden="true">
-  <div class="modal-dialog ">
+  <div class="modal-dialog modal-sm"> <!-- modal-sm para reducir el tamaño del modal -->
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="expenseModalLabel">Editar Categoria</h5>
@@ -7,17 +7,18 @@
       </div>
       <div class="modal-body">
         <div class="row">
-          <div class="col-6 d-flex align-items-center">
-            <label class="me-2">Descripcion:</label>
+          <div class="col-12 d-flex align-items-center mb-3">
+            <label class="me-2" style="width: 80px;">Descripcion</label>
             <input
-              class="form-control"
+              class="form-control form-control-sm" 
               *ngIf="category"
               [(ngModel)]="category.description"
               type="text"
+              style="width: 70%;" 
             />
           </div>
-          <div class="col-6 d-flex align-items-center">
-            <label class="me-2">Estado:</label>
+          <div class="col-12 d-flex align-items-center">
+            <label class="me-2" style="width: 80px;">Estado</label>
             <div class="form-check form-switch">
               <input
                 type="checkbox"
@@ -36,8 +37,8 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal" (click)="edit()">Editar</button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal" (click)="edit()">Guardar</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
       </div>
     </div>
   </div>

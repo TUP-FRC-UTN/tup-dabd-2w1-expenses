@@ -65,6 +65,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
 
   // Form validation
   formSubmitted = false;
+  touchedFields: { [key: string]: boolean } = {};
 
   distributions: Distributions[] = [];
   expense: Expense;
@@ -81,8 +82,6 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   private cdRef = inject(ChangeDetectorRef);
   private readonly expenseService = inject(ExpenseService);
   private readonly propietarioService = inject(OwnerService);
-  private readonly expenseCategoryService = inject(CategoryService);
-  private readonly providerService = inject(ProviderService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
@@ -93,7 +92,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
         expenseDate: '',
         invoiceNumber: '',
         typeExpense: '',
-        categoryId: 0,
+        categoryId: 1,
         amount: 0,
         installments: 0,
         distributions: this.distributions,
@@ -115,6 +114,27 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
         this.initializeDefaultExpense();
       }
     });
+  }
+  
+  onFieldBlur(fieldName: string, control: any) {
+    this.touchedFields[fieldName] = true;
+    control.markAsTouched();
+  }
+
+  isFieldValid(fieldName: string, control: any): boolean {
+    return !control.errors && control.touched;
+  }
+
+  isFieldInvalid(fieldName: string, control: any): boolean {
+    return (control.errors && control.touched) || 
+           (this.formSubmitted && control.errors);
+  }
+
+  getFieldClass(fieldName: string, control: any): any {
+    return {
+      'is-valid': this.isFieldValid(fieldName, control),
+      'is-invalid': this.isFieldInvalid(fieldName, control)
+    };
   }
 
   private loadExpense(id: number): void {
@@ -457,6 +477,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       Object.keys(this.form.controls).forEach((key) => {
         const control = this.form.controls[key];
         control.markAsTouched();
+        this.touchedFields[key] = true;
       });
       this.showErrorModal('Por favor, complete todos los campos requeridos.');
       return false;
