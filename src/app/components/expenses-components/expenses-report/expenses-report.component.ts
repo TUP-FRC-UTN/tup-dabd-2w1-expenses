@@ -12,11 +12,14 @@ import { LastBillRecord } from '../../../models/expenses-models/LastBillRecord';
 import { debounceTime, distinctUntilChanged, finalize, mergeMap, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { ExpenseCategoriesNgSelectComponent } from "../expenses-categories-ngSelect/expense-categories-ng-select/expense-categories-ng-select.component";
 import { Category } from '../../../models/expenses-models/category';
+import { ExpensesFiltersComponent } from "../expenses-filters/expenses-filters.component";
+import { Provider } from '../../../models/expenses-models/provider';
+import { ExpenseType } from '../../../models/expenses-models/expenseType';
 
 @Component({
   standalone: true,
   selector: 'app-report-expense',
-  imports: [CommonModule, FormsModule, ExpensesKpiComponent, ExpenseCategoriesNgSelectComponent,GoogleChartsModule],
+  imports: [CommonModule, FormsModule, ExpensesKpiComponent, ExpenseCategoriesNgSelectComponent, GoogleChartsModule, ExpensesFiltersComponent],
   templateUrl: './expenses-report.component.html',
   styleUrls: ['./expenses-report.component.scss']
 })
@@ -25,6 +28,8 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
   private dateChangeSubject = new Subject<{ from: string, to: string }>();
   private unsubscribe$ = new Subject<void>();
   selectedCategories: Category[] = [];
+  selectedProviders: Provider[] =[];
+  selectedType: ExpenseType[]=[];
   isLoading = false;
   dateFrom: string = '';
   dateTo: string = '';
@@ -83,8 +88,8 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
         textStyle: { fontSize: 12 } 
       },
       vAxis: { title: 'Monto ($)' },
-      chartArea: { width: '85%', height: '70%' },
-      legend: { position: 'bottom' },
+      chartArea: { width: '80%', height: '50%' },
+      legend: { position: 'right' },
       colors: ['#4285F4', '#EA4335', '#34A853', '#FBBC05'],
     }
   };
@@ -124,7 +129,8 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
     ).subscribe({
       next: (kpiExpenses: kpiExpense[]) => {
         this.expenseKpis = kpiExpenses;
-        this.updateKpi();
+        //this.updateKpi();
+        this.filteredCharts();
       },
       error: (error) => {
         console.error('Error fetching bills:', error);
@@ -144,7 +150,9 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
     })
   }
   updateKpi(){
-    this.expenseKpiFiltered = this.filterKpi(this.expenseKpis.slice());
+    this.expenseKpiFiltered = this.filterTypeKpi(this.expenseKpis.slice());
+    this.expenseKpiFiltered = this.filterCategoryKpi(this.expenseKpiFiltered);
+    this.expenseKpiFiltered = this.filterProviderKpi(this.expenseKpiFiltered);
     this.amountCommon= this.sumAmounts('COMUN',this.expenseKpiFiltered);
     this.amountExtraordinary= this.sumAmounts('EXTRAORDINARIO',this.expenseKpiFiltered);
     this.amountIndividual= this.sumAmounts('INDIVIDUAL',this.expenseKpiFiltered);
@@ -154,11 +162,27 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
     this.cdRef.detectChanges();
   }
 
-  filterKpi(list : kpiExpense[]) : kpiExpense[]{
+  filterCategoryKpi(list : kpiExpense[]) : kpiExpense[]{
     
     if (this.selectedCategories && this.selectedCategories.length>0){
       const selectedCategoryIds = this.selectedCategories.map(category => category.id as number); // Extraer los ids de las categorías seleccionadas
       return list.filter(expense => selectedCategoryIds.includes(expense.categoryId)); // Filtrar solo los que tienen un id que coincida
+    }
+    return list;
+  }
+  filterTypeKpi(list : kpiExpense[]) : kpiExpense[]{
+    
+    if (this.selectedType && this.selectedType.length>0){
+      const selectedTypeIds = this.selectedType.map(type => type.id); // Extraer los ids de las categorías seleccionadas
+      return list.filter(expense => selectedTypeIds.includes(expense.expenseType)); // Filtrar solo los que tienen un id que coincida
+    }
+    return list;
+  }
+  filterProviderKpi(list : kpiExpense[]) : kpiExpense[]{
+    
+    if (this.selectedProviders && this.selectedProviders.length>0){
+      const selectedProviderIds = this.selectedProviders.map(provider => provider.id); // Extraer los ids de las categorías seleccionadas
+      return list.filter(expense => selectedProviderIds.includes(expense.providerId)); // Filtrar solo los que tienen un id que coincida
     }
     return list;
   }
@@ -177,7 +201,9 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
   }
   updateLastBillRecord(){
     if(this.lastBillRecord){
-      this.lastBillRecordFiltered = this.filterKpi(this.lastBillRecord.bills)
+      this.lastBillRecordFiltered = this.filterTypeKpi(this.lastBillRecord.bills.slice());
+      this.lastBillRecordFiltered = this.filterCategoryKpi(this.lastBillRecordFiltered);
+      this.lastBillRecordFiltered = this.filterProviderKpi(this.lastBillRecordFiltered);
       this.lastBillCommon= this.sumAmounts('COMUN',this.lastBillRecordFiltered);
       this.lastBillExtraordinary= this.sumAmounts('EXTRAORDINARIO',this.lastBillRecordFiltered);
       this.lastBillIndividual= this.sumAmounts('INDIVIDUAL',this.lastBillRecordFiltered);
@@ -201,16 +227,32 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
     });
   }
   updatecomparateYearMonth() {
-    this.comparateYearMonthFiltered = this.filercomparateYearMonth(this.comparateYearMonth.slice());
+    this.comparateYearMonthFiltered = this.filerTypecomparateYearMonth(this.comparateYearMonth.slice());
+    this.comparateYearMonthFiltered = this.filerCategorycomparateYearMonth(this.comparateYearMonthFiltered);
+    this.comparateYearMonthFiltered = this.filerProvidercomparateYearMonth(this.comparateYearMonthFiltered);
     const data = this.sumAmountByYearMonth(this.comparateYearMonthFiltered);
     this.chartCompareYearMonth.data = data;
     this.cdRef.detectChanges();
   }
   
-  filercomparateYearMonth(list: ExpenseData[]): ExpenseData[] {
+  filerCategorycomparateYearMonth(list: ExpenseData[]): ExpenseData[] {
     if (this.selectedCategories && this.selectedCategories.length > 0) {
-      const selectedCategoryIds = this.selectedCategories.map(category => category.id as number);
+      const selectedCategoryIds = this.selectedCategories.map(category => category.id);
       return list.filter(expense => selectedCategoryIds.includes(expense.categoryId));
+    }
+    return list;
+  }
+  filerTypecomparateYearMonth(list: ExpenseData[]): ExpenseData[] {
+    if (this.selectedType && this.selectedType.length > 0) {
+      const selectedTypeIds = this.selectedType.map(type => type.id );
+      return list.filter(expense => selectedTypeIds.includes(expense.expense_type));
+    }
+    return list;
+  }
+  filerProvidercomparateYearMonth(list: ExpenseData[]): ExpenseData[] {
+    if (this.selectedProviders && this.selectedProviders.length > 0) {
+      const selectedProviderIds = this.selectedProviders.map(provider => provider.id);
+      return list.filter(expense => selectedProviderIds.includes(expense.providerId));
     }
     return list;
   }
@@ -237,7 +279,12 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
     return aggregatedData;
   }
   sumAmountByYearMonth(list: ExpenseData[]): any {
+    debugger
     const years = Array.from(new Set(list.map(d => d.year))).sort();
+    if(years.length==0){
+      years.push(new Date().getFullYear()-1)
+      years.push(new Date().getFullYear())
+    }
 
     // Define las columnas para el gráfico, donde el primer elemento es 'Meses' seguido de los años
     this.chartCompareYearMonth.columns = ['Meses', ...years.map(year => year.toString())];
@@ -266,7 +313,14 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
     return monthlyData;
   }
 
+  //Borrar esto
   onSelectedCategoriesChange(): void {
+    this.updateKpi();
+    this.updateLastBillRecord();
+    this.updatecomparateYearMonth();
+  }
+
+  filteredCharts(){
     this.updateKpi();
     this.updateLastBillRecord();
     this.updatecomparateYearMonth();
@@ -282,6 +336,11 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
     return date.toLocaleString('default', { month: 'long' });
   }
   clearFiltered(){
-    
+    this.selectedCategories=[];
+    this.selectedProviders=[];
+    this.selectedType=[];
+    // this.filteredCharts();
+    this.loadDates();
+    this.filterDataOnChange();
   }
 }
