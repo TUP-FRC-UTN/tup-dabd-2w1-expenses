@@ -91,8 +91,10 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
       chartArea: { width: '80%', height: '50%' },
       legend: { position: 'right' },
       colors: ['#4285F4', '#EA4335', '#34A853', '#FBBC05'],
+      //tooltip: { isHtml: true }
     }
   };
+  
 
   ngOnInit() {
     console.log("ngOnInit called");
@@ -279,47 +281,57 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
     return aggregatedData;
   }
   sumAmountByYearMonth(list: ExpenseData[]): any {
-    debugger
     const years = Array.from(new Set(list.map(d => d.year))).sort();
-    if(years.length==0){
-      years.push(new Date().getFullYear()-1)
-      years.push(new Date().getFullYear())
+    if (years.length === 0) {
+        years.push(new Date().getFullYear() - 1);
+        years.push(new Date().getFullYear());
     }
 
-    // Define las columnas para el gráfico, donde el primer elemento es 'Meses' seguido de los años
+    // Define las columnas para el gráfico
     this.chartCompareYearMonth.columns = ['Meses', ...years.map(year => year.toString())];
 
-    // Creamos un objeto para almacenar la suma acumulada de cada mes y año
+    // Crear objeto para almacenar la suma acumulada por mes y año
     const aggregatedData = list.reduce((acc, d) => {
-        const key = `${d.year}-${d.month}`; // Llave única para año y mes
-        if (!acc[key]) {
-            acc[key] = 0;
-        }
-        acc[key] += d.amount; // Acumula el monto para el año y mes específicos
+        const key = `${d.year}-${d.month}`;
+        if (!acc[key]) acc[key] = 0;
+        acc[key] += d.amount;
         return acc;
     }, {} as Record<string, number>);
 
-    // Generamos el arreglo para los meses, inicializando cada fila con el nombre del mes y un valor de 0 para cada año
+    // Calcular el monto máximo para ajustar la escala
+    const maxAmount = Math.max(...Object.values(aggregatedData));
+    let scale = 1;
+    let scaleLabel = 'Monto ($)';
+
+    if (maxAmount >= 1_000_000) {
+        scale = 1_000_000;
+        scaleLabel = 'Montos en millones de pesos';
+    } else if (maxAmount >= 100_000) {
+        scale = 1_000;
+        scaleLabel = 'Montos en miles de pesos';
+    }
+
+    // Generar datos mensuales, aplicando la escala
     const months = Array.from({ length: 12 }, (_, i) => i + 1);
     const monthlyData = months.map(month => {
         const monthName = new Date(0, month - 1).toLocaleString('es', { month: 'long' });
         const row = [monthName, ...years.map(year => {
             const key = `${year}-${month}`;
-            return aggregatedData[key] || 0; // Asigna el valor acumulado o 0 si no hay datos para ese mes y año
+            return (aggregatedData[key] || 0) / scale;
         })];
         return row;
     });
 
+    // Actualizar la etiqueta del eje vertical
+    this.chartCompareYearMonth.options.vAxis.title = scaleLabel;
+
     return monthlyData;
-  }
+}
 
-  //Borrar esto
-  onSelectedCategoriesChange(): void {
-    this.updateKpi();
-    this.updateLastBillRecord();
-    this.updatecomparateYearMonth();
-  }
 
+
+
+  
   filteredCharts(){
     this.updateKpi();
     this.updateLastBillRecord();
