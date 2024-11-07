@@ -1,7 +1,6 @@
 <ng-select 
   [items]="categoryList" 
   bindLabel="description" 
-  [placeholder]= "multiple ? 'Categorías' : 'Categoria'"
   [bindValue]="multiple ? '':'id'"
   [multiple]="multiple"
   [(ngModel)]="selectValue"

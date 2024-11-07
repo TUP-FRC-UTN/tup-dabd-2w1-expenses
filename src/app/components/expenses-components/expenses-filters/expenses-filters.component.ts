@@ -3,7 +3,6 @@ import { ExpenseCategoriesNgSelectComponent } from "../expenses-categories-ngSel
 import { Category } from '../../../models/expenses-models/category';
 import { ExpenseProvidersNgSelectComponent } from "../expenses-providers-ngSelect/expense-providers-ng-select/expense-providers-ng-select.component";
 import { Provider } from '../../../models/expenses-models/provider';
-import { debounceTime, Subject } from 'rxjs';
 import { ExpensesTypeExpenseNgSelectComponent } from "../expenses-type-expense-ng-select/expenses-type-expense-ng-select.component";
 import { ExpenseType } from '../../../models/expenses-models/expenseType';
 
@@ -24,17 +23,11 @@ export class ExpensesFiltersComponent {
   @Output() selectedTypesChange = new EventEmitter<ExpenseType[]>();
 
 
-  limpiarFiltros() {
-    this.selectedCategories=[]
-    this.selectedProviders=[]
-    }
   onCategoryChange(): void {
-    //this.categoryChangeSubject.next();
     this.selectedCategoriesChange.emit(this.selectedCategories);
   }
 
   onProviderChange(): void {
-    //this.providerChangeSubject.next();
     this.selectedProvidersChange.emit(this.selectedProviders)
   }
 

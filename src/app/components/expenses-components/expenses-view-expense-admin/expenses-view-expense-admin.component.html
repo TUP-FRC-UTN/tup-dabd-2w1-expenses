@@ -37,9 +37,9 @@
 
       <!-- Botones de exportar -->
       <div class="col-auto d-flex gap-1 text-end">
-        <button  class="btn btn-primary" data-bs-toggle="modal" title="Filtros Avanzados" data-bs-target="#filtrosAvanzados">
-          <i class="bi bi-sort-down-alt"></i>
-    </button>
+        <button class="btn btn-primary" data-bs-toggle="modal" title="Filtros Avanzados" data-bs-target="#filtrosAvanzados">
+          <i class="bi bi-funnel-fill"></i>
+        </button>
         <button type="button" class="btn btn-secondary bi bi-trash" title="Limpiar Filtros" (click)="clearFiltered()"></button>
         <button (click)="exportToExcel()" id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel"></button>
         <button  (click)="exportToPDF()" id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf"></button>
@@ -70,12 +70,36 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Título de tu modal</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <h5 class="modal-title" id="exampleModalLabel">Listado de expensas</h5>        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <!-- body con tus inputs -->
-        Ejemplo modal
+        <p>
+          En este listado podrá visualizar, buscar y ordenar las expensas existentes.
+        </p>
+        <p>
+          Además, en las acciones, cuenta con la posibilidad de editar, ver más información o modificar las expensas.
+        </p>
+        <p>
+          La tabla también incluye una barra de búsqueda, filtros de fecha desde y hasta, y opciones de paginación, lo que facilita la navegación y el filtrado de los datos disponibles.
+        </p>
+        <ul>
+          <li>
+            <strong>Tabla de Expensas</strong>: Muestra la información de las expensas, con columnas para la categoría, proveedor, tipo de gasto, monto, fecha y opciones de acciones.
+          </li>
+          <li>
+            <strong>Botones</strong>:
+            <ul>
+              <li><button class="btn btn-success mt-2 bi-file-earmark-excel mb-2"></button> Exporta el contenido de la tabla a Excel.</li>
+              <li><button class="btn btn-danger bi-file-earmark-pdf mb-2"></button> Exporta el contenido de la tabla a PDF.</li>
+              <li><button  class="btn btn-primary bi bi-sort-down-alt mb-2"></button> Permite aplicar filtros avanzados.</li>
+              <li><button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros avanzados aplicados.</li>
+              <li><button class="rounded-circle mb-2 btn btn-primary"> 
+                <span class="bi-plus-lg"></span>
+              </button> Abre modal para registrar nueva expensa.</li>
+            </ul>
+          </li>
+        </ul>
+       
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
@@ -132,36 +156,7 @@
    </div>
  </div>
   <!--Modal show operation successfuly-->
-  <div
-  #operationSuccessfullyDelete
-  class="modal"
-  id="operationSuccessfully"
-  tabindex="-1"
-  role="dialog"
- >
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Confirmación</h5>
-      </div>
-      <div class="modal-body">
-        Se realizo con exito la eliminacion del gasto
-      </div>
-      <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-secondary">
-          Cancelar
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary">
-          Aceptar
-        </button>
-      </div>
-    </div>
-  </div>
- </div>
+  
  
  <!-- Modal Note Credit -->
  <div
@@ -182,18 +177,18 @@
        <div class="modal-footer">
          <button
            type="button"
-           class="btn btn-secondary"
-           (click)="closeModal(modalNoteCredit)"
-         >
-           Cancelar
-         </button>
-         <button
-           type="button"
            class="btn btn-danger"
            (click)="deleteWithNoteCredit()"
          >
            Eliminar
          </button>
+         <button
+         type="button"
+         class="btn btn-secondary"
+         (click)="closeModal(modalNoteCredit)"
+       >
+         Cancelar
+       </button>
        </div>
      </div>
    </div>

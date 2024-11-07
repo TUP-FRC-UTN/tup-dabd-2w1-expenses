@@ -92,14 +92,14 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
   }
   filteredByProviders(bills :BillViewOwner[]):BillViewOwner[]{
     if (this.selectedProviders && this.selectedProviders.length>0){
-      const selectedProviderIds = this.selectedProviders.map(provider => provider.id); // Extraer los ids de las categorías seleccionadas
+      const selectedProviderIds = this.selectedProviders.map(provider => provider.id); // Extraer los ids de los proveedores seleccionadas
     return bills.filter(bill => selectedProviderIds.includes(bill.providerId)); // Filtrar solo los que tienen un id que coincida
     }
     return bills;
   }
   filteredByType(bills :BillViewOwner[]):BillViewOwner[]{
     if (this.selectedType && this.selectedType.length>0){
-      const selectedTypeIds = this.selectedType.map(type => type.id); // Extraer los ids de las categorías seleccionadas
+      const selectedTypeIds = this.selectedType.map(type => type.id); // Extraer los ids de los tipo seleccionadas
     return bills.filter(bill => selectedTypeIds.includes(bill.expenseType)); // Filtrar solo los que tienen un id que coincida
     }
     return bills;
@@ -131,7 +131,9 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     });
   }
   loadBillsFiltered() {
+    debugger;
     const dataTable = $('#myTable').DataTable();
+    //this.bills es la lista filtrada por fecha desde la API, esa no se toca
     let billsFiltered = this.filteredByType(this.bills.slice());
     billsFiltered = this.filteredByCategiries(billsFiltered);
     billsFiltered = this.filteredByProviders(billsFiltered);
@@ -142,7 +144,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     this.selectedCategories=[];
     this.selectedProviders=[];
     this.selectedType=[];
-    this.loadBillsFiltered();
+    this.loadDates();
     }
   // Cargar fechas por defecto (último mes hasta hoy)
   loadDates() {
@@ -182,8 +184,8 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     const filteredData = table.rows({ search: 'applied' }).data().toArray();
 
     const pdfData = filteredData.map(bill => [
-      bill.category.description,
-      bill.providerName,
+      bill.categoryDescription,
+      bill.providerDescription,
       bill.expenseType === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : bill.expenseType,
       bill.description,
       `$${bill.amount}`,
@@ -210,17 +212,17 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
       }
     });
 
-    doc.save('listado_gastos.pdf');
+    doc.save(`${moment().format('YYYY-MM-DD')}_listado_gastos.pdf`);
   }
 
   // Exportar a Excel
   exportToExcel(): void {
     const table = $('#myTable').DataTable();
     const filteredData = table.rows({ search: 'applied' }).data().toArray();
-
+    debugger
     const excelData = filteredData.map(bill => ({
-      'Categoría': bill.category.description,
-      'Proveedor': bill.providerName,
+      'Categoría': bill.categoryDescription,
+      'Proveedor': bill.providerDescription,
       'Tipo de Gasto': bill.expenseType === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : bill.expenseType,
       'Descripción': bill.description,
       'Monto': `$${bill.amount}`,
@@ -231,7 +233,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Listado de Gastos');
 
-    XLSX.writeFile(workbook, 'listado_gastos.xlsx');
+    XLSX.writeFile(workbook, `${moment().format('YYYY-MM-DD')}_listado_gastos.xlsx`);
   }
 
   // Actualizar la tabla DataTable con los nuevos datos
@@ -247,12 +249,27 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
       searching: true,
       ordering: true,
       lengthChange: true,
-      order: [4, 'desc'],
+      order: [0, 'desc'],
       lengthMenu: [5, 10, 25, 50],
       pageLength: 5,
       data: this.bills,
 
       columns: [
+        {
+          data: 'expenseDate',
+          title: 'Fecha',
+          className: 'align-middle',
+          render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
+          type: 'date-moment'
+        },
+        {
+          data: 'expenseType',
+          title: 'Tipo de Gasto',
+          className: 'align-middle',
+          render: function (data) {
+            return `<div>${data === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : data}</div>`
+          }
+        },
         {
           data: 'categoryDescription',
           title: 'Categoría',
@@ -263,14 +280,6 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
           data: 'providerDescription',
           title: 'Proveedor',
           className: 'align-middle',
-        },
-        {
-          data: 'expenseType',
-          title: 'Tipo de Gasto',
-          className: 'align-middle',
-          render: function (data) {
-            return `<div>${data === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : data}</div>`
-          }
         },
         {
           data: 'amount',
@@ -284,14 +293,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
           }
         },
         {
-          data: 'expenseDate',
-          title: 'Fecha',
-          className: 'align-middle',
-          render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
-          type: 'date-moment'
-        },
-        {
-          title: "Acciones",
+          title: "Acción",
           data: null,
           orderable: false,
           className: 'text-center',
@@ -300,11 +302,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
               <div class="text-center">
                 <div class="btn-group">
                   <div class="dropdown">
-                    <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
-                    <ul class="dropdown-menu">
-                      <li><hr class="dropdown-divider"></li>
-                      <li><a class="dropdown-item btn-view" style="cursor: pointer">Ver más</a></li>
-                    </ul>
+                    <button type="button" class="btn btn-light border border-2 btn-view">Ver más</button>
                   </div>
                 </div>
               </div>`;

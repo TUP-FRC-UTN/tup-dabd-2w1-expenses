@@ -1,7 +1,6 @@
 <ng-select 
   [items]="expenseTypeList" 
   bindLabel="description" 
-  [placeholder]= "multiple ? 'Tipos' : 'Tipo'"
   [bindValue]="multiple ? '':'id'"
   [multiple]="multiple"
   [(ngModel)]="selectValue"
