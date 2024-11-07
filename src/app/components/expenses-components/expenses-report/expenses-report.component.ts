@@ -278,7 +278,10 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
       }
       return acc;
     }, []);
-    return aggregatedData;
+
+    const result = aggregatedData.map(([category, amount]) => [category, amount < 0 ? 0 : amount]);
+
+    return result;
   }
   sumAmountByYearMonth(list: ExpenseData[]): any {
     const years = Array.from(new Set(list.map(d => d.year))).sort();
