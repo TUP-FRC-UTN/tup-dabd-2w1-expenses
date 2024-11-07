@@ -235,22 +235,12 @@
                       id="description"
                       [(ngModel)]="expense.description"
                       class="form-control"
-                      [ngClass]="getFieldClass('description', description)"
+                   
                       placeholder="Escribe una descripción..."
                       rows="2"
                       #description="ngModel"
                       required
-                      (blur)="onFieldBlur('description', description)"
                     ></textarea>
-                    @if(isFieldValid('description', description)) {
-                      <div class="valid-feedback">
-                      </div>
-                    }
-                    @if(isFieldInvalid('description', description)) {
-                      <div class="invalid-feedback">
-                        La descripción es requerida
-                      </div>
-                    }
                   </div>
                 </div>
               </div>
