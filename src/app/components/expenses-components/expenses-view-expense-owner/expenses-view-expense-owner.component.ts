@@ -131,7 +131,6 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     });
   }
   loadBillsFiltered() {
-    debugger;
     const dataTable = $('#myTable').DataTable();
     //this.bills es la lista filtrada por fecha desde la API, esa no se toca
     let billsFiltered = this.filteredByType(this.bills.slice());
@@ -144,6 +143,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     this.selectedCategories=[];
     this.selectedProviders=[];
     this.selectedType=[];
+    this.loadBillsFiltered();
     this.loadDates();
     }
   // Cargar fechas por defecto (último mes hasta hoy)
@@ -219,7 +219,6 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
   exportToExcel(): void {
     const table = $('#myTable').DataTable();
     const filteredData = table.rows({ search: 'applied' }).data().toArray();
-    debugger
     const excelData = filteredData.map(bill => ({
       'Categoría': bill.categoryDescription,
       'Proveedor': bill.providerDescription,
