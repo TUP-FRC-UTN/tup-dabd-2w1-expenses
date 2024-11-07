@@ -118,6 +118,10 @@ export class ExpensesViewCategoryComponent implements OnInit {
       }
     });
   }
+  clearFiltered(){
+    this.selectedStates=[];
+    this.loadCategory();
+  }
   loadCategory() {
     const dataTable = $('#myTable').DataTable();
     let categoriasFiltered = this.filteredByState(this.selectedStates)
