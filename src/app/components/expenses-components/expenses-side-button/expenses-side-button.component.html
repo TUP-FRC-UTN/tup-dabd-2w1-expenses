@@ -6,6 +6,7 @@
         </button>    
     }
     @else {
+        <!--Error en este boton, no se cierra el colapse, solo se abre-->
         <button class="nav-link d-flex text-light w-100" data-bs-toggle="collapse" [attr.data-bs-target]="'#' + info.title" [title]="info.title">
             <i [ngClass]="info.icon"></i>
             @if (expanded) {<span class="ms-2">{{info.title}}</span>}
