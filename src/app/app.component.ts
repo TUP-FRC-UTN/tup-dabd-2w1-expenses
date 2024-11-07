@@ -41,21 +41,6 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
   }
   title = 'Gastos';
-
-  //navbar
-  visibleSection: string = '';
-  items: MenuItems[] = [
-    { key: 'menu1', name: 'Registrar Gastos', active: true },
-    { key: 'menu2', name: 'Consultar Gastos Administrador', active: true },
-    { key: 'menu3', name: 'Consultar Gastos Propietarios', active: true },
-    { key: 'menu4', name: 'Consultar Categorias Administrador', active: true }
-  ];
-
-  //navbar
-  onMenuVisited(key: string) {
-    this.visibleSection = key;
-  }
-
 }
 // // Bootstrap la aplicación en modo standalone
 // bootstrapApplication(AppComponent, {

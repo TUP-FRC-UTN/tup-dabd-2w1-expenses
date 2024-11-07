@@ -19,7 +19,10 @@ export class ExpensesNavbarComponent {
   // private readonly authService = inject(AuthService);
 
   // userRoles: string[] =  this.authService.getUser().roles!; 
-  userRoles: string[] = ["Propietario", "SuperAdmin"]
+  userRoles: string[] = ["Gerente", "Propietario"]
+
+  //Traer con el authService
+  actualRole : string = "Gerente"
 
   //Lista de botones
   buttonsList: SideButton[] = [];
@@ -33,7 +36,6 @@ export class ExpensesNavbarComponent {
       {
         //botón Listar Gastos para el Propietario
         icon: "bi bi-currency-dollar",
-        name: "Mis Gastos",
         title: "Mis Gastos",
         route: "viewExpenseOwner",
         roles: ["Propietario"]
@@ -41,40 +43,35 @@ export class ExpensesNavbarComponent {
       {
         //Boton General para el Administrador (padre)
         icon: "bi bi-person-gear",
-        name:"Gestion Gastos",
         title: "Gastos",
-        roles: ["SuperAdmin", "Gerente Finanzas"],
+        roles: ["SuperAdmin", "Gerente Finanzas", "Gerente"],
         childButtons: [{
           //botón Listar Gastos para el Administrador
           icon: "bi bi-receipt-cutoff",
-          name: "Visualizar Gastos",
           title: "Visualizar",
           route: "viewExpenseAdmin",
-          roles: ["SuperAdmin", "Gerente Finanzas"]
+          roles: ["SuperAdmin", "Gerente Finanzas", "Gerente"]
         },
         {
           //botón Lista Categoria de Gastos
           icon: "bi bi-list-task",
-          name: "Gestion Categoria Gastos",
-          title: "Categorias",
+          title: "Categorías",
           route: "viewCategory",
-          roles: ["SuperAdmin", "Gerente Finanzas"]
+          roles: ["SuperAdmin", "Gerente Finanzas", "Gerente"]
         },
         {
           //botón Registrar Gasto
           icon: "bi bi-journal-arrow-up",
-          name: "Registrar Gasto",
           title: "Registrar",
           route: "registerExpense",
-          roles: ["SuperAdmin", "Gerente Finanzas"]
+          roles: ["SuperAdmin", "Gerente Finanzas", "Gerente"]
         },
         {
           // botón Estadísticas
           icon: "bi bi-graph-up",
-          name: "Reporte Gastos",
           title: "Reportes",
           route: "estadisticas",
-          roles: ["SuperAdmin", "Gerente Finanzas"]
+          roles: ["SuperAdmin", "Gerente Finanzas", "Gerente"]
         }
         ]
       }
@@ -101,4 +98,9 @@ export class ExpensesNavbarComponent {
     this.pageTitle = title;
   }
   
+  selectRole(role : string){
+    this.actualRole = role;
+  }
+
+
 }
