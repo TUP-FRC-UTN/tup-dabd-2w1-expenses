@@ -25,7 +25,7 @@
         >
       </div>
       <div class="col-3">
-     <app-expenses-state-category-ng-select [(selectedStates)]="selectedStates" [multiple]="true"></app-expenses-state-category-ng-select>
+     <app-expenses-state-category-ng-select [(selectedStates)]="selectedStates" [multiple]="true" (selectedStatesChange)="onStateChange()" (selectedStateChange)="onStateChange()"></app-expenses-state-category-ng-select>
       </div>
 
       <!-- Botones de exportar -->

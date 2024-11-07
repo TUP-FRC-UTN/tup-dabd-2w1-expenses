@@ -26,6 +26,7 @@ declare let bootstrap: any;
   styleUrl: './expenses-view-category.component.scss',
 })
 export class ExpensesViewCategoryComponent implements OnInit {
+
   searchTerm: any;
   table: any;
 
@@ -56,16 +57,11 @@ export class ExpensesViewCategoryComponent implements OnInit {
       title: '¡Éxito!',
       text: message,
       icon: 'success',
-      confirmButtonColor: '#4caf50',
-      background: '#ffffff',
-      customClass: {
-        title: 'text-xl font-medium text-gray-900',
-        htmlContainer: 'text-sm text-gray-600',
-        confirmButton: 'px-4 py-2 text-white rounded-lg',
-        popup: 'swal2-popup'
-      }
     });
   }
+  onStateChange() {
+   this.loadCategory()
+    }
 
   showErrorAlert(message: string) {
     return Swal.fire({
@@ -124,7 +120,18 @@ export class ExpensesViewCategoryComponent implements OnInit {
   }
   loadCategory() {
     const dataTable = $('#myTable').DataTable();
-    dataTable.clear().rows.add(this.category).draw();
+    let categoriasFiltered = this.filteredByState(this.selectedStates)
+    dataTable.clear().rows.add(categoriasFiltered).draw();
+  }
+  filteredByState(selectedStates: any[]) : Category[] {
+    console.log(selectedStates);
+  if (selectedStates.length === 0) {
+    return this.category;
+  }
+
+  return this.category.filter(m => {
+    return selectedStates.some(state => state.description === m.state);
+  });
   }
 
   onSearch(event: any) {

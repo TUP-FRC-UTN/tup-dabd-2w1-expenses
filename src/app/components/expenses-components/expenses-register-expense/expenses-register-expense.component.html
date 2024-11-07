@@ -148,7 +148,18 @@
                     />
                   </div>
                 </div>
+              
+                <ng-container *ngIf="selectedFile">
+                  <div class="d-flex justify-content-between align-items-center mb-0 w-100" style="padding-left: calc(25%);">
+                    <div class="d-flex align-items-center flex-grow-1">
+                      <i class="bi-file-earmark-text me-3 text-primary fs-5"></i>
+                      <span>{{ selectedFile.name.length > 40 ? selectedFile.name.slice(0, 40) + '...' : selectedFile.name }}</span>
+                    </div>
+                    <span>{{ (selectedFile.size / (1024 * 1024)).toFixed(2) }} MB</span>
+                  </div>
+                </ng-container>
               </div>
+              
             </div>
 
             <!-- Monto y Cuotas -->

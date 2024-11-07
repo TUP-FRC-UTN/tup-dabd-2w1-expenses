@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
-import { NgSelectComponent } from '@ng-select/ng-select';
+import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-expenses-state-category-ng-select',
   standalone: true,
-  imports: [NgSelectComponent,CommonModule,FormsModule],
+  imports: [NgSelectModule,CommonModule,FormsModule],
   templateUrl: './expenses-state-category-ng-select.component.html',
   styleUrl: './expenses-state-category-ng-select.component.scss'
 })
