@@ -37,12 +37,12 @@
 
       <!-- Botones de exportar -->
       <div class="col-auto d-flex gap-1 text-end">
-        <button class="btn btn-primary" data-bs-toggle="modal" title="Filtros Avanzados" data-bs-target="#filtrosAvanzados">
+        <button class="btn btn-primary filterbutton" data-bs-toggle="modal" title="Filtros Avanzados" data-bs-target="#filtrosAvanzados">
           <i class="bi bi-funnel-fill"></i>
         </button>
-        <button type="button" class="btn btn-secondary bi bi-trash" title="Limpiar Filtros" (click)="clearFiltered()"></button>
-        <button (click)="exportToExcel()" id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel"></button>
-        <button  (click)="exportToPDF()" id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf"></button>
+        <button type="button" class="btn btn-secondary bi bi-trash filterbutton" title="Limpiar Filtros" (click)="clearFiltered()"></button>
+        <button (click)="exportToExcel()" id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel filterbutton"></button>
+        <button  (click)="exportToPDF()" id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf filterbutton"></button>
       </div>
     </div>
     <table id="myTable" class="table table-striped border border-3 rounded">
