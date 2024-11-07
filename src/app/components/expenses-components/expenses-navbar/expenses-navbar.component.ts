@@ -87,13 +87,6 @@ export class ExpensesNavbarComponent {
   }
 
   redirect(path: string) {
-    // if(path === '/login'){
-    //   this.authService.logOut();
-    //   this.router.navigate([path]);
-    // }
-    // else{
-    //   this.router.navigate([path]);
-    // }
     this.router.navigate([path]);
   }
 
