@@ -9,7 +9,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { BillViewOwner } from '../../../models/expenses-models/bill-view-owner.model';
 import { BillViewOwnerService } from '../../../services/expenses-services/viewOwnerServices/bill-view-owner.service';
-import { ProviderViewOwnerService } from '../../../services/expenses-services/viewOwnerServices/provider-view-owner.service';
 import { ExpenseViewService } from '../../../services/expenses-services/expenseView/expenseView.service';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
@@ -18,12 +17,17 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, tap, finalize, takeUntil } from 'rxjs/operators';
 import { ExpenseView } from '../../../models/expenses-models/expenseView';
 import { ExpenseViewComponent } from '../../expenses-components/expenses-view/expenses-view.component';
+import { ExpensesFiltersComponent } from "../expenses-filters/expenses-filters.component";
+import { Category } from '../../../models/expenses-models/category';
+import { Provider } from '../../../models/expenses-models/provider';
+import { Bill } from '../../../models/expenses-models/bill';
+import { ExpenseType } from '../../../models/expenses-models/expenseType';
 
 declare let bootstrap: any;
 @Component({
   selector: 'app-view-owner-expense',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule, ExpenseViewComponent],
+  imports: [CommonModule, HttpClientModule, FormsModule, ExpenseViewComponent, ExpensesFiltersComponent],
   providers: [ExpenseViewService],
   templateUrl: './expenses-view-expense-owner.component.html',
   styleUrls: ['./expenses-view-expense-owner.component.scss'],
@@ -43,11 +47,12 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
   private dateChangeSubject = new Subject<{ from: string, to: string }>();
   private unsubscribe$ = new Subject<void>();
   isLoading = false;
-
+  selectedCategories: Category[] = [];
+  selectedProviders: Provider[] =[];
+  selectedType: ExpenseType[]=[];
 
   constructor(
     private billService: BillViewOwnerService,
-    private providerService: ProviderViewOwnerService,
     private cdRef: ChangeDetectorRef,
     private expenseViewService: ExpenseViewService
   ) { }
@@ -71,7 +76,34 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
-
+  // loadBillsFilter() {
+  //   const dataTable = $('#myTable').DataTable();
+  //   debugger
+  //   let billsFiltered = this.fileredByCategiries(this.bills.slice());
+  //   billsFiltered = this.fileredByProviders(billsFiltered);
+  //   dataTable.clear().rows.add(billsFiltered).draw();
+  // }
+  filteredByCategiries(bills :BillViewOwner[]):BillViewOwner[]{
+    if (this.selectedCategories && this.selectedCategories.length>0){
+      const selectedCategoryIds = this.selectedCategories.map(category => category.id); 
+    return bills.filter(bill => selectedCategoryIds.includes(bill.categoryId)); // Filtrar solo los que tienen un id que coincida
+    }
+    return bills;
+  }
+  filteredByProviders(bills :BillViewOwner[]):BillViewOwner[]{
+    if (this.selectedProviders && this.selectedProviders.length>0){
+      const selectedProviderIds = this.selectedProviders.map(provider => provider.id); // Extraer los ids de los proveedores seleccionadas
+    return bills.filter(bill => selectedProviderIds.includes(bill.providerId)); // Filtrar solo los que tienen un id que coincida
+    }
+    return bills;
+  }
+  filteredByType(bills :BillViewOwner[]):BillViewOwner[]{
+    if (this.selectedType && this.selectedType.length>0){
+      const selectedTypeIds = this.selectedType.map(type => type.id); // Extraer los ids de los tipo seleccionadas
+    return bills.filter(bill => selectedTypeIds.includes(bill.expenseType)); // Filtrar solo los que tienen un id que coincida
+    }
+    return bills;
+  }
   // Configuración del observable para escuchar cambios en las fechas
   private setupDateChangeObservable() {
     this.dateChangeSubject.pipe(
@@ -100,8 +132,20 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
   }
   loadBillsFiltered() {
     const dataTable = $('#myTable').DataTable();
-    dataTable.clear().rows.add(this.bills).draw();
+    //this.bills es la lista filtrada por fecha desde la API, esa no se toca
+    let billsFiltered = this.filteredByType(this.bills.slice());
+    billsFiltered = this.filteredByCategiries(billsFiltered);
+    billsFiltered = this.filteredByProviders(billsFiltered);
+    dataTable.clear().rows.add(billsFiltered).draw();
   }
+  clearFiltered(){
+
+    this.selectedCategories=[];
+    this.selectedProviders=[];
+    this.selectedType=[];
+    this.loadBillsFiltered();
+    this.loadDates();
+    }
   // Cargar fechas por defecto (último mes hasta hoy)
   loadDates() {
     const today = new Date();
@@ -140,8 +184,8 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     const filteredData = table.rows({ search: 'applied' }).data().toArray();
 
     const pdfData = filteredData.map(bill => [
-      bill.category.description,
-      bill.providerName,
+      bill.categoryDescription,
+      bill.providerDescription,
       bill.expenseType === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : bill.expenseType,
       bill.description,
       `$${bill.amount}`,
@@ -168,17 +212,16 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
       }
     });
 
-    doc.save('listado_gastos.pdf');
+    doc.save(`${moment().format('YYYY-MM-DD')}_listado_gastos.pdf`);
   }
 
   // Exportar a Excel
   exportToExcel(): void {
     const table = $('#myTable').DataTable();
     const filteredData = table.rows({ search: 'applied' }).data().toArray();
-
     const excelData = filteredData.map(bill => ({
-      'Categoría': bill.category.description,
-      'Proveedor': bill.providerName,
+      'Categoría': bill.categoryDescription,
+      'Proveedor': bill.providerDescription,
       'Tipo de Gasto': bill.expenseType === 'NOTE_OF_CREDIT' ? 'NOTA DE CRÉDITO' : bill.expenseType,
       'Descripción': bill.description,
       'Monto': `$${bill.amount}`,
@@ -189,7 +232,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Listado de Gastos');
 
-    XLSX.writeFile(workbook, 'listado_gastos.xlsx');
+    XLSX.writeFile(workbook, `${moment().format('YYYY-MM-DD')}_listado_gastos.xlsx`);
   }
 
   // Actualizar la tabla DataTable con los nuevos datos
@@ -205,22 +248,18 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
       searching: true,
       ordering: true,
       lengthChange: true,
-      order: [5, 'desc'],
-      lengthMenu: [10, 25, 50],
-      pageLength: 10,
+      order: [0, 'desc'],
+      lengthMenu: [5, 10, 25, 50],
+      pageLength: 5,
       data: this.bills,
 
       columns: [
         {
-          data: 'category.description',
-          title: 'Categoría',
+          data: 'expenseDate',
+          title: 'Fecha',
           className: 'align-middle',
-          render: (data) => `<div>${data}</div>`
-        },
-        {
-          data: 'providerName',
-          title: 'Proveedor',
-          className: 'align-middle',
+          render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
+          type: 'date-moment'
         },
         {
           data: 'expenseType',
@@ -231,26 +270,29 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
           }
         },
         {
-          data: 'description',
-          title: 'Descripción',
+          data: 'categoryDescription',
+          title: 'Categoría',
           className: 'align-middle',
           render: (data) => `<div>${data}</div>`
+        },
+        {
+          data: 'providerDescription',
+          title: 'Proveedor',
+          className: 'align-middle',
         },
         {
           data: 'amount',
           title: 'Monto',
           className: 'align-middle',
-          render: (data) => `<div>$${data}</div>`
+          render: (data) => {
+            let formattedAmount = new Intl.NumberFormat('es-AR', {
+              minimumFractionDigits: 2
+            }).format(data);
+            return `<div>$ ${formattedAmount} </div>`;
+          }
         },
         {
-          data: 'expenseDate',
-          title: 'Fecha',
-          className: 'align-middle',
-          render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
-          type: 'date-moment'
-        },
-        {
-          title: "Opciones",
+          title: "Acción",
           data: null,
           orderable: false,
           className: 'text-center',
@@ -259,11 +301,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
               <div class="text-center">
                 <div class="btn-group">
                   <div class="dropdown">
-                    <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
-                    <ul class="dropdown-menu">
-                      <li><hr class="dropdown-divider"></li>
-                      <li><a class="dropdown-item btn-view" style="cursor: pointer">Ver más</a></li>
-                    </ul>
+                    <button type="button" class="btn btn-light border border-2 btn-view">Ver más</button>
                   </div>
                 </div>
               </div>`;
@@ -278,6 +316,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
       language: {
         lengthMenu:
           `<select class="form-select">
+            <option value="5">5</option>
             <option value="10">10</option>
             <option value="25">25</option>
             <option value="50">50</option>

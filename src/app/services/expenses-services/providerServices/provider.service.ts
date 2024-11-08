@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { Provider } from '../../../models/expenses-models/provider';
 import { Injectable } from '@angular/core';
 
@@ -13,7 +13,12 @@ export class ProviderService {
   constructor(private http: HttpClient) {}
 
   getProviders(): Observable<Provider[]> {
-    return this.http.get<Provider[]>(this.apiUrl);
+    return this.http.get<Provider[]>(this.apiUrl).pipe(
+      map(providers => providers.map(provider => ({
+        ...provider,
+        id: Number(provider.id) // Convertir id a número
+      })))
+    );
   }
 
 }

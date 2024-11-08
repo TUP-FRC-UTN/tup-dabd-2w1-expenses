@@ -19,13 +19,19 @@ import jsPDF from 'jspdf';
 import Swal from 'sweetalert2';
 import { ExpenseView } from '../../../models/expenses-models/expenseView';
 import { ExpenseViewComponent } from '../expenses-view/expenses-view.component';
+import { Category } from '../../../models/expenses-models/category';
+import { ExpenseCategoriesNgSelectComponent } from "../expenses-categories-ngSelect/expense-categories-ng-select/expense-categories-ng-select.component";
+import { ExpenseProvidersNgSelectComponent } from "../expenses-providers-ngSelect/expense-providers-ng-select/expense-providers-ng-select.component";
+import { Provider } from '../../../models/expenses-models/provider';
+import { ExpensesFiltersComponent } from "../expenses-filters/expenses-filters.component";
+import { ExpenseType } from '../../../models/expenses-models/expenseType';
 
 declare let bootstrap: any;
 
 @Component({
   selector: 'app-view-gastos-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, ExpenseViewComponent],
+  imports: [CommonModule, FormsModule, ExpenseViewComponent, ExpenseCategoriesNgSelectComponent, ExpenseProvidersNgSelectComponent, ExpensesFiltersComponent],
   providers: [BillService,ExpenseViewService],
   templateUrl: './expenses-view-expense-admin.component.html',
   styleUrl: './expenses-view-expense-admin.component.scss'
@@ -54,6 +60,11 @@ export class ViewGastosAdminComponent implements OnInit {
   providers: string[] = [];
   expenseTypes: string[] = [];
   selectedExpense: ExpenseView | null = null;
+  
+  
+  selectedCategories: Category[] = [];
+  selectedProviders: Provider[] =[];
+  selectedType: ExpenseType[]=[];
   constructor(
     private cdRef: ChangeDetectorRef,
     private billService: BillService,
@@ -87,6 +98,7 @@ export class ViewGastosAdminComponent implements OnInit {
     ).subscribe({
       next: (response: Bill[]) => {
         this.bills = response;
+        console.log(this.bills)
         this.loadBillsFiltered();
       },
       error: (error) => {
@@ -184,7 +196,7 @@ export class ViewGastosAdminComponent implements OnInit {
       }
     });
 
-    doc.save('listado_gastos.pdf');
+    doc.save(`${moment().format('YYYY-MM-DD')}_listado_gastos.pdf`);
   }
 
   // Exportar a Excel
@@ -208,7 +220,7 @@ export class ViewGastosAdminComponent implements OnInit {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Listado de Gastos');
   
-    XLSX.writeFile(workbook, 'listado_gastos.xlsx');
+    XLSX.writeFile(workbook, `${moment().format('YYYY-MM-DD')}_listado_gastos.xlsx`);
   }
 
   filterDataOnChange() {
@@ -230,18 +242,10 @@ export class ViewGastosAdminComponent implements OnInit {
       next: () => {
         console.log(`Gasto con ID ${id} eliminada con éxito.`);
         Swal.fire({
-          title: '¡Expensa borrada!',
-          text: 'La expensa se ha eliminado correctamente.',
-          icon: 'success',
-          confirmButtonColor: '#4CAF50',
-          background: '#ffffff',
-          customClass: {
-            title: 'text-xl font-medium text-gray-900',
-            htmlContainer: 'text-sm text-gray-600',  // Changed from 'content' to 'htmlContainer'
-            confirmButton: 'px-4 py-2 text-white rounded-lg',
-            popup: 'swal2-popup'
-          }
-        });
+          icon: 'success',               // Icono de éxito
+          title: 'Éxito',                // Título del mensaje
+          text: 'Los cambios se guardaron correctamente', // Mensaje de confirmación
+        })
         this.filterDataOnChange();
       },
       error: (error) => {
@@ -265,8 +269,37 @@ export class ViewGastosAdminComponent implements OnInit {
 
   loadBillsFiltered() {
     const dataTable = $('#myTable').DataTable();
-    dataTable.clear().rows.add(this.bills).draw();
+    let billsFiltered = this.filteredbyType(this.bills.slice());
+    billsFiltered = this.filteredByCategiries(billsFiltered);
+    billsFiltered = this.filteredByProviders(billsFiltered);
+    dataTable.clear().rows.add(billsFiltered).draw();
   }
+  filteredByCategiries(bills :Bill[]):Bill[]{
+
+    console.log(this.selectedCategories)
+    if (this.selectedCategories && this.selectedCategories.length>0){
+      const selectedCategoryIds = this.selectedCategories.map(category => category.id); // Extraer los ids de las categorías seleccionadas
+    return bills.filter(bill => selectedCategoryIds.includes(bill.categoryId)); // Filtrar solo los que tienen un id que coincida
+    }
+    return bills;
+  }
+  filteredByProviders(bills :Bill[]):Bill[]{
+
+    if (this.selectedProviders && this.selectedProviders.length>0){
+      const selectedProviderIds = this.selectedProviders.map(provider => provider.id as number); // Extraer los ids de las categorías seleccionadas
+    return bills.filter(bill => selectedProviderIds.includes(bill.providerId)); // Filtrar solo los que tienen un id que coincida
+    }
+    return bills;
+  }
+  filteredbyType(bills :Bill[]):Bill[]{
+    debugger;
+    if (this.selectedType && this.selectedType.length>0){
+      const selectedTypeIds = this.selectedType.map(type => type.id);
+    return bills.filter(bill => selectedTypeIds.includes(bill.expenseType)); // Filtrar solo los que tienen un id que coincida
+    }
+    return bills;
+  }
+
   closeModal(modal: ElementRef | HTMLDivElement) {
     const element = modal instanceof ElementRef ? modal.nativeElement : modal;
     element.style.display = 'none';
@@ -281,7 +314,11 @@ export class ViewGastosAdminComponent implements OnInit {
       next: () => {
         console.log(`Gasto con ID ${this.failedBillId} se le creó nota de crédito con éxito`);
         this.filterDataOnChange();
-        alert('Se realizó la nota de crédito con éxito');
+        Swal.fire({
+          icon: 'success',               // Icono de éxito
+          title: 'Éxito',                // Título del mensaje
+          text: 'Los cambios se guardaron correctamente', // Mensaje de confirmación
+        })
         this.closeModal(this.modalNoteCredit);
       },
       error: (error) => {
@@ -290,6 +327,11 @@ export class ViewGastosAdminComponent implements OnInit {
       }
     });
   }
+  onSelectedCategoriesChange(): void {
+    this.loadBillsFiltered()
+    console.log(this.selectedCategories);
+  }
+
   configDataTable() {
     $.fn.dataTable.ext.type.order['date-moment-pre'] = (d: string) => moment(d, 'DD/MM/YYYY').unix();
 
@@ -303,30 +345,19 @@ export class ViewGastosAdminComponent implements OnInit {
       searching: true,
       ordering: true,
       lengthChange: true,
-      order: [4, 'desc'], // Ordenar por fecha por defecto
-      lengthMenu: [10, 25, 50],
-      pageLength: 10,
+      order: [0, 'desc'], // Ordenar por fecha por defecto
+      lengthMenu: [5, 10, 25, 50],
+      pageLength: 5,
       data: this.bills,
 
       // Columnas de la tabla
       columns: [
-        // {
-        //   data: 'id',
-        //   visible: false
-        // },
         {
-          data: 'category',
-          title: 'Categoría',
+          data: 'expenseDate',
+          title: 'Fecha',
           className: 'align-middle',
-          render: (data) => `<div>${data}</div>`
-        },
-        {
-          data: 'provider',
-          title: 'Proveedor',
-          className: 'align-middle',
-          render: function (data) {
-            return `<div>empresa anonima</div>`
-          }
+          render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
+          type: 'date-moment'
         },
         {
           data: 'expenseType',
@@ -337,20 +368,31 @@ export class ViewGastosAdminComponent implements OnInit {
           }
         },
         {
+          data: 'category',
+          title: 'Categoría',
+          className: 'align-middle',
+          render: (data) => `<div>${data}</div>`
+        },
+        {
+          data: 'provider',
+          title: 'Proveedor',
+          className: 'align-middle',
+          render: (data) => `<div>${data}</div>`
+        },
+        {
           data: 'amount',
           title: 'Monto',
           className: 'align-middle',
-          render: (data) => `<div>$${data}</div>`
+          render: (data) => {
+            let formattedAmount = new Intl.NumberFormat('es-AR', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            }).format(data);
+            return `<div>$ ${formattedAmount} </div>`;
+          }
         },
         {
-          data: 'expenseDate',
-          title: 'Fecha',
-          className: 'align-middle',
-          render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
-          type: 'date-moment'
-        },
-        {
-          title: "Opciones",
+          title: "Acciones",
           data: null,
           orderable: false,
           className: 'text-center',
@@ -361,10 +403,10 @@ export class ViewGastosAdminComponent implements OnInit {
                   <div class="dropdown">
                     <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
                     <ul class="dropdown-menu">
-                      <li><hr class="dropdown-divider"></li>
                       <li><a class="dropdown-item btn-view" style="cursor: pointer">Ver más</a></li>
+                       <li><hr class="dropdown-divider"></li>
                       <li><a class="dropdown-item btn-edit" style="cursor: pointer">Editar</a></li>
-                      <li><a class="dropdown-item btn-delete" style="cursor: pointer">Eliminar</a></li>
+                       <li><a class="dropdown-item btn-delete" style="cursor: pointer">Eliminar</a></li>
                     </ul>
                   </div>
                 </div>
@@ -382,6 +424,7 @@ export class ViewGastosAdminComponent implements OnInit {
       language: {
         lengthMenu: `
           <select class="form-select">
+          <option value="5">5</option>
             <option value="10">10</option>
             <option value="25">25</option>
             <option value="50">50</option>
@@ -390,12 +433,7 @@ export class ViewGastosAdminComponent implements OnInit {
         info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
         infoEmpty: "Mostrando 0 registros",
         infoFiltered: "(filtrado de _MAX_ registros totales)",
-        paginate: {
-          first: 'Primero',
-          last: 'Último',
-          next: 'Siguiente',
-          previous: 'Anterior'
-        },
+        
         zeroRecords: 'No se encontraron resultados',
         emptyTable: 'No hay datos disponibles',
         loadingRecords: "Cargando...",
@@ -427,6 +465,14 @@ export class ViewGastosAdminComponent implements OnInit {
       this.failedBillId = rowData.id;
       this.openModal(this.modalConfirmDelete);
     });
+  }
+  clearFiltered(){
+
+  this.selectedCategories=[];
+  this.selectedProviders=[];
+  this.selectedType=[];
+  this.loadDates()
+  this.filterDataOnChange()
   }
   editBill(id: any) {
     console.log(id); // Esto mostrará el id en la consola

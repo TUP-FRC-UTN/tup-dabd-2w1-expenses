@@ -22,20 +22,12 @@ export class CategoryService {
 }
 
 
-  deleteCategory(id: number): Observable<any> {
-    return this.http.delete(`${this.url}/deleteById?id=${id}`);
-
-  }
   updateCategory(category: Category): Observable<any> {
-    return this.http.put(`${this.url}/putById?id=${category.id}&description=${category.description}`,null);
+    return this.http.put(
+      `${this.url}/putById?id=${category.id}&description=${category.description}&enabled=${category.state}`,null);
   }
   getCategoryById(id: number): Observable<Category> {
     return this.http.get<Category>(`${this.url}/${id}`);
   }
 
-  editCategory(id:number):Observable<void>{
-    const url=this.url+'/edit?id='+id;
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.put<void>(url, { headers });
-  }
 }

@@ -24,10 +24,13 @@ import { CurrencyMaskModule } from 'ng2-currency-mask';
 import { catchError } from 'rxjs/operators';
 import { of, throwError } from 'rxjs';
 import Swal from 'sweetalert2';
-import { ExpenseProviderSelectComponent } from "../expenses-providers-seelect/expense-provider-select/expense-provider-select.component";
-import { ExpenseCategoriesSelectComponent } from "../expenses-categories-select/expense-categories-select/expense-categories-select.component";
+
 import { CategoryService } from '../../../services/expenses-services/expensesCategoryServices/category.service';
 import { Category } from '../../../models/expenses-models/category';
+import { ExpenseCategoriesNgSelectComponent } from "../expenses-categories-ngSelect/expense-categories-ng-select/expense-categories-ng-select.component";
+import { ExpenseProvidersNgSelectComponent } from "../expenses-providers-ngSelect/expense-providers-ng-select/expense-providers-ng-select.component";
+import { ExpensesTypeExpenseNgSelectComponent } from "../expenses-type-expense-ng-select/expenses-type-expense-ng-select.component";
+import { ExpensesOwnersNgSelectComponent } from "../expenses-owners-ng-select/expenses-owners-ng-select.component";
 
 @Component({
   selector: 'app-expenses-register-expense',
@@ -43,15 +46,17 @@ import { Category } from '../../../models/expenses-models/category';
     RouterOutlet,
     ReactiveFormsModule,
     CurrencyMaskModule,
-    ExpenseProviderSelectComponent,
-    ExpenseCategoriesSelectComponent
+    ExpenseCategoriesNgSelectComponent,
+    ExpenseProvidersNgSelectComponent,
+    ExpensesTypeExpenseNgSelectComponent,
+    ExpensesOwnersNgSelectComponent
 ],
   styleUrls: ['./expenses-register-expense.component.css'],
 })
 export class ExpensesRegisterExpenseComponent implements OnInit {
   @ViewChild('form') form!: NgForm;
   @ViewChild('fileInput') fileInput!: ElementRef;
-  @ViewChild(ExpenseCategoriesSelectComponent) categorySelectComponent!: ExpenseCategoriesSelectComponent;
+
   // Modal states
   showModal = false;
   modalMessage = '';
@@ -60,20 +65,10 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
 
   // Form validation
   formSubmitted = false;
+  touchedFields: { [key: string]: boolean } = {};
 
   distributions: Distributions[] = [];
-  expense: Expense = {
-    description: '',
-    providerId: 0,
-    expenseDate: '',
-    invoiceNumber: '',
-    typeExpense: '',
-    categoryId: 0,
-    amount: 0,
-    installments: 0,
-    distributions: this.distributions,
-  };
-
+  expense: Expense;
   selectedFile: File | null = null;
   listOwner: Owner[] = [];
   selectedOwnerId: number = 0;
@@ -87,15 +82,26 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   private cdRef = inject(ChangeDetectorRef);
   private readonly expenseService = inject(ExpenseService);
   private readonly propietarioService = inject(OwnerService);
-  private readonly expenseCategoryService = inject(CategoryService);
-  private readonly providerService = inject(ProviderService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
+  constructor(){
+    this.expense= {
+        description: '',
+        providerId: 0,
+        expenseDate: '',
+        invoiceNumber: '',
+        typeExpense: '',
+        categoryId: 1,
+        amount: 0,
+        installments: 0,
+        distributions: this.distributions,
+      };
+  }
   ngOnInit(): void {
     this.loadInitialData();
     this.checkForEditMode();
-    this.initializeDefaultExpense();
+    //this.initializeDefaultExpense();
   }
   checkForEditMode() {
     this.route.params.subscribe(params => {
@@ -104,8 +110,31 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
         this.isEditMode = true;
         this.pageTitle = 'Editar Gasto';
         this.loadExpense(id);
+      }else{
+        this.initializeDefaultExpense();
       }
     });
+  }
+  
+  onFieldBlur(fieldName: string, control: any) {
+    this.touchedFields[fieldName] = true;
+    control.markAsTouched();
+  }
+
+  isFieldValid(fieldName: string, control: any): boolean {
+    return !control.errors && control.touched;
+  }
+
+  isFieldInvalid(fieldName: string, control: any): boolean {
+    return (control.errors && control.touched) || 
+           (this.formSubmitted && control.errors);
+  }
+
+  getFieldClass(fieldName: string, control: any): any {
+    return {
+      'is-valid': this.isFieldValid(fieldName, control),
+      'is-invalid': this.isFieldInvalid(fieldName, control)
+    };
   }
 
   private loadExpense(id: number): void {
@@ -364,29 +393,6 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       },
     });
   }
-  // private loadProviders() {
-  //   this.providerService.getProviders().subscribe({
-  //     next: (providers: Provider[]) => {
-  //       this.listProviders = providers;
-  //     },
-  //   });
-  // }
-  // private loadExpenseCategories() {
-  //   this.expenseCategoryService.getCategory().subscribe({
-  //     next: (categories: Category[]) => {
-  //       categories.forEach(cat => {
-  //         if(cat.state=='Activo')
-  //         {
-  //           const expenseCategory: ExpenseCategory = {
-  //             id: cat.id.toString(), // Convertimos el number a string ya que ExpenseCategory.id es string
-  //             description: cat.description
-  //           };
-  //           this.expenseCategoryList.push(expenseCategory);
-  //         }
-  //       });
-  //     },
-  //   });
-  // }
   public addDistribution(): void {
     if (this.selectedOwnerId !== 0) {
       const exists = this.expense.distributions.some(
@@ -471,6 +477,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       Object.keys(this.form.controls).forEach((key) => {
         const control = this.form.controls[key];
         control.markAsTouched();
+        this.touchedFields[key] = true;
       });
       this.showErrorModal('Por favor, complete todos los campos requeridos.');
       return false;
@@ -490,17 +497,10 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     return true;
   }
   isCategoryValid(): boolean {
-    // Este metodo no esta cumpliendo con el objetivo
-    return this.categorySelectComponent?.internalCategoryId?.valid ?? false;
+    // Probar esto
+    return this.expense.categoryId>0 ? true : false;
   }
 
-  // Funciones para el modal
-  // showSuccessModal(message: string): void {
-  //   this.modalTitle = 'Éxito';
-  //   this.modalMessage = message;
-  //   this.modalType = 'success';
-  //   this.showModal = true;
-  // }
 
   showErrorModal(message: string): void {
     this.modalTitle = 'Error';
@@ -544,29 +544,21 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       next: (response) => {
         debugger
         if (response && response.status === 200) {
-          console.log(`${this.isEditMode ? 'Actualización' : 'Registro'} exitoso`);
+          // Mensaje de éxito estándar
           Swal.fire({
-            title: `¡${this.isEditMode ? 'Expensa actualizada' : 'Expensa registrada'}!`,
-            text: `La expensa se ha ${this.isEditMode ? 'actualizado' : 'registrado'} correctamente.`,
-            icon: 'success',
-            confirmButtonColor: '#4CAF50',
-            background: '#ffffff',
-            customClass: {
-              title: 'text-xl font-medium text-gray-900',
-              htmlContainer: 'text-sm text-gray-600',
-              confirmButton: 'px-4 py-2 text-white rounded-lg',
-              popup: 'swal2-popup'
-            }
-            
+            icon: 'success',               // Icono de éxito
+            title: 'Éxito',                // Título del mensaje
+            text: 'Los cambios se guardaron correctamente', // Mensaje de confirmación
           }).then(() => {
             // Redirigir después de confirmar el alert
             this.router.navigate(['/viewExpenseAdmin']);
           });
+    
           this.clearForm();
           this.isLoading = false;
         } else {
           console.log('Respuesta inesperada', response);
-          this.showErrorAlert('Respuesta inesperada del servidor')
+          this.showErrorAlert('Respuesta inesperada del servidor');
           this.isLoading = false;
         }
       },
@@ -645,4 +637,31 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       }
     });
   }
+
+  confirmCancel() { //TODO HACER ESTO CON MODAL 
+    Swal.fire({
+      title: '¿Seguro de que desea cancelar?',
+      text: 'Los cambios no guardados se perderán.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí',
+      cancelButtonText: 'No',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      background: '#ffffff',
+      customClass: {
+        title: 'text-xl font-medium text-gray-900',
+        htmlContainer: 'text-sm text-gray-600',
+        confirmButton: 'px-4 py-2 text-white rounded-lg',
+        cancelButton: 'px-4 py-2 text-white rounded-lg bg-blue-600',
+        popup: 'swal2-popup'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Redirigir a otra ruta si se confirma
+        this.router.navigate(['/viewExpenseAdmin']);
+      }
+    });
+  }
+
 }

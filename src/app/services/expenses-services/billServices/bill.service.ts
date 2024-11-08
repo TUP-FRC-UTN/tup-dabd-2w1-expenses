@@ -27,7 +27,8 @@ export class BillService {
   getBillsByDateRange(formattedDateFrom: string, formattedDateTo: string) :Observable<Bill[]> {
     const urlWithFilters = `${this.apiUrl}?dateFrom=${formattedDateFrom}&dateTo=${formattedDateTo}`;
     console.log(urlWithFilters)
-    return this.http.get<Bill[]>(urlWithFilters);
+    const response =  this.http.get<Bill[]>(urlWithFilters);
+    return response
   }
   
 }

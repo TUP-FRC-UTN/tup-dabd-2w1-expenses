@@ -1,8 +1,8 @@
 <section class="py-5">
   <div class="container p-3 border border-2 rounded shadow-lg">
     <div class="container mt-4">
-      <div class="card border">
-        <div class="card-body">
+      <div class="card border-0">
+        <div class="card border-0">
           @if(isEditMode){
             <h3 class="card-title mb-4">Editar Gasto</h3>
           }
@@ -14,330 +14,368 @@
               <div class="col">
                 <div class="d-flex justify-content-start align-items-center mb-2">
                   <div class="col-3">
-                    <label for="typeExpense" class="Text Start">Tipo *  </label>
+                    <label for="typeExpense" class="Text Start">Tipo </label>
                   </div>
-                  <select
-                    name="typeExpense"
-                    [(ngModel)]="expense.typeExpense"
-                    id="typeExpense"
-                    class="form-select"
-                    #typeExpense="ngModel"
-                    required
-                  >
-                    <option value="COMUN">Común</option>
-                    <option value="INDIVIDUAL">Individual</option>
-                    <option value="EXTRAORDINARIO">Extraordinario</option>
-                  </select>
-                </div>
-                @if(formSubmitted && typeExpense.invalid ) {
-                <span class="text-danger">El tipo de gasto es requerido</span>
-                }
-              </div>
-              <div class="col">
-                <div class="d-flex justify-content-start align-items-center mb-2">
-                  <div class="col-3">
-                    <label for="expenseDate" class="form-lable">Fecha * </label>
-                  </div>
-                  <input
-                    type="date"
-                    name="expenseDate"
-                    [(ngModel)]="expense.expenseDate"
-                    id="expenseDate"
-                    class="form-control "
-                    [max]="today | date : 'yyyy-MM-dd'"
-                    #fecha="ngModel"
-                    required
-                  />
-                </div>
-                @if(formSubmitted && fecha.invalid) {
-                  <span class="text-danger">La fecha es requerida</span>
-                }
-              </div>
-            </div>
-            <div class="mb-3 row">
-              <div class="col">
-                <div class="d-flex justify-content-start align-items-center mb-2">
-                  <div class="col-3">
-                    <label for="selectprovider" class="form-lable"
-                      >Proveedor
-                    </label>
-                  </div>
-                  <!-- <select
-                    class="form-select"
-                    name="selectprovider"
-                    [(ngModel)]="expense.providerId"
-                    id="selectprovider"
-                    aria-label="Seleccione un proveedor:"
-                    #provider="ngModel"
-                  >
-                    <option value="0" selected></option>
-                    <option
-                      *ngFor="let provider of listProviders"
-                      [value]="provider.id"
-                    >
-                      {{ provider.description }}
-                    </option>
-                  </select> -->
-                  <app-expense-provider-select [(selectedProviderId)]="expense.providerId"></app-expense-provider-select>
-                </div>
-              </div>
-              <div class="col">
-                <div class="d-flex justify-content-start align-items-center mb-2">
-                  <div class="col-3">
-                    <label for="categoryId" class="form-lable">Categoría * </label>
-                  </div>
-                  <!-- <select
-                    name="categoryId"
-                    [(ngModel)]="expense.categoryId"
-                    id="categoryId"
-                    class="form-select "
-                    #categoryId="ngModel"
-                    required
-                  >
-                    @for (expenseCategory of expenseCategoryList; track $index) {
-                    <option [value]="expenseCategory.id">
-                      {{ expenseCategory.description }}
-                    </option>
+                  <div class="position-relative flex-grow-1">
+                    <app-expenses-type-expense-ng-select 
+                      [(selectedType)]="expense.typeExpense" 
+                      [multiple]="false" 
+                      [noteCredit]="false">
+                    </app-expenses-type-expense-ng-select>
+                    @if(formSubmitted && !expense.typeExpense) {
+                      <div class="invalid-feedback d-block">
+                        El tipo es requerido
+                      </div>
                     }
-                  </select> -->
-                  <app-expense-categories-select 
-                  [(selectedCategoryId)]="expense.categoryId" [removeEmpty] = "true"></app-expense-categories-select>
+                    
+                  </div>
                 </div>
-                @if(formSubmitted && !isCategoryValid()) {
-                <span class="text-danger">La categoría de gasto es requerida</span>
-                }
               </div>
-            </div>
-            <div class="mb-3 row">
               <div class="col">
                 <div class="d-flex justify-content-start align-items-center mb-2">
                   <div class="col-3">
-                    <label for="invoiceNumber" class="form-lable">N° Comprobante * </label>
+                    <label for="expenseDate" class="form-label">Fecha </label>
                   </div>
-                  <input
-                    type="string"
-                    name="invoiceNumber"
-                    [(ngModel)]="expense.invoiceNumber"
-                    id="invoiceNumber"
-                    class="form-control"
-                    [maxlength]="50"
-                    #invoiceNumber="ngModel"
+                  <div class="position-relative flex-grow-1">
+                    <input
+                      type="date"
+                      name="expenseDate"
+                      [(ngModel)]="expense.expenseDate"
+                      id="expenseDate"
+                      class="form-control"
+                      [ngClass]="getFieldClass('expenseDate', fecha)"
+                      [max]="today | date : 'yyyy-MM-dd'"
+                      #fecha="ngModel"
+                      required
+                      (blur)="onFieldBlur('expenseDate', fecha)"
+                    />
+                    @if(isFieldValid('expenseDate', fecha)) {
+                      <div class="valid-feedback">
+                      </div>
+                    }
+                    @if(isFieldInvalid('expenseDate', fecha)) {
+                      <div class="invalid-feedback">
+                        La fecha es requerida
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
 
-                    required
-                  />
-                </div>
-                @if(formSubmitted && invoiceNumber.invalid) {
-                <span class="text-danger"
-                  >El numero de comprobante es requerido</span
-                >
-                }
-              </div>
-              <div class="col">
-                <div class="d-flex justify-content-start align-items-center mb-2">
-                  <div class="col-3">
-                    <label for="receipt" class="form-lable">Comprobante  </label>
-                  </div>
-                  <input
-                    type="file"
-                    name="receipt"
-                    id="receipt"
-                    #fileInput
-                    class="form-control"
-                    (change)="onFileSelected($event)"
-                    accept="image/*,.pdf"
-                  />
-                </div>
-              </div>
-            </div>
-    
+            <!-- Proveedor y Categoría -->
             <div class="mb-3 row">
               <div class="col">
                 <div class="d-flex justify-content-start align-items-center mb-2">
                   <div class="col-3">
-                    <label for="amount" class="form-lable">Monto * </label>
+                    <label for="selectprovider" class="form-label">Proveedor</label>
                   </div>
-                  <input
-                    currencyMask [options]="{ prefix: '$ ', thousands: '.', decimal: ',' , allowNegative : false}"
-                    name="amount"
-                    [(ngModel)]="expense.amount"
-                    id="amount"
-                    class="form-control"
-                    (keypress)="allowOnlyPositiveNumbers($event)"
-                    [min]="1"
-                    #amount="ngModel"
-                    required
-                  />
+                  <div class="position-relative flex-grow-1">
+                    <app-expense-providers-ng-select 
+                      [(selectedProvider)]="expense.providerId" 
+                      [emptyValue]="true" 
+                      [multiple]="false">
+                    </app-expense-providers-ng-select>
+                  </div>
                 </div>
-                @if(formSubmitted && amount.invalid) {
-                <span class="text-danger">El monto es requerido</span>
-                }
               </div>
               <div class="col">
                 <div class="d-flex justify-content-start align-items-center mb-2">
                   <div class="col-3">
-                    <label for="installments" class="form-lable">Cuotas * </label>
+                    <label for="categoryId" class="form-label">Categoría </label>
                   </div>
-                  <select
-                    name="installments"
-                    [(ngModel)]="expense.installments"
-                    id="installments"
-                    style="text-align: end"
-                    class="form-select"
-                    #intallments="ngModel"
-                    required
-                  >
-                    <option value="1">1</option>
-                    <option value="3">3</option>
-                    <option value="6">6</option>
-                    <option value="9">9</option>
-                    <option value="12">12</option>
-                  </select>
+                  <div class="position-relative flex-grow-1">
+                    <app-expense-categories-ng-select 
+                      [(selectedCategory)]="expense.categoryId" 
+                      [multiple]="false">
+                    </app-expense-categories-ng-select>
+                    @if(formSubmitted && !isCategoryValid()) {
+                      <div class="invalid-feedback d-block">
+                        La categoría es requerida
+                      </div>
+                    }
+                  </div>
                 </div>
-                @if(formSubmitted && intallments.invalid) {
-                <span class="text-danger">Las cuotas son requeridas</span>
-                }
               </div>
             </div>
+
+            <!-- Número de Comprobante y Archivo -->
+            <div class="mb-3 row">
+              <div class="col">
+                <div class="d-flex justify-content-start align-items-center mb-2">
+                  <div class="col-3">
+                    <label for="invoiceNumber" class="form-label">N° Comprobante </label>
+                  </div>
+                  <div class="position-relative flex-grow-1">
+                    <input
+                      type="string"
+                      name="invoiceNumber"
+                      [(ngModel)]="expense.invoiceNumber"
+                      id="invoiceNumber"
+                      class="form-control"
+                      [ngClass]="getFieldClass('invoiceNumber', invoiceNumber)"
+                      [maxlength]="50"
+                      #invoiceNumber="ngModel"
+                      required
+                      (blur)="onFieldBlur('invoiceNumber', invoiceNumber)"
+                    />
+                    @if(isFieldValid('invoiceNumber', invoiceNumber)) {
+                      <div class="valid-feedback">
+                      </div>
+                    }
+                    @if(isFieldInvalid('invoiceNumber', invoiceNumber)) {
+                      <div class="invalid-feedback">
+                        El número de comprobante es requerido
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                <div class="d-flex justify-content-start align-items-center mb-2">
+                  <div class="col-3">
+                    <label for="receipt" class="form-label">Comprobante</label>
+                  </div>
+                  <div class="position-relative flex-grow-1">
+                    <input
+                      type="file"
+                      name="receipt"
+                      id="receipt"
+                      #fileInput
+                      class="form-control"
+                      (change)="onFileSelected($event)"
+                      accept="image/*,.pdf"
+                    />
+                  </div>
+                </div>
+              
+                <ng-container *ngIf="selectedFile">
+                  <div class="d-flex justify-content-between align-items-center mb-0 w-100" style="padding-left: calc(25%);">
+                    <div class="d-flex align-items-center flex-grow-1">
+                      <i class="bi-file-earmark-text me-3 text-primary fs-5"></i>
+                      <span>{{ selectedFile.name.length > 40 ? selectedFile.name.slice(0, 40) + '...' : selectedFile.name }}</span>
+                    </div>
+                    <span>{{ (selectedFile.size / (1024 * 1024)).toFixed(2) }} MB</span>
+                  </div>
+                </ng-container>
+              </div>
+              
+            </div>
+
+            <!-- Monto y Cuotas -->
+            <div class="mb-3 row">
+              <div class="col">
+                <div class="d-flex justify-content-start align-items-center mb-2">
+                  <div class="col-3">
+                    <label for="amount" class="form-label">Monto </label>
+                  </div>
+                  <div class="position-relative flex-grow-1">
+                    <input
+                      currencyMask 
+                      [options]="{ prefix: '$ ', thousands: '.', decimal: ',' , allowNegative : false}"
+                      name="amount"
+                      [(ngModel)]="expense.amount"
+                      id="amount"
+                      class="form-control"
+                      [ngClass]="getFieldClass('amount', amount)"
+                      (keypress)="allowOnlyPositiveNumbers($event)"
+                      [min]="1"
+                      #amount="ngModel"
+                      required
+                      (blur)="onFieldBlur('amount', amount)"
+                    />
+                    @if(isFieldValid('amount', amount)) {
+                      <div class="valid-feedback">
+                      </div>
+                    }
+                    @if(isFieldInvalid('amount', amount)) {
+                      <div class="invalid-feedback">
+                        El monto es requerido
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                <div class="d-flex justify-content-start align-items-center mb-2">
+                  <div class="col-3">
+                    <label for="installments" class="form-label">Cuotas </label>
+                  </div>
+                  <div class="position-relative flex-grow-1">
+                    <select
+                      name="installments"
+                      [(ngModel)]="expense.installments"
+                      id="installments"
+                      style="text-align: end"
+                      class="form-select"
+                      [ngClass]="getFieldClass('installments', intallments)"
+                      #intallments="ngModel"
+                      required
+                      (blur)="onFieldBlur('installments', intallments)"
+                    >
+                      <option value="1">1</option>
+                      <option value="3">3</option>
+                      <option value="6">6</option>
+                      <option value="9">9</option>
+                      <option value="12">12</option>
+                    </select>
+                    @if(isFieldValid('installments', intallments)) {
+                      <div class="valid-feedback">
+                      </div>
+                    }
+                    @if(isFieldInvalid('installments', intallments)) {
+                      <div class="invalid-feedback">
+                        Las cuotas son requeridas
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Descripción -->
             <div class="mb-3 row">
               <div class="col">
                 <div class="d-flex justify-content-start align-items-center mb-2">
                   <div class="col-1 me-5">
-                    <label for="description" class="form-lable">Descripción *</label>
+                    <label for="description" class="form-label">Descripción </label>
                   </div>
-                  <textarea
-                    name="description"
-                    id="description"
-                    [(ngModel)]="expense.description"
-                    class="form-control"
-                    placeholder="Escribe una descripción..."
-                    rows="2"
-                    #description="ngModel"
-                    required
-                  >
-                  </textarea>
+                  <div class="position-relative flex-grow-1">
+                    <textarea
+                      name="description"
+                      id="description"
+                      [(ngModel)]="expense.description"
+                      class="form-control"
+                   
+                      placeholder="Escribe una descripción..."
+                      rows="2"
+                      #description="ngModel"
+                      required
+                    ></textarea>
+                  </div>
                 </div>
-                @if(formSubmitted && description.invalid) {
-                <span class="text-danger">La descripción es requerida</span>
-                }
               </div>
             </div>
             @if(expense.typeExpense == 'INDIVIDUAL') {
-            <div class="mb-3 row">
-              <div class="col-9">
-                <label for="owner" class="form-label">Propietarios</label>
-                <select
-                  name="owner"
-                  id="owner"
-                  [(ngModel)]="selectedOwnerId"
-                  class="form-select"
-                  #owner="ngModel"
-                  required
-                >
-                  <option *ngFor="let owner of listOwner" [value]="owner.id">
-                    {{ owner.name }} {{ owner.lastname }}
-                  </option>
-                </select>
-                @if (formSubmitted && distributions.length == 0) {
+              <div class="mb-3 row">
+                <div class="col-9">
+                  <label for="owner" class="form-label">Propietarios</label>
+                  <!-- <select
+                    name="owner"
+                    id="owner"
+                    [(ngModel)]="selectedOwnerId"
+                    class="form-select"
+                    #owner="ngModel"
+                    required
+                  >
+                    <option *ngFor="let owner of listOwner" [value]="owner.id">
+                      {{ owner.name }} {{ owner.lastname }}
+                    </option>
+                  </select> -->
+                  <app-expenses-owners-ng-select [(selectedOwner)]="selectedOwnerId" [multiple]="false"></app-expenses-owners-ng-select>
+                  @if (formSubmitted && distributions.length == 0) {
+                  <span class="text-danger"
+                    >Se debe agregar al menos un propietario</span
+                  >
+                  }
+                </div>
+                <div class="col-3">
+                  <button
+                    class="btn btn-primary"
+                    type="button"
+                    style="width: 100%; margin-top: 32px"
+                    (click)="addDistribution()"
+                  >
+                    Añadir
+                  </button>
+                </div>
+                @if(alreadysent){
                 <span class="text-danger"
-                  >Se debe agregar al menos un propietario</span
+                  >Ese propietario ya se encuentra en la tabla</span
                 >
                 }
               </div>
-              <div class="col-3">
-                <button
-                  class="btn btn-primary"
-                  type="button"
-                  style="width: 100%; margin-top: 32px"
-                  (click)="addDistribution()"
-                >
-                  Añadir
-                </button>
+              <div class="mb-3 row">
+                <div class="col-12">
+                  <table datatable class="table table-bordered table-striped">
+                    <thead>
+                      <tr>
+                        <th class="col-6">Propietario</th>
+                        <th class="col-2">Proporción</th>
+                        <th class="col-2">Monto</th>
+                        <th class="col-2">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        *ngFor="
+                          let distribution of expense.distributions;
+                          let i = index
+                        "
+                        [hidden]="!getOwnerName(distribution.ownerId)"
+                      >
+                        <td>
+                          {{ getOwnerName(distribution.ownerId) }}
+                        </td>
+                        <td>
+                          <input
+                            type="number"
+                            [(ngModel)]="distribution.proportion"
+                            min="1"
+                            max="100"
+                            style="text-align: end"
+                            class="form-control"
+                            name="proportion{{ i }}"
+                            #distributionInput="ngModel"
+                            (ngModelChange)="onProportionChange($event, i)"
+                            (blur)="onBlur($event, i)"
+                          />
+                        </td>
+                        <td>
+                          <p style="text-align-last: end">
+                            {{
+                              (expense.amount * distribution.proportion) / 100
+                                | currency
+                            }}
+                          </p>
+                        </td>
+                        <td>
+                          <button
+                            class="btn btn-danger w-100"
+                            type="button"
+                            (click)="deleteDistribution(i)"
+                          >
+                            Eliminar
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  @if(!validateTotalProportion() && distributions.length > 0) {
+                  <span class="text-danger"
+                    >La suma de las proporciones debe ser igual a 100</span
+                  >
+                  }
+                </div>
               </div>
-              @if(alreadysent){
-              <span class="text-danger"
-                >Ese propietario ya se encuentra en la tabla</span
-              >
               }
-            </div>
-            <div class="mb-3 row">
-              <div class="col-12">
-                <table datatable class="table table-bordered table-striped">
-                  <thead>
-                    <tr>
-                      <th class="col-6">Propietario</th>
-                      <th class="col-2">Proporción</th>
-                      <th class="col-2">Monto</th>
-                      <th class="col-2">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr
-                      *ngFor="
-                        let distribution of expense.distributions;
-                        let i = index
-                      "
-                      [hidden]="!getOwnerName(distribution.ownerId)"
-                    >
-                      <td>
-                        {{ getOwnerName(distribution.ownerId) }}
-                      </td>
-                      <td>
-                        <input
-                          type="number"
-                          [(ngModel)]="distribution.proportion"
-                          min="1"
-                          max="100"
-                          style="text-align: end"
-                          class="form-control"
-                          name="proportion{{ i }}"
-                          #distributionInput="ngModel"
-                          (ngModelChange)="onProportionChange($event, i)"
-                          (blur)="onBlur($event, i)"
-                        />
-                      </td>
-                      <td>
-                        <p style="text-align-last: end">
-                          {{
-                            (expense.amount * distribution.proportion) / 100
-                              | currency
-                          }}
-                        </p>
-                      </td>
-                      <td>
-                        <button
-                          class="btn btn-danger w-100"
-                          type="button"
-                          (click)="deleteDistribution(i)"
-                        >
-                          Eliminar
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-                @if(!validateTotalProportion() && distributions.length > 0) {
-                <span class="text-danger"
-                  >La suma de las proporciones debe ser igual a 100</span
-                >
-                }
-              </div>
-            </div>
-            }
+
+            <!-- Rest of your form remains the same -->
+            
+            <!-- Buttons section -->
             <div class="mb-3 mt-5 row text-center">
               <div class="col d-flex justify-content-end gap-1">
                 <button
                   class="btn btn-secondary px-5 d-flex align-items-center justify-content-center"
                   type="button"
-                  style="width: 120px; height: 38px;"
-                  (click)="clearForm()"
+                  (click)="confirmCancel()"
                 >
                   Cancelar
                 </button>
                 @if(isEditMode){
                   <button
-                    class="btn btn-success px-5 d-flex align-items-center justify-content-center"
+                    class="btn btn-primary px-5 d-flex align-items-center justify-content-center"
                     type="submit"
-                    style="width: 120px; height: 38px;"
                     [disabled]="!form.valid || (expense.typeExpense == 'INDIVIDUAL' && !validateTotalProportion())">
                     @if(isLoading){
                       <div class="spinner-border spinner-border-sm" role="status">
@@ -345,7 +383,7 @@
                       </div>
                     }
                     @else{
-                      Actualizar
+                      Guardar
                     } 
                   </button>
                 }
@@ -353,7 +391,6 @@
                   <button
                     class="btn btn-success px-5 d-flex align-items-center justify-content-center"
                     type="submit"
-                    style="width: 120px; height: 38px;"
                     [disabled]="!form.valid || (expense.typeExpense == 'INDIVIDUAL' && !validateTotalProportion()) || isLoading">
                     @if(isLoading){
                       <div class="spinner-border spinner-border-sm" role="status">
@@ -396,3 +433,27 @@
 
 <!-- Backdrop para el modal -->
 <div class="modal-backdrop fade show" *ngIf="showModal"></div>
+
+<!-- Modal de info -->
+<div class="modal fade" id="infoModal" role="dialog" [ngClass]="{'show': showModal}" [style.display]="showModal ? 'block' : 'none'" tabindex="-1" style="z-index: 1055;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Registrar gasto</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          En esta página podrá registrar un nuevo gasto, contando con la posibilidad de asignarle
+          al gasto un tipo, una fecha, adjuntar comprobantes, entre otros.
+        </p>
+        <p>
+          En caso de que el tipo de expensa seleccionado sea de tipo <strong>individual</strong>,
+          entonces aparecerá un campo para añadir individualmente a los propietarios.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
