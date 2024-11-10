@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ExpenseReportService } from '../../../services/expenses-services/expenseReportServices/expense-report.service';
 import { ExpenseData } from '../../../models/expenses-models/ExpenseData';
@@ -19,7 +19,7 @@ import { ExpenseType } from '../../../models/expenses-models/expenseType';
 @Component({
   standalone: true,
   selector: 'app-report-expense',
-  imports: [CommonModule, FormsModule, ExpensesKpiComponent, ExpenseCategoriesNgSelectComponent, GoogleChartsModule, ExpensesFiltersComponent],
+  imports: [CommonModule, FormsModule, ExpensesKpiComponent, ExpenseCategoriesNgSelectComponent, GoogleChartsModule, ExpensesFiltersComponent,NgIf],
   templateUrl: './expenses-report.component.html',
   styleUrls: ['./expenses-report.component.scss']
 })
@@ -40,6 +40,7 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
   expenseKpiFiltered : kpiExpense[] = [];
   lastBillRecordFiltered : kpiExpense[] = [];
   comparateYearMonthFiltered: ExpenseData[] = [];
+  cardView:Number = 0;
   
   
   amountCommon : number =0
@@ -52,6 +53,9 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
   lastBillIndividual : number = 0;
   lastBillNoteCredit: number = 0;
 
+  amountLastYear: number=0;
+  amountThisYear: number=0;
+
   constructor(private expenseReportService: ExpenseReportService,private cdRef: ChangeDetectorRef) {}
 
   chartExpensesPeriod = {
@@ -60,8 +64,7 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
     options: {
       title: 'Distribución de Gastos por Categoría',
       pieHole: 0.4,
-      chartArea: { width: '90%', height: '90%' },
-      //colors: ['#4CAF50', '#FF9800', '#03A9F4', '#f44336', '#9C27B0'],
+      chartArea: { width: '100%', height: '90%' },
     }
   };
   chartLastBill={
@@ -70,8 +73,7 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
     options: {
       title: 'Distribución de Gastos por Categoría',
       pieHole: 0.4,
-      chartArea: { width: '90%', height: '90%' },
-      //colors: ['#4CAF50', '#FF9800', '#03A9F4', '#f44336', '#9C27B0'],
+      chartArea: { width: '100%', height: '90%' },
     }
   }
   chartCompareYearMonth = {
@@ -89,7 +91,7 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
       },
       vAxis: { title: 'Monto ($)' },
       chartArea: { width: '80%', height: '50%' },
-      legend: { position: 'right' },
+      legend: { position: 'bottom' },
       colors: ['#4285F4', '#EA4335', '#34A853', '#FBBC05'],
       //tooltip: { isHtml: true }
     }
@@ -194,7 +196,6 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
       next: (lastBillRecord: LastBillRecord)=>{
         this.lastBillRecord = lastBillRecord
         this.updateLastBillRecord();
-        console.log(lastBillRecord)
       },
       error(error){
         console.log(error);
@@ -232,6 +233,8 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
     this.comparateYearMonthFiltered = this.filerTypecomparateYearMonth(this.comparateYearMonth.slice());
     this.comparateYearMonthFiltered = this.filerCategorycomparateYearMonth(this.comparateYearMonthFiltered);
     this.comparateYearMonthFiltered = this.filerProvidercomparateYearMonth(this.comparateYearMonthFiltered);
+    this.amountLastYear = this.sumAmountByYear(new Date().getFullYear()-1,this.comparateYearMonthFiltered)
+    this.amountThisYear = this.sumAmountByYear(new Date().getFullYear(),this.comparateYearMonthFiltered)
     const data = this.sumAmountByYearMonth(this.comparateYearMonthFiltered);
     this.chartCompareYearMonth.data = data;
     this.cdRef.detectChanges();
@@ -330,9 +333,27 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
 
     return monthlyData;
 }
+  sumAmountByYear(year: number, list : any[]):number{
+    const amount = list.filter(m=>m.year==year).reduce((sum,current)=>sum+current.amount,0);
+    return amount;
+  }
 
 
+ get titleLAstYear(){
+  return "Total "+(new Date().getFullYear()-1).toString();
+ }
+ get titleThisYear(){
+  return "Total "+(new Date().getFullYear()).toString();
+ }
+ get percentageVariation(){
+  if(this.amountLastYear==0)
+    return 0;
 
+  return (this.amountThisYear - this.amountLastYear) / this.amountLastYear
+ }
+ get titleCard(){
+  return `Comparación Mensual de Gastos entre ${new Date().getFullYear()-1} y ${new Date().getFullYear()}`
+ }
 
   
   filteredCharts(){
@@ -357,5 +378,8 @@ export class ReportExpenseComponent implements OnInit,OnDestroy {
     // this.filteredCharts();
     this.loadDates();
     this.filterDataOnChange();
+  }
+  changeView(view:number){
+    this.cardView=view;
   }
 }

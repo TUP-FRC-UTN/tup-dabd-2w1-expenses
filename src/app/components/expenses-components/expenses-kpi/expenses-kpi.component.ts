@@ -15,5 +15,7 @@ export class ExpensesKpiComponent {
 
   @Input() amount : number =0
   @Input() title : string =''
-  
+  @Input() customStyles: { [key: string]: string } = {};
+  @Input() icon: string='';
+  @Input() formatPipe: string='';
 }
