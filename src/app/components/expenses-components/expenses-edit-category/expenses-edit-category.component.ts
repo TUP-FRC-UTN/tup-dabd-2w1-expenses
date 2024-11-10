@@ -41,5 +41,8 @@ export class ExpensesEditCategoryComponent {
   toggleState() {
     this.category.state = this.category.state === 'Activo' ? 'Inactivo' : 'Activo';
   }
+  limpiarCampos() {
+    
+    }
 
 }

@@ -26,7 +26,6 @@ declare let bootstrap: any;
   styleUrl: './expenses-view-category.component.scss',
 })
 export class ExpensesViewCategoryComponent implements OnInit {
-
   searchTerm: any;
   table: any;
 
@@ -38,12 +37,16 @@ export class ExpensesViewCategoryComponent implements OnInit {
   category: Category[] = [];
   filterCategory: Category[] = [];
   expenseCategory: Category = new Category();
+  
 
   filters = {
     categoryOrProviderOrExpenseType: '',
     expenseTypes: '',
   };
-
+  handleEditCancel() {
+    throw new Error('Method not implemented.');
+    }
+    
   ngOnInit(): void {
     
 
@@ -298,8 +301,12 @@ export class ExpensesViewCategoryComponent implements OnInit {
 
 
   editCategory(rowData: any) {
-    this.categorySelected={ id:1,description:'',lastUpdatedDatetime: '',state:''}
-      this.categorySelected=rowData
+      this.categorySelected =rowData
+      this.categoryService.getCategoryById(this.categorySelected.id).subscribe({
+        next:(value : Category) =>{
+          this.categorySelected= value
+        },
+      })
       this.cdRef.detectChanges();
       
       const modalElement = document.getElementById('categoryEditModal');
