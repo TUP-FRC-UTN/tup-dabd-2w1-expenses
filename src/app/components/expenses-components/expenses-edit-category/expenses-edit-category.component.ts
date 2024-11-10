@@ -21,7 +21,7 @@ export class ExpensesEditCategoryComponent {
 
   @Input() category: Category = new Category();
   @Output() eventSuccess = new EventEmitter<void>();
-  @Output() eventError = new EventEmitter<void>();
+  @Output() eventError = new EventEmitter<string>();
 
   edit() {
     if (this.category) {
@@ -32,8 +32,31 @@ export class ExpensesEditCategoryComponent {
         next: () => {
           this.eventSuccess.emit();
         },
-        error: () => {
-          this.eventError.emit();
+        error: (error) => {
+          if (error.error) {
+            switch (error.error.status) {
+                case 409:
+                    if (error.error.message === "A category with this description already exists") {
+                        this.eventError.emit(`La categoría con la descripción '${this.category.description}' ya existe.`);
+                    }
+                    break;
+                case 404:
+                    if (error.error.message === "The category does not exist") {
+                        this.eventError.emit(`La categoría que está modificando no existe.`);
+                    }
+                    break;
+                case 400:
+                    if (error.error.message === "The description is required") {
+                        this.eventError.emit(`La descripción es requerida`);
+                    }
+                    break;
+                default:
+                    this.eventError.emit(`Se produjo un error al intentar modificar la categoría.`);
+                    break;
+            }
+          } else {
+              this.eventError.emit('Se produjo un error al intentar modificar la categoría');
+          }
         }
       });
     }

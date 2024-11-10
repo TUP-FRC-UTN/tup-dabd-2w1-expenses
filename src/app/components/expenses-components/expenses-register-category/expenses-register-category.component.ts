@@ -22,7 +22,7 @@ export class ExpenseRegisterCategoryComponent {
      state: ''
    }
   @Output() eventSucces = new EventEmitter<void>();
-  @Output() eventError = new EventEmitter<void>();
+  @Output() eventError = new EventEmitter<string>();
 
   clearInputs() {
    this.category.description=""
@@ -34,8 +34,28 @@ export class ExpenseRegisterCategoryComponent {
         this.eventSucces.emit()
         this.clearInputs()
       },
-      error: () => {
-        this.eventError.emit()
+      error: (error) => {
+        if (error.error) {
+          switch (error.error.status) {
+              case 400:
+                  if (error.error.message === "The description is required") {
+                      this.eventError.emit(`La descripción es requerida`);
+                  }
+                  break;
+              case 409:
+                  if (error.error.message === "A category with this description already exists") {
+                      this.eventError.emit(`La categoría "${this.category.description}" ya existe`);
+                  }
+                  break;
+              default:
+                  this.eventError.emit('La categoría no pudo registrarse');
+                  break;
+          }
+      } else {
+          this.eventError.emit('La categoría no pudo registrarse');
+      }
+        
+        this.clearInputs()
       }
     })
     }

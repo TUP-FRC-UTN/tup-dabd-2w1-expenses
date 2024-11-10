@@ -334,8 +334,8 @@ export class ExpensesViewCategoryComponent implements OnInit {
     this.showSuccessAlert('Categoría actualizada con éxito');
     this.filterData(); 
   }
-  handleEditError() {
-    this.showErrorAlert('Error al actualizar la categoría');
+  handleEditError(message :string) {
+    this.showErrorAlert(message);
   }
 
 }
