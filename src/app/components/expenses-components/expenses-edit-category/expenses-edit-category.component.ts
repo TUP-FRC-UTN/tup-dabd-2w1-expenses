@@ -23,8 +23,11 @@ export class ExpensesEditCategoryComponent {
   @Output() eventSuccess = new EventEmitter<void>();
   @Output() eventError = new EventEmitter<string>();
 
+  validateDescription(): boolean {
+    return !!(this.category && this.category.description && this.category.description.trim());
+  }
   edit() {
-    if (this.category) {
+    if (this.category && this.category.description && this.category.description.trim()) {
       
       this.category.state = this.category.state === 'Activo' ? 'true' : 'false';
 
@@ -64,8 +67,6 @@ export class ExpensesEditCategoryComponent {
   toggleState() {
     this.category.state = this.category.state === 'Activo' ? 'Inactivo' : 'Activo';
   }
-  limpiarCampos() {
-    
-    }
+  
 
 }

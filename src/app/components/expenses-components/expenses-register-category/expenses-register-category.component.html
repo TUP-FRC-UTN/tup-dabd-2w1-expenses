@@ -9,13 +9,22 @@
           <div class="row">
             <div class="col">
               <p>Descripción:</p><input class="form-control"
+              class="form-control form-control-sm"
+              *ngIf="category"
+              [(ngModel)]="category.description"
+              name="description"
+              #description="ngModel"
+              type="text"
               required
-              [(ngModel)]="category.description" 
-              type="text">
+              [ngClass]="{
+                'is-valid': description.valid && (description.dirty || description.touched),
+                'is-invalid': description.invalid && (description.dirty || description.touched)
+              }">
+              
             </div>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-success" data-bs-dismiss="modal" (click)="save()">Guardar</button>
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal" (click)="save()"[disabled]="validateDescription()">Guardar</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="clearInputs()">Cancelar</button>
         </div>
       </div>

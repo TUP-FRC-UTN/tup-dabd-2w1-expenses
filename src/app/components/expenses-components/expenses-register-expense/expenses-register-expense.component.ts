@@ -85,7 +85,6 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   private readonly propietarioService = inject(OwnerService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-
   constructor(){
     this.expense= {
         description: '',
@@ -115,6 +114,10 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
         this.initializeDefaultExpense();
       }
     });
+  }
+  removeFile(): void {
+    this.selectedFile = null;
+    this.fileInput.nativeElement.value = '';
   }
   
   onFieldBlur(fieldName: string, control: any) {

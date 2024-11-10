@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class ExpenseRegisterCategoryComponent {
 
+
   private readonly categoryService = inject(CategoryService);
 
    category : Category = {
@@ -26,6 +27,9 @@ export class ExpenseRegisterCategoryComponent {
 
   clearInputs() {
    this.category.description=""
+    }
+    validateDescription() : boolean {
+      return !(this.category && this.category.description && this.category.description.trim());
     }
   save() {
     if(this.category!=null)
