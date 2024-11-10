@@ -417,13 +417,13 @@
     <div class="modal-content">
       <div class="modal-header" [ngClass]="{'bg-success text-white': modalType === 'success', 'bg-danger text-white': modalType === 'error'}">
         <h5 class="modal-title">{{ modalTitle }}</h5>
-        <button type="button" class="btn-close" [ngClass]="{'btn-close-white': true}" (click)="closeModal()"></button>
+        <button type="button" class="btn-close" [ngClass]="{'btn-close-white': true}" (click)="closeModal1()"></button>
       </div>
       <div class="modal-body">
         <p>{{ modalMessage }}</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn" [ngClass]="{'btn-success': modalType === 'success', 'btn-danger': modalType === 'error'}" (click)="closeModal()">
+        <button type="button" class="btn" [ngClass]="{'btn-success': modalType === 'success', 'btn-danger': modalType === 'error'}" (click)="closeModal1()">
           Cerrar
         </button>
       </div>
@@ -456,4 +456,42 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- Modal Confirm Delete -->
+<div 
+#modalConfirmDelete 
+class="modal" 
+id="modalConfirmationDeleteExpense" 
+tabindex="-1" 
+role="dialog"
+>
+<div class="modal-dialog" role="document">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Confirmación</h5>
+    </div>
+    
+    <div class="modal-body">
+      <p class="mb-4">¿Está seguro de cancelar el registro?</p>
+    </div>
+
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="closeModal(modalConfirmDelete)"
+      >
+      Volver
+      </button>
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="redirectToViewAdmin()"
+      >
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
 </div>
