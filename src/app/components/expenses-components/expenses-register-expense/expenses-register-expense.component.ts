@@ -54,9 +54,10 @@ import { ExpensesOwnersNgSelectComponent } from "../expenses-owners-ng-select/ex
   styleUrls: ['./expenses-register-expense.component.css'],
 })
 export class ExpensesRegisterExpenseComponent implements OnInit {
+
   @ViewChild('form') form!: NgForm;
   @ViewChild('fileInput') fileInput!: ElementRef;
-
+  @ViewChild('modalConfirmDelete') modalConfirmDelete!: ElementRef;
   // Modal states
   showModal = false;
   modalMessage = '';
@@ -136,7 +137,9 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       'is-invalid': this.isFieldInvalid(fieldName, control)
     };
   }
-
+  redirectToViewAdmin() {
+    this.router.navigate(["/viewExpenseAdmin"])
+    }
   private loadExpense(id: number): void {
     this.expenseService.getById(id).subscribe({
       next: (expenseData: ExpenseGetById) => {
@@ -233,7 +236,9 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       return this.formatDateToString(today);
     }
   }
-
+  confirmCancel() {
+   this.openModal(this.modalConfirmDelete)
+    }
   private formatDateToString(date: Date): string {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -509,7 +514,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     this.showModal = true;
   }
 
-  closeModal(): void {
+  closeModal1(): void {
     this.showModal = false;
     // Si fue un registro exitoso, limpiamos el formulario
     if (this.modalType === 'success') {
@@ -637,31 +642,20 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       }
     });
   }
-
-  confirmCancel() { //TODO HACER ESTO CON MODAL 
-    Swal.fire({
-      title: '¿Seguro de que desea cancelar?',
-      text: 'Los cambios no guardados se perderán.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Sí',
-      cancelButtonText: 'No',
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      background: '#ffffff',
-      customClass: {
-        title: 'text-xl font-medium text-gray-900',
-        htmlContainer: 'text-sm text-gray-600',
-        confirmButton: 'px-4 py-2 text-white rounded-lg',
-        cancelButton: 'px-4 py-2 text-white rounded-lg bg-blue-600',
-        popup: 'swal2-popup'
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Redirigir a otra ruta si se confirma
-        this.router.navigate(['/viewExpenseAdmin']);
-      }
-    });
+  openModal(modal: ElementRef | HTMLDivElement) {
+    console.log(modal)
+    const element = modal instanceof ElementRef ? modal.nativeElement : modal;
+    element.style.display = 'block';
+    element.classList.add('show');
+    document.body.classList.add('modal-open');
+    this.cdRef.detectChanges();
+  }
+  closeModal(modal: ElementRef | HTMLDivElement) {
+    const element = modal instanceof ElementRef ? modal.nativeElement : modal;
+    element.style.display = 'none';
+    element.classList.remove('show');
+    document.body.classList.remove('modal-open');
+    this.cdRef.detectChanges();
   }
 
 }
