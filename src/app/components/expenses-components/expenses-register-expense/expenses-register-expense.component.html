@@ -479,15 +479,15 @@ role="dialog"
     <div class="modal-footer">
       <button
         type="button"
-        class="btn btn-primary"
-        (click)="closeModal(modalConfirmDelete)"
+        class="btn btn-danger"
+        (click)="redirectToViewAdmin()"
       >
-      Volver
+      Confirmar
       </button>
       <button
         type="button"
         class="btn btn-secondary"
-        (click)="redirectToViewAdmin()"
+        (click)="closeModal(modalConfirmDelete)"
       >
         Cancelar
       </button>
