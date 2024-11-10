@@ -12,6 +12,7 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './expenses-register-category.component.scss'
 })
 export class ExpenseRegisterCategoryComponent {
+
   private readonly categoryService = inject(CategoryService);
 
    category : Category = {
@@ -23,12 +24,15 @@ export class ExpenseRegisterCategoryComponent {
   @Output() eventSucces = new EventEmitter<void>();
   @Output() eventError = new EventEmitter<void>();
 
-
+  clearInputs() {
+   this.category.description=""
+    }
   save() {
     if(this.category!=null)
     this.categoryService.add(this.category).subscribe({
       next: () => {
         this.eventSucces.emit()
+        this.clearInputs()
       },
       error: () => {
         this.eventError.emit()

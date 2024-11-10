@@ -46,7 +46,8 @@
 <app-expenses-edit-category
   [category]="categorySelected"
   (eventSuccess)="handleEditSuccess()"
-  (eventError)="handleEditError()">
+  (eventError)="handleEditError()"
+  >
 </app-expenses-edit-category>
 <app-expense-register-category 
 (eventSucces)="loadAlertAndFilter('Se registro la categoria con exito')"

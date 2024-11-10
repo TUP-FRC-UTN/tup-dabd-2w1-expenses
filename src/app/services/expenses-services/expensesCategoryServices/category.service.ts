@@ -27,7 +27,7 @@ export class CategoryService {
       `${this.url}/putById?id=${category.id}&description=${category.description}&enabled=${category.state}`,null);
   }
   getCategoryById(id: number): Observable<Category> {
-    return this.http.get<Category>(`${this.url}/${id}`);
+    return this.http.get<Category>(`${'http://localhost:8080/categories/getById'}/${id}`);
   }
 
 }
