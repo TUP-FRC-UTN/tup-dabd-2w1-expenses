@@ -366,3 +366,184 @@
 <app-expenses-filters [(selectedCategories)]="selectedCategories" [(selectedProviders)]="selectedProviders"
   [(selectedTypes)]="selectedType" (selectedCategoriesChange)="filteredCharts()"
   (selectedProvidersChange)="filteredCharts()" (selectedTypesChange)="filteredCharts()"></app-expenses-filters>
+
+
+<!-- Modal de info -->
+  @if(cardView == 0){
+    <div class="modal fade" id="infoModal" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Reportes</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p>
+              En esta pantalla podrá visualizar diferentes tipos de reportes. Cada uno puede expandirse para ver más información.
+            </p>
+            <p>
+              Los gráficos pueden filtrarse por fecha (desde y hasta) y aplicar filtros avanzados de forma dinámica.
+            </p>
+            <ul>
+              <li>
+                <p>
+                  <strong>Gastos del Período</strong>: Muestra los gastos de acuerdo con el período establecido en el filtro. Incluye un KPI que indica el total, que es la suma de los gastos Comunes, Extraordinarios, Individuales y Notas de Crédito.
+                </p>
+                <p>
+                  El gráfico de dona muestra la proporción de gastos por categoría; aquellas categorías que no superen el 1% serán agrupadas.
+                </p>
+              </li>
+              <li>
+                <p>
+                  <strong>Último Período Facturado</strong>: Muestra el último período que se pasó a cobrar. No representa lo recaudado, sino lo que se debe cobrar a los propietarios. Incluye un KPI que indica el total, que es la suma de los gastos Comunes, Extraordinarios, Individuales, Notas de Crédito y Multas.
+                </p>
+                <p>
+                  El gráfico de dona muestra la proporción de gastos por categoría, aquellas categorías que no superen el 1% serán agrupadas.
+                </p>
+              </li>
+              <li>
+                <p>
+                  <strong>Comparación Mensual de Gastos</strong>: Muestra una comparativa entre el año anterior y el año actual. Incluye dos KPI que indican el total de cada año y un tercero que muestra el % de aumento o disminución del gasto del año actual respecto al año anterior.
+                </p>
+                <p>
+                  El gráfico de columnas muestra el total de cada año por mes. La escala de los montos se ajusta de forma automática.
+                </p>
+              </li>
+              <li>
+                <strong>Botones</strong>:
+                <ul>
+                  <li><button class="btn btn-primary bi bi-funnel-fill mb-2"></button> Permite aplicar filtros avanzados.</li>
+                  <li><button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros avanzados aplicados.</li>
+                  <li><button class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5"></button> Expande el reporte para ver más.</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+  @if(cardView == 1){
+    <div class="modal fade" id="infoModal" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Reporte</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <ul>
+              <li>
+                <p>
+                  <strong>Gastos del Período</strong>: Muestra los gastos de acuerdo con el período establecido en el filtro. 
+                  Incluye un KPI que indica el total, que es la suma de los gastos Comunes, Extraordinarios, Individuales y Notas de Crédito.
+                  Además, se agregan los KPI de los montos individuales de cada tipo de gasto.
+                </p>
+                <p>
+                  El gráfico de dona muestra la proporción de gastos por categoría, aquellas categorías que no superen el 1% serán agrupadas.
+                </p>
+                <p>
+                  El gráfico de barras muestra el total de gastos por proveedor, ordenados de mayor a menor. La escala de los montos se ajusta de forma automática.
+                </p>
+              </li>
+              <li>
+                <strong>Botones</strong>:
+                <ul>
+                  <li><button class="btn btn-primary bi bi-funnel-fill mb-2"></button> Permite aplicar filtros avanzados.</li>
+                  <li><button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros avanzados aplicados.</li>
+                  <li><button class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5"></button> Vuelve a la pantalla principal.</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+  @if(cardView == 2){
+    <div class="modal fade" id="infoModal" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Reporte</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <ul>
+              <li>
+                <p>
+                  <strong>Último Período Facturado</strong>: Muestra el último período que se pasó a cobrar. 
+                  No representa lo recaudado, sino lo que se debe cobrar a los propietarios. 
+                  Incluye un KPI que indica el total, que es la suma de los gastos Comunes, Extraordinarios, Individuales, Notas de Crédito y Multas.
+                  Además, se agregan los KPI de los montos individuales de cada tipo de gasto, las multas, y el monto total pendiente para próximos períodos.
+                </p>
+                <p>
+                  El gráfico de dona muestra la proporción de gastos por categoría, aquellas categorías que no superen el 1% serán agrupadas.
+                </p>
+                <p>
+                  El gráfico de barras muestra el total de gastos por proveedor, ordenados de mayor a menor. La escala de los montos se ajusta de forma automática.
+                </p>
+              </li>
+              <li>
+                <strong>Botones</strong>:
+                <ul>
+                  <li><button class="btn btn-primary bi bi-funnel-fill mb-2"></button> Permite aplicar filtros avanzados.</li>
+                  <li><button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros avanzados aplicados.</li>
+                  <li><button class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5"></button> Vuelve a la pantalla principal.</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+  @if(cardView == 3){
+    <div class="modal fade" id="infoModal" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Reporte</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <ul>
+              <li>
+                <p>
+                  <strong>Comparación Mensual de Gastos</strong>: Muestra una comparativa entre el año anterior y el año actual. 
+                  Incluye dos KPI que indican el total de cada año y un tercero que muestra el % de aumento o disminución del gasto del año actual respecto al año anterior.
+                </p>
+                <p>
+                  El gráfico de columnas muestra el total de cada año por mes. La escala de los montos se ajusta de forma automática.
+                </p>
+                <p>
+                  Hay dos gráficos de barras que muestran el total de gastos por proveedor de cada año, ordenados de mayor a menor. La escala de los montos se ajusta de forma automática.
+                </p>
+              </li>
+              <li>
+                <strong>Botones</strong>:
+                <ul>
+                  <li><button class="btn btn-primary bi bi-funnel-fill mb-2"></button> Permite aplicar filtros avanzados.</li>
+                  <li><button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros avanzados aplicados.</li>
+                  <li><button class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5"></button> Vuelve a la pantalla principal.</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+  
