@@ -255,11 +255,11 @@
                     <div class="col-5 m-1">
                       @if(lastBillRecord && lastBillRecord.id>0){
                       <app-expenses-kpi [amount]="lastBillRecord.fineAmount" title="Multas"
-                        [customStyles]="{ 'background-color': '#d8ffedde' }" [icon]="'bi bi-receipt-cutoff'"
+                        [customStyles]="{ 'background-color': '#d8ffedde' }" [icon]="'bi-exclamation-triangle'"
                         [formatPipe]="'currency'"></app-expenses-kpi>
                       }@else {
                       <app-expenses-kpi [amount]="0" title="Multas" [customStyles]="{ 'background-color': '#d8ffedde' }"
-                        [icon]="'bi bi-receipt-cutoff'" [formatPipe]="'currency'"></app-expenses-kpi>
+                        [icon]="'bi-exclamation-triangle'" [formatPipe]="'currency'"></app-expenses-kpi>
                       }
 
                     </div>
@@ -269,11 +269,11 @@
                     <div class="col-5 m-1">
                       @if(lastBillRecord && lastBillRecord.id>0){
                       <app-expenses-kpi [amount]="lastBillRecord.pendingAmount" title="Pendiente"
-                        [customStyles]="{ 'background-color': '#fcc7ccde' }" [icon]="'bi bi-receipt-cutoff'"
+                        [customStyles]="{ 'background-color': '#fcc7ccde' }" [icon]="'bi-calendar-x'"
                         [formatPipe]="'currency'"></app-expenses-kpi>
                       }@else {
                       <app-expenses-kpi [amount]="0" title="Pendiente"
-                        [customStyles]="{ 'background-color': '#fcc7ccde' }" [icon]="'bi bi-receipt-cutoff'"
+                        [customStyles]="{ 'background-color': '#fcc7ccde' }" [icon]="'bi-calendar-x'"
                         [formatPipe]="'currency'"></app-expenses-kpi>
                       }
                     </div>
