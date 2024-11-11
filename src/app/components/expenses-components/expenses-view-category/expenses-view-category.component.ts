@@ -167,7 +167,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
       const wb: XLSX.WorkBook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Categorías');
       
-      XLSX.writeFile(wb,`categorias-${moment(new Date()).format('DD/MM/YYYY')}.xlsx`);
+      XLSX.writeFile(wb,`${moment(new Date()).format('DD/MM/YYYY')}_listado_categorias.xlsx`);
       
     
     } catch (error) {
@@ -191,7 +191,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
         body: tableData,
       });
 
-      doc.save(`categorias-${moment(new Date()).format('DD/MM/YYYY')}.pdf`);
+      doc.save(`${moment(new Date()).format('DD/MM/YYYY')}_listado_categorias.pdf`);
       
       
     } catch (error) {

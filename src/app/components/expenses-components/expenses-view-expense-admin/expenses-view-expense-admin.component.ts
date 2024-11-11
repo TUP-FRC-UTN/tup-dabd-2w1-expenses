@@ -196,7 +196,10 @@ export class ViewGastosAdminComponent implements OnInit {
       }
     });
 
-    doc.save(`${moment().format('YYYY-MM-DD')}_listado_gastos.pdf`);
+    const dateFromFormatted = moment(this.dateFrom).format('YYYY-MM-DD');
+    const dateToFormatted = moment(this.dateTo).format('YYYY-MM-DD');
+    const fileName = `${dateFromFormatted}_${dateToFormatted}_listado_gastos.pdf`;
+    doc.save(fileName);
   }
 
   // Exportar a Excel
@@ -220,7 +223,11 @@ export class ViewGastosAdminComponent implements OnInit {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Listado de Gastos');
   
-    XLSX.writeFile(workbook, `${moment().format('YYYY-MM-DD')}_listado_gastos.xlsx`);
+    const dateFromFormatted = moment(this.dateFrom).format('YYYY-MM-DD');
+    const dateToFormatted = moment(this.dateTo).format('YYYY-MM-DD');
+    const fileName = `${dateFromFormatted}_${dateToFormatted}_listado_gastos.xlsx`;
+
+    XLSX.writeFile(workbook, fileName);
   }
 
   filterDataOnChange() {

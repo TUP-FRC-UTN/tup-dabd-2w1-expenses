@@ -211,8 +211,10 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
         doc.text(text, (pageSize.width / 2) - (textWidth / 2), pageHeight - 10);
       }
     });
-
-    doc.save(`${moment().format('YYYY-MM-DD')}_listado_gastos.pdf`);
+    const dateFromFormatted = moment(this.fechaDesde).format('YYYY-MM-DD');
+    const dateToFormatted = moment(this.fechaHasta).format('YYYY-MM-DD');
+    const fileName = `${dateFromFormatted}_${dateToFormatted}_listado_gastos.pdf`;
+    doc.save(fileName);
   }
 
   // Exportar a Excel
@@ -232,7 +234,11 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Listado de Gastos');
 
-    XLSX.writeFile(workbook, `${moment().format('YYYY-MM-DD')}_listado_gastos.xlsx`);
+    const dateFromFormatted = moment(this.fechaDesde).format('YYYY-MM-DD');
+    const dateToFormatted = moment(this.fechaHasta).format('YYYY-MM-DD');
+    const fileName = `${dateFromFormatted}_${dateToFormatted}_listado_gastos.xlsx`;
+
+    XLSX.writeFile(workbook, fileName);
   }
 
   // Actualizar la tabla DataTable con los nuevos datos
