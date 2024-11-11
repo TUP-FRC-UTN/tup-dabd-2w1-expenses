@@ -642,7 +642,7 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
 
     // Actualizar la etiqueta del eje horizontal (hAxis)
     chart.options.hAxis.title = scaleLabel;
-
+    chart.options.title=`Gastos por Proveedor año ${year}`
     return result;
   }
   sumAmountByYearMonth(list: ExpenseData[]): any {
