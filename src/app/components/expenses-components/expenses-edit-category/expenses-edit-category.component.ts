@@ -24,7 +24,7 @@ export class ExpensesEditCategoryComponent {
   @Output() eventError = new EventEmitter<string>();
 
   validateDescription(): boolean {
-    return !!(this.category && this.category.description && this.category.description.trim());
+    return !(this.category && this.category.description && this.category.description.trim());
   }
   edit() {
     if (this.category && this.category.description && this.category.description.trim()) {
