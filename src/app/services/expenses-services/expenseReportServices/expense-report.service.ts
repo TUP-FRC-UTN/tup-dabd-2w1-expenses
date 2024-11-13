@@ -14,8 +14,8 @@ export class ExpenseReportService {
 
   constructor(private http: HttpClient) {}
 
-  getExpenseData(): Observable<ExpenseData[]> {
-    const url = `${this.apiUrl}yearmonth`;
+  getExpenseData(yearFrom: number, yearTo: number): Observable<ExpenseData[]> {
+    const url = `${this.apiUrl}yearmonth?start_year=${yearFrom}&end_year=${yearTo}`;
     return this.http.get<ExpenseData[]>(url);
   }
 
