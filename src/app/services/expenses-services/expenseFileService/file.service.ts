@@ -1,32 +1,33 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable, throwError } from 'rxjs';
+import Swal from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FileService {
 
-  baseUrl: string = 'http://localhost:8085/fileManager'; // Cambia esto por tu URL base
+  baseUrl: string = 'http://localhost:8085/fileManager'; 
   constructor(private http: HttpClient) { }
-  // Método para obtener el archivo como Blob y los encabezados
+ 
   getFile(fileId: string): Observable<{ blob: Blob; filename: string }> {
     return this.http.get(`${this.baseUrl}/getFile/${fileId}`, {
-      responseType: 'blob', // Esperamos un Blob
-      observe: 'response' // Observamos toda la respuesta para acceder a los encabezados
+      responseType: 'blob', 
+      observe: 'response'
     }).pipe(
-      catchError(this.handleError),  // Manejo de errores
+      catchError(this.handleError), 
       map(response => {
         console.log(response);
         
-        const blob = response.body as Blob; // Obtenemos el Blob
-        const filename = response.headers.get('filename') || 'downloaded-file.pdf'; // Obtenemos el nombre del archivo desde los encabezados
+        const blob = response.body as Blob; 
+        const filename = response.headers.get('filename') || 'downloaded-file.pdf'; 
         
         return { blob, filename };
       })
     );
   }
-  // Método para descargar el archivo
+ 
   downloadFile(fileId: string): void {
     this.getFile(fileId).subscribe({
       next: ({ blob, filename }) => {
@@ -34,22 +35,32 @@ export class FileService {
         
         const link = document.createElement('a');
         link.href = objectURL;
-        link.download = filename; // Usamos el nombre de archivo obtenido desde el header
+        link.download = filename; 
         
-        // Simular el clic en el enlace para iniciar la descarga
         document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link); // Limpiamos el enlace
+        document.body.removeChild(link); 
         
-        // Liberar la memoria del objeto URL
         URL.revokeObjectURL(objectURL);
       },
       error: (error) => {
         console.error('Error al descargar el archivo:', error);
+        Swal.fire({
+          title: '¡Error!',
+          text: 'No se pudo descargar el comprobante. Inténtalo de nuevo.',
+          icon: 'error',
+          confirmButtonColor: '#f44336', 
+          background: '#ffffff',
+          customClass: {
+            title: 'text-xl font-medium text-gray-900',
+            htmlContainer: 'text-sm text-gray-600',
+            confirmButton: 'px-4 py-2 text-white rounded-lg',
+            popup: 'swal2-popup'
+          }
+        });
       }
     });
   }
-  // Manejo de errores
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'Unknown error occurred';
     

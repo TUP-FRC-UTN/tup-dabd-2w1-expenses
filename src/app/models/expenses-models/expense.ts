@@ -9,6 +9,7 @@ export interface Expense {
     typeExpense: string;
     categoryId: number;
     amount: number;
+    fileId: string;
     installments: number;
     distributions: Distributions[];
 }

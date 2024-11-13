@@ -31,6 +31,7 @@ import { ExpenseCategoriesNgSelectComponent } from "../expenses-categories-ngSel
 import { ExpenseProvidersNgSelectComponent } from "../expenses-providers-ngSelect/expense-providers-ng-select/expense-providers-ng-select.component";
 import { ExpensesTypeExpenseNgSelectComponent } from "../expenses-type-expense-ng-select/expenses-type-expense-ng-select.component";
 import { ExpensesOwnersNgSelectComponent } from "../expenses-owners-ng-select/expenses-owners-ng-select.component";
+import { FileService } from '../../../services/expenses-services/expenseFileService/file.service';
 
 @Component({
   selector: 'app-expenses-register-expense',
@@ -56,7 +57,7 @@ import { ExpensesOwnersNgSelectComponent } from "../expenses-owners-ng-select/ex
 export class ExpensesRegisterExpenseComponent implements OnInit {
 
   @ViewChild('form') form!: NgForm;
-  @ViewChild('fileInput') fileInput!: ElementRef;
+  @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
   @ViewChild('modalConfirmDelete') modalConfirmDelete!: ElementRef;
   // Modal states
   showModal = false;
@@ -82,6 +83,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
 
   private cdRef = inject(ChangeDetectorRef);
   private readonly expenseService = inject(ExpenseService);
+  private readonly fileService = inject(FileService);
   private readonly propietarioService = inject(OwnerService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -96,6 +98,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
         amount: 0,
         installments: 0,
         distributions: this.distributions,
+        fileId:''
       };
   }
   ngOnInit(): void {
@@ -143,6 +146,32 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   redirectToViewAdmin() {
     this.router.navigate(["/viewExpenseAdmin"])
     }
+    loadFile(fileId: string): void {
+      this.fileService.getFile(fileId).subscribe({
+        next: ({ blob, filename }) => {
+          const file = new File([blob], filename, { type: blob.type });
+          this.selectedFile = file;
+  
+          console.log('Archivo asignado a selectedFile:', this.selectedFile);
+        },
+        error: (error) => {
+          console.error('Error al descargar el archivo:', error);
+          Swal.fire({
+            title: '¡Error!',
+            text: 'No se pudo cargar el archivo. Inténtalo de nuevo.',
+            icon: 'error',
+            confirmButtonColor: '#f44336',
+            background: '#ffffff',
+            customClass: {
+              title: 'text-xl font-medium text-gray-900',
+              htmlContainer: 'text-sm text-gray-600',
+              confirmButton: 'px-4 py-2 text-white rounded-lg',
+              popup: 'swal2-popup'
+            }
+          });
+        }
+      });
+    }
   private loadExpense(id: number): void {
     this.expenseService.getById(id).subscribe({
       next: (expenseData: ExpenseGetById) => {
@@ -181,7 +210,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       
       // Determinar el número de cuotas basado en installmentList
       const installments = data.installmentList?.length || 1;
-
+      debugger
       // Mapear al modelo Expense con validaciones para cada campo
       this.expense = {
         id: data.id ?? 0,
@@ -193,8 +222,12 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
         categoryId: data.categoryId,
         amount: data.amount ?? 0,
         installments: installments,
-        distributions: this.mapDistributions(data.distributionList)   
+        distributions: this.mapDistributions(data.distributionList),   
+        fileId:data.fileId
       };
+      if(this.expense.fileId!=null){
+        this.loadFile(this.expense.fileId)
+      }
       console.log('Expense mapeado:', this.expense); // Para debug
     } catch (error) {
       console.error('Error durante el mapeo:', error);
@@ -221,6 +254,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       amount: 0,
       installments: 1,
       distributions: [],
+      fileId:''
     };
   }
 
