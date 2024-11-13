@@ -1,7 +1,6 @@
 import {
   ChangeDetectorRef,
   Component,
-  inject,
   OnDestroy,
   OnInit,
 } from '@angular/core';
@@ -9,7 +8,6 @@ import { CommonModule, NgIf, registerLocaleData } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ExpenseReportService } from '../../../services/expenses-services/expenseReportServices/expense-report.service';
 import { ExpenseData } from '../../../models/expenses-models/ExpenseData';
-import { CategoryData } from '../../../models/expenses-models/CategoryData';
 import { GoogleChartsModule, ChartType } from 'angular-google-charts';
 import { ExpensesKpiComponent } from '../expenses-kpi/expenses-kpi.component';
 import moment from 'moment';
@@ -26,14 +24,13 @@ import {
   takeUntil,
   tap,
 } from 'rxjs';
-import { ExpenseCategoriesNgSelectComponent } from '../expenses-categories-ngSelect/expense-categories-ng-select/expense-categories-ng-select.component';
 import { Category } from '../../../models/expenses-models/category';
 import { ExpensesFiltersComponent } from '../expenses-filters/expenses-filters.component';
 import { Provider } from '../../../models/expenses-models/provider';
 import { ExpenseType } from '../../../models/expenses-models/expenseType';
 import { ProviderService } from '../../../services/expenses-services/providerServices/provider.service';
-import { error } from 'jquery';
 import localeEsAr from '@angular/common/locales/es-AR';
+import { ExpensesYearNgSelectComponent } from "../expenses-year-ngSelect/expenses-year-ngSelect.component";
 registerLocaleData(localeEsAr, 'es-AR');
 @Component({
   standalone: true,
@@ -42,17 +39,17 @@ registerLocaleData(localeEsAr, 'es-AR');
     CommonModule,
     FormsModule,
     ExpensesKpiComponent,
-    ExpenseCategoriesNgSelectComponent,
     GoogleChartsModule,
     ExpensesFiltersComponent,
-    NgIf,
-  ],
+    ExpensesYearNgSelectComponent
+],
   providers: [{ provide: 'LOCALE_ID', useValue: 'es-AR' }],
   templateUrl: './expenses-report.component.html',
   styleUrls: ['./expenses-report.component.scss'],
 })
 export class ReportExpenseComponent implements OnInit, OnDestroy {
   private dateChangeSubject = new Subject<{ from: string; to: string }>();
+  private yearChangeSubject = new Subject<{from: number; to: number}>();
   private unsubscribe$ = new Subject<void>();
   selectedCategories: Category[] = [];
   selectedProviders: Provider[] = [];
@@ -83,11 +80,19 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
   amountLastYear: number = 0;
   amountThisYear: number = 0;
 
+  yearFrom: number =0;
+  yearTo:number=0;
+  currentYear: number = new Date().getFullYear();
+  yearsFromList:number[]=[];
+  yearsToList:number[]=[];
+
+
   constructor(
     private expenseReportService: ExpenseReportService,
     private providerService: ProviderService,
     private cdRef: ChangeDetectorRef
-  ) {}
+  ) {
+  }
 
   chartExpensesPeriod = {
     type: 'PieChart' as ChartType,
@@ -122,7 +127,16 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
         textStyle: { fontSize: 12 },
         minValue: 0,
       },
-      vAxis: { title: 'Monto ($)', minValue: 0, format: 'currency' },
+      vAxis: { 
+        title: 'Monto ($)', 
+        minValue: 0, 
+        format: 'currency',
+        viewWindow: {
+          min: 0.00, // Fuerza el inicio en 0, incluso si no hay datos
+        },
+        viewWindowMode: 'explicit',
+        baseline: 0,
+      },
       chartArea: { width: '70%', height: '55%' },
       legend: { position: 'right' },
       colors: ['#4285F4', '#EA4335', '#34A853', '#FBBC05'],
@@ -169,7 +183,6 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
     type: 'BarChart' as ChartType,
     data: [] as [string, { v: number; f: string }][],
     options: {
-      title: 'Gastos por Proveedor',
       chartArea: { width: '50%' },
       hAxis: {
         title: 'Monto',
@@ -187,7 +200,6 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
     type: 'BarChart' as ChartType,
     data: [] as [string, { v: number; f: string }][],
     options: {
-      title: 'Gastos por Proveedor',
       chartArea: { width: '50%' },
       hAxis: {
         title: 'Monto',
@@ -207,6 +219,7 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
     console.log('ngOnInit called');
     this.loadDates();
     this.setupDateChangeObservable();
+    this.setupYearChangeObservable();
     this.initialKpis();
     this.initialLastBillRecord();
     this.initialcomparateYearMonth();
@@ -230,6 +243,12 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
     this.dateTo = today.format('YYYY-MM-DD');
     this.maxDateTo = this.dateTo;
     this.dateFrom = today.subtract(1, 'month').format('YYYY-MM-DD');
+
+    this.yearFrom = this.currentYear - 1;
+    this.yearTo = this.currentYear;
+    this.yearsFromList= this.generateYearRange(2000,this.yearFrom);
+    this.yearsToList= this.generateYearRange(2001,this.yearTo);
+
   }
   private setupDateChangeObservable() {
     this.dateChangeSubject
@@ -249,6 +268,32 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (kpiExpenses: kpiExpense[]) => {
           this.expenseKpis = kpiExpenses;
+          //this.updateKpi();
+          this.filteredCharts();
+        },
+        error: (error) => {
+          console.error('Error fetching bills:', error);
+        },
+      });
+  }
+  private setupYearChangeObservable() {
+    this.yearChangeSubject
+      .pipe(
+        debounceTime(1000),
+        distinctUntilChanged(
+          (prev, curr) => prev.from === curr.from && prev.to === curr.to
+        ),
+        tap(() => (this.isLoading = true)),
+        switchMap(({ from, to }) =>
+          this.expenseReportService
+            .getExpenseData(from, to)
+            .pipe(finalize(() => (this.isLoading = false)))
+        ),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe({
+        next: (expenseData: ExpenseData[]) => {
+          this.comparateYearMonth = expenseData;
           //this.updateKpi();
           this.filteredCharts();
         },
@@ -386,7 +431,7 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
 
   initialcomparateYearMonth() {
     this.expenseReportService
-      .getExpenseData()
+      .getExpenseData(this.yearFrom,this.yearTo)
       .pipe(take(1))
       .subscribe({
         next: (expenseData: ExpenseData[]) => {
@@ -399,8 +444,6 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
       });
   }
   updatecomparateYearMonth() {
-    const lastYear = new Date().getFullYear() - 1;
-    const thisYear = new Date().getFullYear();
     this.comparateYearMonthFiltered = this.filerTypecomparateYearMonth(
       this.comparateYearMonth.slice()
     );
@@ -411,11 +454,11 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
       this.comparateYearMonthFiltered
     );
     this.amountLastYear = this.sumAmountByYear(
-      lastYear,
+      this.yearFrom,
       this.comparateYearMonthFiltered
     );
     this.amountThisYear = this.sumAmountByYear(
-      thisYear,
+      this.yearTo,
       this.comparateYearMonthFiltered
     );
     const data = this.sumAmountByYearMonth(this.comparateYearMonthFiltered);
@@ -423,13 +466,13 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
       this.chartExpensesPeriodProviderLastYear.data =
         this.sumAmountByProvidersYear(
           this.comparateYearMonthFiltered,
-          lastYear,
+          this.yearFrom,
           this.chartExpensesPeriodProviderLastYear
         );
       this.chartExpensesPeriodProviderThisYear.data =
         this.sumAmountByProvidersYear(
           this.comparateYearMonthFiltered,
-          thisYear,
+          this.yearTo,
           this.chartExpensesPeriodProviderThisYear
         );
     }
@@ -580,7 +623,7 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
           }), // Valor original para tooltip
         },
       ])
-      .sort((a, b) => (b[1] as { v: number }).v - (a[1] as { v: number }).v);
+      .sort((a, b) => (b[1] as { v: number }).v - (a[1] as { v: number }).v).slice(0,5);
 
     // Actualizar la etiqueta del eje horizontal (hAxis)
     this.chartExpensesPeriodProvider.options.hAxis.title = scaleLabel;
@@ -638,19 +681,16 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
           }), // Valor original para tooltip
         },
       ])
-      .sort((a, b) => (b[1] as { v: number }).v - (a[1] as { v: number }).v);
+      .sort((a, b) => (b[1] as { v: number }).v - (a[1] as { v: number }).v).slice(0,5);
 
     // Actualizar la etiqueta del eje horizontal (hAxis)
     chart.options.hAxis.title = scaleLabel;
-    chart.options.title=`Gastos por Proveedor año ${year}`
     return result;
   }
   sumAmountByYearMonth(list: ExpenseData[]): any {
-    const years = Array.from(new Set(list.map((d) => d.year))).sort();
-    if (years.length === 0) {
-      years.push(new Date().getFullYear() - 1);
-      years.push(new Date().getFullYear());
-    }
+    const years:number[]=[];
+    years.push(this.yearFrom);
+    years.push(this.yearTo);
 
     // Define las columnas para el gráfico
     this.chartCompareYearMonth.columns = [
@@ -714,21 +754,17 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
   }
 
   get titleLAstYear() {
-    return 'Total ' + (new Date().getFullYear() - 1).toString();
+    return 'Total ' + this.yearFrom.toString();
   }
   get titleThisYear() {
-    return 'Total ' + new Date().getFullYear().toString();
+    return 'Total ' + this.yearTo.toString();;
   }
   get percentageVariation() {
     if (this.amountLastYear == 0) return 0;
 
     return (this.amountThisYear - this.amountLastYear) / this.amountLastYear;
   }
-  get titleCard() {
-    return `Comparación Mensual de Gastos entre ${
-      new Date().getFullYear() - 1
-    } y ${new Date().getFullYear()}`;
-  }
+
   get totalLastBillRecord() {
     let amount =
       this.lastBillCommon +
@@ -750,6 +786,7 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
 
   filterDataOnChange() {
     this.dateChangeSubject.next({ from: this.dateFrom, to: this.dateTo });
+    this.yearChangeSubject.next({ from: this.yearFrom, to: this.yearTo });
   }
   clearFiltered() {
     this.selectedCategories = [];
@@ -757,6 +794,7 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
     this.selectedType = [];
     this.loadDates();
     this.filterDataOnChange();
+
     this.filteredCharts();
   }
   changeView(view: number) {
@@ -770,5 +808,38 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
     if (view == 3) {
       this.updatecomparateYearMonth();
     }
+    this.cdRef.detectChanges()
+  }
+
+  updateYear(input: 'from' | 'to') {
+    // Asegura que el valor ingresado esté en el rango permitido y tenga 4 dígitos
+    if (this.yearFrom.toString().length != 4) {
+      return
+    }
+    if (this.yearTo.toString().length != 4) {
+      return
+    }
+  
+    // Ajuste automático de yearTo o yearFrom para mantener diferencia de un año
+    if (input === 'from') {
+      this.yearTo = this.yearFrom + 1;
+    } else if (input === 'to') {
+      this.yearFrom = this.yearTo - 1;
+    }
+    // Llamada a la API cuando el rango cambia
+    this.filterDataOnChange();
+  }
+
+  generateYearRange(startYear: number, endYear: number): number[] {
+    const years: number[] = [];
+       
+    const minYear = Math.min(startYear, endYear);
+    const maxYear = Math.max(startYear, endYear);
+  
+    for (let year = minYear; year <= maxYear; year++) {
+      years.push(year);
+    }
+  
+    return years;
   }
 }

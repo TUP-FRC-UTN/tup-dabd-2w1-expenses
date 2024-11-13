@@ -7,12 +7,34 @@
     <!-- Filtro de fechas -->
     <div class="col d-flex gap-3">
       <div class="col">
-        <input (change)="filterDataOnChange()" [(ngModel)]="dateFrom" class="form-control" type="date" [max]="dateTo">
+
+        @if (cardView==3) {
+          <app-expenses-year-ngSelect
+            [yaersList]="yearsFromList"
+            [(selectedYear)]="yearFrom"
+            (selectedYearChange)="updateYear('from')"
+          />
+        }@else {
+          <input (change)="filterDataOnChange()" [(ngModel)]="dateFrom" class="form-control" type="date" [max]="dateTo">
+        }
+        
+
       </div>
       <div class="col">
-        <input (change)="filterDataOnChange()" [(ngModel)]="dateTo" class="form-control" type="date" [max]="maxDateTo" [min]="dateFrom">
+        @if (cardView==3) {
+          <app-expenses-year-ngSelect
+            [yaersList]="yearsToList"
+            [(selectedYear)]="yearTo"
+            (selectedYearChange)="updateYear('to')"
+          />
+        }@else {
+          <input (change)="filterDataOnChange()" [(ngModel)]="dateTo" class="form-control" type="date" [max]="maxDateTo"
+          [min]="dateFrom">
+        }
+        
+    
       </div>
-
+    
     </div>
     <!-- Botones de exportar -->
     <div class="col-auto d-flex gap-1 ms-auto">
@@ -113,7 +135,7 @@
                   class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5 float-end" title="Expandir"
                   (click)="changeView(3)"></button></h4>
               <hr>
-              @if (chartCompareYearMonth.data.length>0 && chartCompareYearMonth.columns.length>0) {
+              @if (chartCompareYearMonth.data.length>0 && chartCompareYearMonth.columns.length>0  && comparateYearMonthFiltered.length>0) {
               <div class="col-12 hover-scale flex-grow-1 d-flex align-items-center justify-content-center">
                 <google-chart [type]="chartCompareYearMonth.type" [columns]="chartCompareYearMonth.columns"
                   [data]="chartCompareYearMonth.data" [options]="chartCompareYearMonth.options"
@@ -308,14 +330,15 @@
   </div>
   }
   @if (cardView==3) {
-  <div class="row justify-content-center align-items-center m-1">
-    <div class="card">
+  <div class="row justify-content-center align-items-center m-1" style="max-height: 550px;">
+    <div class="card h-100">
       <div class="card-body">
         <h4 class="card-title">Comparación Interanual <button type="button"
             class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5 float-end" title="Volver"
             (click)="changeView(0)"></button></h4>
         <hr>
         <div class="row">
+          <!-- KPIS -->
           <div class="col-2 gap-2 d-flex flex-column justify-content-center">
             <!-- KPI 1 -->
             <app-expenses-kpi [amount]="amountLastYear" [title]="titleLAstYear" [formatPipe]="'currency'"
@@ -325,12 +348,12 @@
               [customStyles]="{ 'background-color': '#fcc7ccde' }" [icon]="'bi bi-cash'"></app-expenses-kpi>
             <!-- KPI 3 -->
             @if (percentageVariation>=0) {
-            <app-expenses-kpi [amount]="percentageVariation" title="Aumento" subTitle="Gasto" formatPipe="percent"
+            <app-expenses-kpi [amount]="percentageVariation" title="Variación" subTitle="Interanual" formatPipe="percent"
               tooltip="Amunto de Gasto" [customStyles]="{ 'background-color': '#fcc7ccde' }"
               icon="bi bi-arrow-up-short"></app-expenses-kpi>
             }@else {
-            <app-expenses-kpi [amount]="percentageVariation * -1" title="Reduccion" subTitle="Gasto"
-              formatPipe="percent" tooltip="Reduccion de Gasto" [customStyles]="{ 'background-color': '#d8ffedde' }"
+            <app-expenses-kpi [amount]="percentageVariation * -1" title="Variación" subTitle="Interanual"
+              formatPipe="percent" tooltip="Reducción de Gasto" [customStyles]="{ 'background-color': '#d8ffedde' }"
               icon="bi bi-arrow-down-short"></app-expenses-kpi>
             }
           </div>
@@ -340,11 +363,11 @@
             <div class="row ">
               <!-- Grafico Columna -->
               <div class="col ">
-                @if (chartCompareYearMonth.data.length>0 && chartCompareYearMonth.columns.length>0) {
+                @if (chartCompareYearMonth.data.length>0 && chartCompareYearMonth.columns.length>0 && comparateYearMonthFiltered.length>0) {
                 <div class="col-12 hover-scale flex-grow-1 d-flex align-items-center justify-content-center">
                   <google-chart [type]="chartCompareYearMonth.type" [columns]="chartCompareYearMonth.columns"
                     [data]="chartCompareYearMonth.data" [options]="chartCompareYearMonth.options"
-                    style="width: 100%; height:210px;">
+                    style="width: 100%; height:250px;">
                   </google-chart>
                 </div>
                 }
@@ -353,27 +376,25 @@
             <!-- Graficos chicos (pie, lines, list)-->
             <div class="row mt-2">
               <!-- Grafico 1 -->
-              <div class="col">
-                @if (chartExpensesPeriodProviderLastYear.data.length>0) {
-                <div class="col-6 d-flex align-items-center justify-content-center hover-scale">
-                  <google-chart [type]="chartExpensesPeriodProviderLastYear.type"
-                    [data]="chartExpensesPeriodProviderLastYear.data"
-                    [options]="chartExpensesPeriodProviderLastYear.options"
+              @if (chartExpensesPeriodProviderLastYear.data.length>0) {
+              <div [ngClass]="chartExpensesPeriodProviderThisYear.data.length>0? 'col-6': 'col-12'">
+                <div class="col-12 d-flex align-items-center justify-content-center hover-scale w-100">
+                  <google-chart [type]="chartExpensesPeriodProviderLastYear.type" [data]="chartExpensesPeriodProviderLastYear.data"
+                    [options]="chartExpensesPeriodProviderLastYear.options" title="Gasto por proveedor año {{yearFrom}}"
                     style="width: 100%; height:100%;"></google-chart>
                 </div>
-                }
               </div>
+              }
               <!-- Grafico 2 -->
-              <div class="col ">
                 @if (chartExpensesPeriodProviderThisYear.data.length>0) {
-                <div class="col-6 d-flex align-items-center justify-content-center hover-scale">
-                  <google-chart [type]="chartExpensesPeriodProviderThisYear.type"
-                    [data]="chartExpensesPeriodProviderThisYear.data"
-                    [options]="chartExpensesPeriodProviderThisYear.options"
-                    style="width: 100%; height:100%;"></google-chart>
+                <div [ngClass]="chartExpensesPeriodProviderLastYear.data.length>0? 'col-6': 'col-12'">
+                  <div class="col-12 d-flex align-items-center justify-content-center hover-scale w-100">
+                    <google-chart [type]="chartExpensesPeriodProviderThisYear.type" [data]="chartExpensesPeriodProviderThisYear.data"
+                      [options]="chartExpensesPeriodProviderThisYear.options" title="Gasto por proveedor año {{yearTo}}"
+                      style="width: 100%; height:100%;"></google-chart>
+                  </div>
                 </div>
                 }
-              </div>
             </div>
           </div>
         </div>
