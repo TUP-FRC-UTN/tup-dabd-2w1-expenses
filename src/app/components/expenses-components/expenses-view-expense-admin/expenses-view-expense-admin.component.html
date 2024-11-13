@@ -23,10 +23,11 @@
       <!-- Filtro de fechas -->
       <div class="col d-flex gap-3">
         <div class="col">
-          <input (change)="filterDataOnChange()" [(ngModel)]="dateFrom" class="form-control" type="date">
+          <input (change)="filterDataOnChange()" [(ngModel)]="dateFrom" class="form-control" type="date"[max]="dateTo">
         </div>
         <div class="col">
-          <input (change)="filterDataOnChange()" [(ngModel)]="dateTo" class="form-control" type="date">
+          <input (change)="filterDataOnChange()" [(ngModel)]="dateTo" class="form-control" type="date"[max]="maxDateTo"
+          [min]="dateFrom">
         </div>
       </div>
 

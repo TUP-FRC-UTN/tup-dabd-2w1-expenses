@@ -13,10 +13,10 @@
       <!-- Filtro de fechas -->
       <div class="col d-flex gap-3">
         <div class="col">
-          <input (change)="filterDataOnChange()" [(ngModel)]="fechaDesde" class="form-control" type="date">
+          <input (change)="filterDataOnChange()" [(ngModel)]="fechaDesde" class="form-control" type="date" [max]="fechaHasta">
         </div>
         <div class="col">
-          <input (change)="filterDataOnChange()" [(ngModel)]="fechaHasta" class="form-control" type="date">
+          <input (change)="filterDataOnChange()" [(ngModel)]="fechaHasta" class="form-control" type="date" [max]="maxDateTo" [min]="fechaDesde">
         </div>
 
       </div>
