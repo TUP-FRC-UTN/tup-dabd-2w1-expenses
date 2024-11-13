@@ -93,7 +93,7 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
     type: 'PieChart' as ChartType,
     data: [] as [string, number][],
     options: {
-      title: 'Distribución de Gastos por Categoría',
+      //title: 'Distribución de Gastos por Categoría',
       pieHole: 0.4,
       chartArea: { width: '100%', height: '90%' },
       sliceVisibilityThreshold: 0.01,
@@ -103,7 +103,7 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
     type: 'PieChart' as ChartType,
     data: [] as [string, number][],
     options: {
-      title: 'Distribución de Gastos por Categoría',
+      //title: 'Distribución de Gastos por Categoría',
       pieHole: 0.4,
       chartArea: { width: '100%', height: '90%' },
       sliceVisibilityThreshold: 0.01,
@@ -123,8 +123,8 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
         minValue: 0,
       },
       vAxis: { title: 'Monto ($)', minValue: 0, format: 'currency' },
-      chartArea: { width: '80%', height: '50%' },
-      legend: { position: 'bottom' },
+      chartArea: { width: '70%', height: '55%' },
+      legend: { position: 'right' },
       colors: ['#4285F4', '#EA4335', '#34A853', '#FBBC05'],
       //tooltip: { isHtml: true }
     },
@@ -683,7 +683,7 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
     const months = Array.from({ length: 12 }, (_, i) => i + 1);
     const monthlyData = months.map((month) => {
       const monthName = new Date(0, month - 1).toLocaleString('es', {
-        month: 'long',
+        month: 'short',
       });
       const row = [
         monthName,
