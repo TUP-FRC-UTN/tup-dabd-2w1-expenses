@@ -60,20 +60,20 @@
       <app-expenses-kpi [amount]="amountCommon+amountExtraordinary
                                       +amountIndividual+amountNoteCredit" title="Total" subTitle="Periodo"
         tooltip="Total del Periodo" [customStyles]="{ 'background-color': '#fcc7ccde' }" icon="bi bi-cash"
-        formatPipe="currency"></app-expenses-kpi>
+        formatPipe="currency" (click)="changeView(1)"></app-expenses-kpi>
       <!-- KPI 2 -->
       <app-expenses-kpi [amount]="totalLastBillRecord" title="Total" subTitle="Ultimo Facturado"
         tooltip="Total Ultimo Periodo Facturado" formatPipe="currency"
-        [customStyles]="{ 'background-color': '#d8ffedde' }" icon="bi bi-cash"></app-expenses-kpi>
+        [customStyles]="{ 'background-color': '#d8ffedde' }" icon="bi bi-cash" (click)="changeView(2)"></app-expenses-kpi>
       <!-- KPI 3 -->
       @if (percentageVariation>=0) {
       <app-expenses-kpi [amount]="percentageVariation" title="Variación" subTitle="Interanual" formatPipe="percent"
         tooltip="Variación Interanual" [customStyles]="{ 'background-color': '#fcc7ccde' }"
-        icon="bi bi-arrow-up-short"></app-expenses-kpi>
+        icon="bi bi-arrow-up-short" (click)="changeView(3)"></app-expenses-kpi>
       }@else {
       <app-expenses-kpi [amount]="percentageVariation * -1" title="Variación" subTitle="Interanual" formatPipe="percent"
         tooltip="Variación Interanual" [customStyles]="{ 'background-color': '#d8ffedde' }"
-        icon="bi bi-arrow-down-short"></app-expenses-kpi>
+        icon="bi bi-arrow-down-short"(click)="changeView(3)"></app-expenses-kpi>
       }
     </div>
 
