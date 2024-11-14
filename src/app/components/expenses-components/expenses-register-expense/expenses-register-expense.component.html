@@ -124,9 +124,15 @@
                       </div>
                     }
                     @if(isFieldInvalid('invoiceNumber', invoiceNumber)) {
-                      <div class="invalid-feedback">
-                        El número de comprobante es requerido
-                      </div>
+                      @if (invoiceNumber.getError("maxlength")) {
+                        <div class="invalid-feedback">
+                          El número de comprobante no debe superar los 50 caracteres
+                        </div>
+                      }@else {
+                        <div class="invalid-feedback">
+                          El número de comprobante es requerido
+                        </div>
+                      }
                     }
                   </div>
                 </div>
@@ -183,6 +189,7 @@
                       [ngClass]="getFieldClass('amount', amount)"
                       (keypress)="allowOnlyPositiveNumbers($event)"
                       [min]="1"
+                      [max]="999999999"
                       #amount="ngModel"
                       required
                       (blur)="onFieldBlur('amount', amount)"
@@ -192,9 +199,15 @@
                       </div>
                     }
                     @if(isFieldInvalid('amount', amount)) {
-                      <div class="invalid-feedback">
-                        El monto es requerido
-                      </div>
+                      @if (amount.getError("max")) {
+                        <div class="invalid-feedback">
+                          El monto no puede superar $ 999999999.99
+                        </div>
+                      }@else {
+                        <div class="invalid-feedback">
+                          El monto es requerido
+                        </div>
+                      }
                     }
                   </div>
                 </div>
