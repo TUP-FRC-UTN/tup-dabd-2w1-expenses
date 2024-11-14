@@ -143,6 +143,8 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       'is-invalid': this.isFieldInvalid(fieldName, control)
     };
   }
+
+  
   redirectToViewAdmin() {
     this.router.navigate(["/viewExpenseAdmin"])
     }
