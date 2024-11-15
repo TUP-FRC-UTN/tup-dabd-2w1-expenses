@@ -112,6 +112,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       if (id) {
         this.isEditMode = true;
         this.pageTitle = 'Editar Gasto';
+        debugger
         this.loadExpense(id);
       }else{
         this.initializeDefaultExpense();

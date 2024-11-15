@@ -114,6 +114,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
       next: (filteredCategory) => {
         this.category = filteredCategory;
         this.loadCategory();
+        console.log(this.category)
       },
       error: (error) => {
         this.showErrorAlert('Error al filtrar las categorías');
