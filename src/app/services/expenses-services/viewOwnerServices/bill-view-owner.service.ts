@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BillViewOwner } from '../../../models/expenses-models/bill-view-owner.model';
+import { UserService } from '../userServices/user.service';
 
 
 @Injectable({
@@ -12,11 +13,11 @@ export class BillViewOwnerService {
   private apiUrl = 'http://localhost:8080/api/expenses/distributions/getAllByOwnerId';
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient, private userService:UserService
   ) {}
 
-  getBillsWithProviders(ownerId: number, startDate: string, endDate: string): Observable<BillViewOwner[]> {
-    const urlWithFilters = `${this.apiUrl}?id=${ownerId}&startDate=${startDate}&endDate=${endDate}`;
+  getBillsWithProviders( startDate: string, endDate: string): Observable<BillViewOwner[]> {
+    const urlWithFilters = `${this.apiUrl}?id=${this.userService.getUserId()}&startDate=${startDate}&endDate=${endDate}`;
     
     return this.http.get<any[]>(urlWithFilters).pipe(
       map(response => response.map(item => this.mapToBillViewOwner(item)))

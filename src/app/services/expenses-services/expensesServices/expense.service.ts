@@ -41,7 +41,7 @@ export class ExpenseService {
   }
   updateExpense(expense: Expense, file?: File): Observable<HttpResponse<any>> {
     const formData = new FormData();
-    
+    formData.append('userId', this.userService.getUserId().toString());
     // Asegurarse de que el expense se envía como una cadena JSON
     formData.append('expense', JSON.stringify(expense));
 
