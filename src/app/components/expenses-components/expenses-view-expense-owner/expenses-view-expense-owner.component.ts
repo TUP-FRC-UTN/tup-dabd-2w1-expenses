@@ -115,7 +115,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
         prev.from === curr.from && prev.to === curr.to
       ),
       switchMap(({ from, to }) => {
-        return this.billService.getBillsWithProviders(223, from, to);
+        return this.billService.getBillsWithProviders( from, to);
       }),
       takeUntil(this.unsubscribe$)
     ).subscribe({

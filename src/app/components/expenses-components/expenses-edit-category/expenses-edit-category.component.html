@@ -1,5 +1,5 @@
 <div class="modal fade" id="categoryEditModal" tabindex="-1" aria-labelledby="expenseModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-sm">
+  <div class="modal-dialog modal-sm"> <!-- modal-sm para reducir el tamaño del modal -->
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="expenseModalLabel">Editar Categoria</h5>
@@ -9,26 +9,13 @@
         <div class="row">
           <div class="col-12 d-flex align-items-center mb-3">
             <label class="me-2" style="width: 80px;">Descripcion</label>
-            <div class="position-relative" style="width: 70%;">
-              <input
-                class="form-control form-control-sm"
-                *ngIf="category"
-                [(ngModel)]="category.description"
-                name="description"
-                #description="ngModel"
-                type="text"
-                required
-                [ngClass]="{
-                  'is-valid': description.valid && (description.dirty || description.touched),
-                  'is-invalid': description.invalid && (description.dirty || description.touched)
-                }"
-              />
-              <div class="valid-feedback">
-              </div>
-              <div class="invalid-feedback">
-                La descripción es requerida
-              </div>
-            </div>
+            <input
+              class="form-control form-control-sm" 
+              *ngIf="category"
+              [(ngModel)]="category.description"
+              type="text"
+              style="width: 70%;" 
+            />
           </div>
           <div class="col-12 d-flex align-items-center">
             <label class="me-2" style="width: 80px;">Estado</label>
@@ -50,16 +37,8 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button 
-          type="button" 
-          class="btn btn-primary btn-sm" 
-          data-bs-dismiss="modal" 
-          (click)="edit()"
-          [disabled]="validateDescription()"
-        >
-          Guardar
-        </button>
-        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal" (click)="edit()">Guardar</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" >Cancelar</button>
       </div>
     </div>
   </div>

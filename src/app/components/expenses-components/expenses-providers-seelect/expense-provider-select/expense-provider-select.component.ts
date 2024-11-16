@@ -31,6 +31,7 @@ export class ExpenseProviderSelectComponent implements OnInit, OnDestroy {
       .subscribe(
         (providers) => {
           this.providersList = providers;
+          console.log(this.providersList)
         },
         (error) => {
           console.error('Error loading providers:', error);

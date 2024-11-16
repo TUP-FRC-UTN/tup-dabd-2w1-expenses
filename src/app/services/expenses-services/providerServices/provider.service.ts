@@ -2,21 +2,27 @@ import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { Provider } from '../../../models/expenses-models/provider';
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environment/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProviderService {
 
-  private apiUrl = 'https://67056d45031fd46a830fec8e.mockapi.io/G7/proveedores'; 
 
-  constructor(private http: HttpClient) {}
+  private suppliersUrl: string='';
+  constructor(private http: HttpClient) {
+    this.suppliersUrl = environment.production
+    ? environment.apisMock.suppliers
+    : environment.apisMock.suppliers;
+  }
 
   getProviders(): Observable<Provider[]> {
-    return this.http.get<Provider[]>(this.apiUrl).pipe(
-      map(providers => providers.map(provider => ({
-        ...provider,
-        id: Number(provider.id) // Convertir id a número
+    return this.http.get<Provider[]>(this.suppliersUrl+'/suppliers').pipe(
+      map((providers: any[]) => providers.map(provider => ({
+        ...provider, 
+        id: provider['id'], 
+        description: provider['name'] || provider['description'] || 'Sin descripción' 
       })))
     );
   }

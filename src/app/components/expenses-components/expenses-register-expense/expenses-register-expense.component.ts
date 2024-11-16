@@ -55,7 +55,6 @@ import { FileService } from '../../../services/expenses-services/expenseFileServ
   styleUrls: ['./expenses-register-expense.component.css'],
 })
 export class ExpensesRegisterExpenseComponent implements OnInit {
-
   @ViewChild('form') form!: NgForm;
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
   @ViewChild('modalConfirmDelete') modalConfirmDelete!: ElementRef;
@@ -696,5 +695,6 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     document.body.classList.remove('modal-open');
     this.cdRef.detectChanges();
   }
+
 
 }
