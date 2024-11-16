@@ -58,6 +58,7 @@ export class ExpenseProvidersNgSelectComponent implements OnInit, OnDestroy  {
       .subscribe(
         (providers) => {
           this.providersList = providers;
+          console.log(this.providersList)
           //Si necesito el elemento empty lo agrego
           if (this.emptyValue) {
             this.providersList.push({ id: 0, description: '' });

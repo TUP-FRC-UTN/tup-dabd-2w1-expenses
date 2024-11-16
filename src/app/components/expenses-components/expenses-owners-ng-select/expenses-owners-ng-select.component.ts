@@ -34,6 +34,7 @@ export class ExpensesOwnersNgSelectComponent implements OnInit, OnDestroy {
     this.ownerService.getOwners().pipe(takeUntil(this.destroy$)).subscribe(
       (owners) => {
         this.ownersList = owners;
+        console.log(this.ownersList)
       },
       (error)=>{
         console.log('Error al obtener owners',error);
