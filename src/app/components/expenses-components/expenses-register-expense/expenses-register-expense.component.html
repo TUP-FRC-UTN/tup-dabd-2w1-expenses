@@ -333,16 +333,17 @@
                         </td>
                         <td>
                           <input
-                            type="number"
-                            [(ngModel)]="distribution.proportion"
-                            min="1"
-                            max="100"
-                            style="text-align: end"
-                            class="form-control"
-                            name="proportion{{ i }}"
-                            #distributionInput="ngModel"
-                            (ngModelChange)="onProportionChange($event, i)"
-                            (blur)="onBlur($event, i)"
+                          type="number"
+                          [(ngModel)]="distribution.proportion"
+                          min="1"
+                          max="100"
+                          style="text-align: end"
+                          class="form-control"
+                          name="proportion{{ i }}"
+                          (ngModelChange)="onProportionChange($event, i)"
+                          (keypress)="onKeyPress($event)"
+                          (paste)="onPaste($event)"
+                          (blur)="onBlur($event, i)"
                           />
                         </td>
                         <td>
@@ -365,11 +366,17 @@
                       </tr>
                     </tbody>
                   </table>
-                  @if(!validateTotalProportion() && distributions.length > 0) {
+                  @if(!validateNoZeroProportion()) {
+                    <span class="text-danger"
+                      >La proporcion no debe ser igual a 0</span
+                    >
+                    }
+                  @else if(!validateTotalProportion()) {
                   <span class="text-danger"
                     >La suma de las proporciones debe ser igual a 100</span
                   >
                   }
+
                 </div>
               </div>
               }

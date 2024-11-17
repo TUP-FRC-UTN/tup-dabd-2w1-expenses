@@ -460,10 +460,85 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     return owner ? `${owner.name} ${owner.lastname}` : '';
   }
 
+  onKeyPress(event: KeyboardEvent): void {
+    const input = event.target as HTMLInputElement;
+    if (!(input instanceof HTMLInputElement)) {
+      return;
+    }
+    const currentValue = input.value;
+    const newChar = event.key;
+    const cursorPosition = input.selectionStart;
+    if (!/^\d$/.test(newChar)) {
+      event.preventDefault();
+      return;
+    }
+    
+    if (newChar === '0' && currentValue === '0') {
+      event.preventDefault();
+      return;
+    }
+    if (cursorPosition === 0 && newChar === '0' && currentValue.length > 0) {
+      event.preventDefault();
+      return;
+    }
+    const newValue = this.getNewValue(currentValue, newChar, cursorPosition);
+    if (parseInt(newValue) > 100) {
+      event.preventDefault();
+      return;
+    }
+  }
+
+  onPaste(event: ClipboardEvent): void {
+    const input = event.target as HTMLInputElement;
+    if (!(input instanceof HTMLInputElement)) {
+      return;
+    }
+
+    event.preventDefault();
+    
+    const pastedData = event.clipboardData?.getData('text');
+    if (!pastedData) {
+      return;
+    }
+    let cleanValue = pastedData.replace(/[^\d]/g, '');
+    cleanValue = cleanValue.replace(/^0+/, '');
+    if (!cleanValue) {
+      cleanValue = '0';
+    }
+    const value = parseInt(cleanValue);
+    const finalValue = !isNaN(value) ? Math.min(100, Math.max(0, value)) : 0;
+    input.value = finalValue.toString();
+    
+    const index = parseInt(input.getAttribute('data-index') || '0');
+    this.onProportionChange(finalValue, index);
+  }
+
+  private getNewValue(currentValue: string, newChar: string, cursorPosition: number | null): string {
+    if (cursorPosition === null) return currentValue + newChar;
+    
+    return currentValue.slice(0, cursorPosition) + newChar + currentValue.slice(cursorPosition);
+  }
   onProportionChange(value: number, index: number): void {
-    // Mantener el valor actualizado al escribir, pero limitarlo en el evento `blur`
-    this.distributions[index].proportion = value;
-    this.validateTotalProportion();
+    if (value > 100) {
+      this.distributions[index].proportion = 100;
+      return;
+    }
+
+    if(this.distributions[index].proportion!=null)
+    {
+      this.distributions[index].proportion = value;
+      this.expense.distributions = [...this.distributions];
+      const isValid = this.validateTotalProportion();
+
+      let totalPercentage = this.expense.distributions
+    .reduce((sum, dist) => sum + (Number(dist.proportion) || 0), 0);
+    debugger
+    console.log(totalPercentage)
+       if(totalPercentage>=100){
+         console.log("porcentaje mayor a 100")
+       }
+    }
+ 
   }
 
   onBlur(event: any, index: number): void {
@@ -482,6 +557,11 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       0
     );
     return total === 100;
+  }
+  validateNoZeroProportion(): boolean {
+    return this.expense.distributions.every(
+      distribution => distribution.proportion > 0
+    );
   }
 
   public deleteDistribution(index: number): void {
@@ -528,7 +608,6 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
 
     if (this.expense.typeExpense === 'INDIVIDUAL') {
       if (this.expense.distributions.length === 0) {
-        this.showErrorModal('Debe agregar al menos un propietario');
         return false;
       }
       if (!this.validateTotalProportion()) {
