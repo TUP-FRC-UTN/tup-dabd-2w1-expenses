@@ -19,7 +19,8 @@
                   <div class="position-relative flex-grow-1">
                     <app-expenses-type-expense-ng-select 
                       [(selectedType)]="expense.typeExpense" 
-                      [multiple]="false" 
+                      [multiple]="false"
+                      [showValidBorder]="true" 
                       [noteCredit]="false">
                     </app-expenses-type-expense-ng-select>
                     @if(formSubmitted && !expense.typeExpense) {
@@ -74,7 +75,9 @@
                     <app-expense-providers-ng-select 
                       [(selectedProvider)]="expense.providerId" 
                       [emptyValue]="true" 
-                      [multiple]="false">
+                      [multiple]="false"
+                      [showValidBorder]="true"
+                      >
                     </app-expense-providers-ng-select>
                   </div>
                 </div>
@@ -87,7 +90,7 @@
                   <div class="position-relative flex-grow-1">
                     <app-expense-categories-ng-select 
                       [(selectedCategory)]="expense.categoryId" 
-                      [multiple]="false">
+                      [multiple]="false"[showValidBorder]="true">
                     </app-expense-categories-ng-select>
                     @if(formSubmitted && !isCategoryValid()) {
                       <div class="invalid-feedback d-block">
@@ -246,12 +249,17 @@
                       id="description"
                       [(ngModel)]="expense.description"
                       class="form-control"
-                   
+                      [ngClass]="getFieldClassDescription('description', description)"
                       placeholder="Escribe una descripción..."
                       rows="2"
                       #description="ngModel"
+                      (blur)="onFieldBlur('description', description)"
                       required
                     ></textarea>
+                    @if(isFieldValidDescription('description', description)) {
+                      <div class="valid-feedback">
+                      </div>
+                    }
                   </div>
                 </div>
               </div>

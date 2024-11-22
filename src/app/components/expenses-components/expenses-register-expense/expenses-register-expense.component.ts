@@ -124,6 +124,9 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   isFieldValid(fieldName: string, control: any): boolean {
     return !control.errors && control.touched;
   }
+  isFieldValidDescription(fieldName: string, control: any): boolean {
+    return  control.touched;
+  }
 
   isFieldInvalid(fieldName: string, control: any): boolean {
     return (control.errors && control.touched) || 
@@ -136,7 +139,11 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       'is-invalid': this.isFieldInvalid(fieldName, control)
     };
   }
-
+  getFieldClassDescription(fieldName: string, control: any): any {
+    return {
+      'is-valid': this.isFieldValidDescription(fieldName, control),
+    };
+  }
   private loadExpense(id: number): void {
     this.expenseService.getById(id).subscribe({
       next: (expenseData: ExpenseGetById) => {
